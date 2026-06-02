@@ -18,7 +18,7 @@
 body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
 
 /* TOP NAV — тёмно-синяя полоса как на сайте */
-.topnav{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.topnav{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px;position:sticky;top:0;z-index:100}
 .nav-logo{display:flex;align-items:center;gap:10px}
 .nav-logo-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:24px;height:24px}
 .nav-logo-grid span{background:#4A90D9;border-radius:2px;display:block}
@@ -164,24 +164,26 @@ textarea{resize:vertical;min-height:76px;line-height:1.5}
 <!-- TOP NAVIGATION -->
 <div class="topnav">
   <div class="nav-logo">
-    <div style="position:relative;width:48px;height:64px;flex-shrink:0">
-      <div style="display:grid;grid-template-columns:repeat(3,12px);grid-template-rows:repeat(4,12px);gap:4px;position:relative;z-index:2">
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">D</span>
-        <span style="font-size:9px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:12px;text-align:center">O</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">C</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">U</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">M</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">E</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">N</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">T</span>
-        <span style="font-size:9px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:12px;text-align:center">O</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">L</span>
-        <span style="font-size:9px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:12px;text-align:center">O</span>
-        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:12px;text-align:center">G</span>
+    <!-- 3x4 logo, cell 9px + gap 3px = 45px total height, fits in 72px navbar -->
+    <div style="position:relative;width:36px;height:45px;flex-shrink:0">
+      <div style="display:grid;grid-template-columns:repeat(3,9px);grid-template-rows:repeat(4,9px);gap:3px;position:relative;z-index:2">
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">D</span>
+        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">C</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">U</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">M</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">E</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">N</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">T</span>
+        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">L</span>
+        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">G</span>
       </div>
-      <svg style="position:absolute;top:0;left:0;width:48px;height:64px;z-index:1" viewBox="0 0 48 64">
-        <line x1="22" y1="6" x2="38" y2="38" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>
-        <line x1="38" y1="38" x2="22" y2="54" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>
+      <!-- dotted lines: cell+gap=12px, center of col2=row1: x=9+3+4.5=16.5,y=4.5 | col3row3: x=24+6+4.5=28.5,y=28.5 | col2row4: x=16.5,y=40.5 -->
+      <svg style="position:absolute;top:0;left:0;width:36px;height:45px;z-index:1" viewBox="0 0 36 45">
+        <line x1="16.5" y1="4.5" x2="28.5" y2="28.5" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,2.5" opacity="0.75"/>
+        <line x1="28.5" y1="28.5" x2="16.5" y2="40.5" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,2.5" opacity="0.75"/>
       </svg>
     </div>
     <div class="nav-divider"></div>
