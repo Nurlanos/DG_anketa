@@ -164,24 +164,33 @@ textarea{resize:vertical;min-height:76px;line-height:1.5}
 <!-- TOP NAVIGATION -->
 <div class="topnav">
   <div class="nav-logo">
-    <!-- Логотип: 4 квадрата 2x2, 3 синих + 1 жёлтый (нижний левый) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;width:28px;height:28px;flex-shrink:0">
-      <div style="background:#4A8FD4;border-radius:3px"></div>
-      <div style="background:#4A8FD4;border-radius:3px"></div>
-      <div style="background:#F5C518;border-radius:3px"></div>
-      <div style="background:#4A8FD4;border-radius:3px"></div>
-    </div>
-    <div style="line-height:1.05;margin-left:10px">
-      <div style="color:#fff;font-size:15px;font-weight:800;letter-spacing:.5px">DOCUMENT</div>
-      <div style="color:rgba(255,255,255,.5);font-size:10px;font-weight:400;letter-spacing:2px">OLOG</div>
-    </div>
+    <!-- Логотип: сетка букв D-O / C-U / M-E / N-T / L-O / G с жёлтыми соединителями -->
+    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Буквы в сетке 2 колонки -->
+      <text x="0"  y="7"  font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">D</text>
+      <text x="10" y="7"  font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">O</text>
+      <text x="20" y="7"  font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">C</text>
+      <text x="0"  y="15" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">U</text>
+      <text x="10" y="15" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">M</text>
+      <text x="20" y="15" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">E</text>
+      <text x="0"  y="23" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">N</text>
+      <text x="10" y="23" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">T</text>
+      <text x="0"  y="31" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">L</text>
+      <text x="10" y="31" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">O</text>
+      <text x="0"  y="39" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">G</text>
+      <!-- Жёлтые точки-соединители -->
+      <circle cx="17" cy="11" r="2" fill="#F5C518"/>
+      <circle cx="17" cy="19" r="2" fill="#F5C518"/>
+      <circle cx="6"  cy="27" r="2" fill="#F5C518"/>
+      <circle cx="17" cy="35" r="2" fill="#F5C518"/>
+    </svg>
     <div class="nav-divider"></div>
     <!-- D8N AI badge -->
-    <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 12px">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7BC4F7" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1l2.1-2.1M17 7l2.1-2.1"/></svg>
+    <div style="display:flex;align-items:center;gap:7px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <div>
-        <div style="color:#7BC4F7;font-size:12px;font-weight:700;letter-spacing:.3px">D8N AI</div>
-        <div style="color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.5px">ИИ-автоматизация</div>
+        <div style="color:#fff;font-size:14px;font-weight:700;letter-spacing:.3px;line-height:1.1">D8N AI</div>
+        <div style="color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.5px;text-transform:uppercase">ИИ-автоматизация</div>
       </div>
     </div>
   </div>
