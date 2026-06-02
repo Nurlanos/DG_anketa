@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Анкета клиента — Documentolog</title>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#E05A1B;--bl:#FDF0E8;--bd:#B84A10;--t:#1A1A1A;--t2:#555;--t3:#888;--brd:#E0DDD8;--bg:#FAFAF8;--card:#fff;--r:10px;--f:'Golos Text',sans-serif}
+body{font-family:var(--f);background:var(--bg);color:var(--t);font-size:14px;line-height:1.6;min-height:100vh}
+.w{max-width:680px;margin:0 auto;padding:32px 16px 64px}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.logo{width:40px;height:40px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:700;font-size:13px;letter-spacing:.5px}
+.hi h1{font-size:17px;font-weight:600}
+.hi p{font-size:12px;color:var(--t3)}
+.mgr-b{display:none;align-items:center;gap:6px;background:var(--bl);border:1px solid #F0C4A0;border-radius:20px;padding:4px 12px;font-size:11px;color:var(--brand);font-weight:500;margin-top:8px}
+.pm{margin-bottom:20px}
+.pm-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:6px}
+.pb{height:3px;background:var(--brd);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:var(--brand);border-radius:2px;transition:width .4s}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.st{font-size:13px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+.sn{width:22px;height:22px;background:var(--brand);color:#fff;border-radius:50%;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.f{margin-bottom:14px}.f:last-child{margin-bottom:0}
+.f label{font-size:12px;font-weight:500;color:var(--t2);display:block;margin-bottom:5px}
+.req{color:var(--brand)}
+.hint{font-size:11px;color:var(--t3);margin-top:3px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.r2{grid-template-columns:1fr}}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:8px;font-family:var(--f);font-size:13px;color:var(--t);background:var(--bg);transition:border .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);background:var(--card)}
+textarea{resize:vertical;min-height:72px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
+.rg{display:flex;gap:8px;flex-wrap:wrap}
+.ri{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--brd);border-radius:7px;padding:7px 12px;cursor:pointer;user-select:none;transition:all .15s}
+.ri:hover{border-color:#ccc}
+.ri.sel{background:var(--bl);border-color:var(--brand)}
+.ri span{font-size:13px}
+.cb{display:flex;flex-direction:column;gap:8px}
+.ci{display:flex;align-items:flex-start;gap:8px;cursor:pointer;user-select:none}
+.ci input{width:16px;height:16px;min-width:16px;margin-top:2px;accent-color:var(--brand);cursor:pointer}
+.ci span{font-size:13px;line-height:1.5}
+.nav{display:flex;justify-content:space-between;margin-top:18px;gap:12px}
+.bp{padding:10px 20px;background:var(--card);color:var(--t2);border:1px solid var(--brd);border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.bp:hover{background:var(--bg)}
+.bn{padding:10px 28px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;margin-left:auto}
+.bn:hover{background:var(--bd)}
+.bn:disabled{background:#ccc;cursor:not-allowed}
+.done{text-align:center;padding:48px 20px}
+.di{width:56px;height:56px;background:#E8F5E9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
+.done h2{font-size:20px;font-weight:600;margin-bottom:8px}
+.done p{color:var(--t2);max-width:440px;margin:0 auto 20px}
+.cb2{background:#1A1A1A;border-radius:var(--r);padding:14px;text-align:left;margin-bottom:14px;max-height:260px;overflow-y:auto}
+.cb2 pre{font-family:'JetBrains Mono',monospace;font-size:11px;color:#D4D0C8;white-space:pre-wrap;line-height:1.6}
+.acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.bc{padding:10px 18px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer}
+.bc:hover{background:var(--bd)}
+.bc.s{background:var(--card);color:var(--t2);border:1px solid var(--brd)}
+.bc.s:hover{background:var(--bg)}
+.err-hl{border-color:#E24B4A!important}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hdr">
+    <div class="logo">DG</div>
+    <div class="hi">
+      <h1>Анкета для коммерческого предложения</h1>
+      <p>Documentolog Group — ECM/EDMS платформа</p>
+      <div class="mgr-b" id="mgr-b">👤 Менеджер: <span id="mgr-n"></span></div>
+    </div>
+  </div>
+
+  <div class="pm">
+    <div class="pm-meta"><span id="sl">Шаг 1 из 4</span><span id="sp">25%</span></div>
+    <div class="pb"><div class="pf" id="pf" style="width:25%"></div></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="s1">
+    <div class="card">
+      <div class="st"><span class="sn">1</span>Организация</div>
+      <div class="r2">
+        <div class="f"><label>Наименование<span class="req">*</span></label><input id="company" type="text" placeholder='АО "Компания"'></div>
+        <div class="f"><label>БИН / ИИН<span class="req">*</span></label><input id="bin" type="text" placeholder="000000000000" maxlength="12"></div>
+      </div>
+      <div class="r2">
+        <div class="f"><label>Вид собственности<span class="req">*</span></label>
+          <select id="ownership"><option value="">—</option><option>Частная</option><option>Государственная</option><option>Квазигосударственная</option></select></div>
+        <div class="f"><label>Отрасль<span class="req">*</span></label>
+          <select id="industry"><option value="">—</option><option>Финансы / Банки</option><option>Строительство</option><option>IT / Телеком</option><option>Медиа / Издания</option><option>СПК / Холдинги</option><option>Производство</option><option>Здравоохранение</option><option>Государственный сектор</option><option>Другое</option></select></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st"><span class="sn" style="background:var(--t3)">→</span>Контактное лицо</div>
+      <div class="r2">
+        <div class="f"><label>ФИО<span class="req">*</span></label><input id="cname" type="text" placeholder="Иванов Иван"></div>
+        <div class="f"><label>Должность<span class="req">*</span></label><input id="crole" type="text" placeholder="Директор по IT"></div>
+      </div>
+      <div class="r2">
+        <div class="f"><label>Email<span class="req">*</span></label><input id="cemail" type="email" placeholder="name@company.kz"></div>
+        <div class="f"><label>Телефон<span class="req">*</span></label><input id="cphone" type="tel" placeholder="+7 700 000 0000"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="s2" style="display:none">
+    <div class="card">
+      <div class="st"><span class="sn">2</span>Пользователи и масштаб</div>
+      <div class="r2">
+        <div class="f"><label>Пользователей СЭД (N_full)<span class="req">*</span></label><input id="users" type="number" placeholder="50" min="1"><div class="hint">Кто будет работать в системе</div></div>
+        <div class="f"><label>Из них мобильных</label><input id="mobile" type="number" placeholder="20" min="0"></div>
+      </div>
+      <div class="f"><label>Всего сотрудников в компании</label><input id="totalEmp" type="number" placeholder="500" min="1"></div>
+      <div class="f"><label>Ожидаемый рост пользователей (12 мес.)</label>
+        <div class="rg" id="rg-growth">
+          <div class="ri" data-v="Не планируется"><span>Не планируется</span></div>
+          <div class="ri" data-v="+10–30%"><span>+10–30%</span></div>
+          <div class="ri" data-v="+30%+"><span>+30%+</span></div>
+        </div>
+      </div>
+      <div class="f"><label>Есть филиалы / дочерние структуры?</label>
+        <div class="rg" id="rg-branches">
+          <div class="ri" data-v="Нет"><span>Нет</span></div>
+          <div class="ri" data-v="Да"><span>Да</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st"><span class="sn">3</span>Текущая ситуация и боль</div>
+      <div class="f"><label>Используется ли сейчас СЭД?<span class="req">*</span></label>
+        <div class="rg" id="rg-sed">
+          <div class="ri" data-v="Нет"><span>Нет</span></div>
+          <div class="ri" data-v="Да — хотим сменить"><span>Да — хотим сменить</span></div>
+        </div>
+      </div>
+      <div id="sed-row" style="display:none" class="f"><label>Какая система и причина смены</label><input id="sedName" type="text" placeholder="Directum — медленная, нет мобильного доступа"></div>
+      <div class="f"><label>Основная цель внедрения<span class="req">*</span></label>
+        <select id="goal"><option value="">—</option><option>Compliance / соответствие требованиям</option><option>Повышение эффективности</option><option>Цифровая трансформация</option><option>Контроль исполнения</option><option>Рост / масштабирование</option></select>
+      </div>
+      <div class="f"><label>Что сейчас работает плохо?<span class="req">*</span></label><textarea id="pain" placeholder="Согласование занимает 3–5 дней, нет мобильного доступа..."></textarea></div>
+      <div class="f"><label>Почему важно решить это сейчас?<span class="req">*</span></label><textarea id="urgency" placeholder="Дедлайн, регуляторное требование..."></textarea></div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="s3" style="display:none">
+    <div class="card">
+      <div class="st"><span class="sn">4</span>Нужные модули</div>
+      <div class="f"><label>Какие процессы автоматизировать?<span class="req">*</span></label>
+        <div class="cb" id="cb-mod">
+          <label class="ci"><input type="checkbox" value="Входящая/Исходящая корреспонденция"><span>Входящая / Исходящая корреспонденция</span></label>
+          <label class="ci"><input type="checkbox" value="Приказы и распоряжения (ОРД)"><span>Приказы и распоряжения (ОРД)</span></label>
+          <label class="ci"><input type="checkbox" value="Договоры (согласование, хранение)"><span>Договоры — согласование, хранение</span></label>
+          <label class="ci"><input type="checkbox" value="HR / Кадровый ЭДО"><span>HR / Кадровый ЭДО</span></label>
+          <label class="ci"><input type="checkbox" value="Протоколы совещаний / поручения"><span>Протоколы совещаний / поручения</span></label>
+          <label class="ci"><input type="checkbox" value="ВНД (нормативные документы)"><span>ВНД — внутренние нормативные документы</span></label>
+          <label class="ci"><input type="checkbox" value="Финансовые процессы"><span>Финансовые процессы (счета, акты)</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st"><span class="sn" style="background:#6B4FC8">AI</span>AI-агенты d8n.ai</div>
+      <div class="f"><label>Интересные AI-агенты</label>
+        <div class="cb" id="cb-ai">
+          <label class="ci"><input type="checkbox" value="Канцелярия-агент"><span>Канцелярия — мониторинг исполнения поручений</span></label>
+          <label class="ci"><input type="checkbox" value="Legal-агент"><span>Legal — проверка договоров на риски</span></label>
+          <label class="ci"><input type="checkbox" value="HR-агент"><span>HR — отпуска, личные дела, адаптация</span></label>
+          <label class="ci"><input type="checkbox" value="Агент руководителя"><span>Агент руководителя — контроль поручений</span></label>
+        </div>
+      </div>
+      <div class="f"><label>Нужные интеграции</label>
+        <div class="cb" id="cb-int">
+          <label class="ci"><input type="checkbox" value="1С"><span>1С (бухгалтерия / ERP)</span></label>
+          <label class="ci"><input type="checkbox" value="ЕСЭДО"><span>ЕСЭДО</span></label>
+          <label class="ci"><input type="checkbox" value="SAP / ERP"><span>SAP / ERP</span></label>
+          <label class="ci"><input type="checkbox" value="eGov / ЦУП"><span>eGov / ЦУП</span></label>
+        </div>
+      </div>
+      <div class="f"><label>Модель развёртывания<span class="req">*</span></label>
+        <div class="rg" id="rg-deploy">
+          <div class="ri" data-v="SaaS (облако)"><span>SaaS (облако)</span></div>
+          <div class="ri" data-v="PaaS"><span>PaaS</span></div>
+          <div class="ri" data-v="On-Premise (свои серверы)"><span>On-Premise</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div id="s4" style="display:none">
+    <div class="card">
+      <div class="st"><span class="sn">5</span>Коммерческие условия</div>
+      <div class="f"><label>Срок договора<span class="req">*</span></label>
+        <div class="rg" id="rg-term">
+          <div class="ri" data-v="1 год"><span>1 год</span></div>
+          <div class="ri" data-v="2 года"><span>2 года</span></div>
+          <div class="ri" data-v="3 года"><span>3 года</span></div>
+        </div>
+      </div>
+      <div class="f"><label>Авансовая оплата<span class="req">*</span></label>
+        <div class="rg" id="rg-prepay">
+          <div class="ri" data-v="Нет"><span>Нет</span></div>
+          <div class="ri" data-v="Ежеквартально"><span>Ежеквартально</span></div>
+          <div class="ri" data-v="Ежегодно"><span>Ежегодно</span></div>
+        </div>
+      </div>
+      <div class="f"><label>Статус бюджета<span class="req">*</span></label>
+        <div class="rg" id="rg-budget">
+          <div class="ri" data-v="Согласован"><span>Согласован</span></div>
+          <div class="ri" data-v="В процессе согласования"><span>В процессе</span></div>
+          <div class="ri" data-v="Speculative"><span>Speculative</span></div>
+        </div>
+      </div>
+      <div class="f"><label>Когда ожидаете заключить договор?<span class="req">*</span></label>
+        <select id="deadline"><option value="">—</option><option>2 недели</option><option>До конца месяца</option><option>В этом квартале</option><option>Неизвестно</option></select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st"><span class="sn">6</span>Лицо, принимающее решение</div>
+      <div class="r2">
+        <div class="f"><label>ФИО (кто подписывает бюджет)<span class="req">*</span></label><input id="ebName" type="text" placeholder="Иванов Иван Иванович"></div>
+        <div class="f"><label>Должность</label><input id="ebRole" type="text" placeholder="Генеральный директор"></div>
+      </div>
+      <div class="f"><label>Внутренний champion (сторонник проекта)</label><input id="champion" type="text" placeholder="ФИО, должность"></div>
+      <div class="f"><label>Критерии выбора поставщика</label>
+        <div class="cb" id="cb-crit">
+          <label class="ci"><input type="checkbox" value="Цена"><span>Цена</span></label>
+          <label class="ci"><input type="checkbox" value="Функционал"><span>Функционал</span></label>
+          <label class="ci"><input type="checkbox" value="Сроки внедрения"><span>Сроки внедрения</span></label>
+          <label class="ci"><input type="checkbox" value="Безопасность данных"><span>Безопасность данных</span></label>
+          <label class="ci"><input type="checkbox" value="Интеграции"><span>Интеграции с текущими системами</span></label>
+          <label class="ci"><input type="checkbox" value="Репутация поставщика"><span>Репутация поставщика</span></label>
+        </div>
+      </div>
+      <div class="f"><label>Дополнительные пожелания</label><textarea id="notes" placeholder="Любые требования, сроки, условия..."></textarea></div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="sdone" style="display:none" class="card done">
+    <div class="di">✓</div>
+    <h2>Анкета отправлена!</h2>
+    <p>Ваш менеджер получил данные и подготовит коммерческое предложение в течение 1 рабочего дня.</p>
+    <div class="cb2"><pre id="md-out"></pre></div>
+    <div class="acts">
+      <button class="bc" onclick="copyP()">Скопировать промпт d8n Sales</button>
+      <button class="bc s" onclick="location.reload()">Заполнить ещё раз</button>
+    </div>
+  </div>
+
+  <div class="nav" id="nav">
+    <button class="bp" id="bprev" style="visibility:hidden" onclick="prev()">← Назад</button>
+    <button class="bn" id="bnext" onclick="next()">Далее →</button>
+  </div>
+</div>
+
+<script>
+const MANAGERS = {
+  'n.omarov': 'Омаров Нурлан (Упр. №9)',
+  'a.kuz':    'Кузьменко Азиза (Упр. №9)',
+  'manager3': 'Менеджер 3'
+};
+
+const p = new URLSearchParams(location.search);
+const mgrId = p.get('mgr') || '';
+const mgrName = MANAGERS[mgrId] || mgrId;
+if (mgrId && mgrName) {
+  const b = document.getElementById('mgr-b');
+  b.style.display = 'inline-flex';
+  document.getElementById('mgr-n').textContent = mgrName;
+}
+
+let step = 1, maxStep = 4, R = {};
+
+document.querySelectorAll('.rg').forEach(g => {
+  g.querySelectorAll('.ri').forEach(item => {
+    item.addEventListener('click', () => {
+      g.querySelectorAll('.ri').forEach(r => r.classList.remove('sel'));
+      item.classList.add('sel');
+      R[g.id] = item.dataset.v;
+      if (g.id === 'rg-sed')
+        document.getElementById('sed-row').style.display = item.dataset.v.startsWith('Да') ? 'block' : 'none';
+    });
+  });
+});
+
+function v(id){ return (document.getElementById(id)?.value||'').trim(); }
+function chk(id){ return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i=>i.value); }
+function upd(){
+  const pct = Math.round(step/maxStep*100);
+  document.getElementById('pf').style.width = pct+'%';
+  document.getElementById('sl').textContent = `Шаг ${step} из ${maxStep}`;
+  document.getElementById('sp').textContent = pct+'%';
+  document.getElementById('bprev').style.visibility = step>1?'visible':'hidden';
+  document.getElementById('bnext').textContent = step===maxStep?'Отправить анкету →':'Далее →';
+}
+function show(n){ for(let i=1;i<=4;i++) document.getElementById('s'+i).style.display=i===n?'block':'none'; }
+
+function validate(){
+  const rules = {
+    1:[{id:'company'},{id:'bin',min:12},{id:'ownership'},{id:'industry'},{id:'cname'},{id:'crole'},{id:'cemail'},{id:'cphone'}],
+    2:[{id:'users'},{rg:'rg-sed'},{id:'goal'},{id:'pain'},{id:'urgency'}],
+    3:[{cb:'cb-mod'},{rg:'rg-deploy'}],
+    4:[{rg:'rg-term'},{rg:'rg-prepay'},{rg:'rg-budget'},{id:'deadline'},{id:'ebName'}]
+  };
+  let ok=true;
+  document.querySelectorAll('.err-hl').forEach(e=>e.classList.remove('err-hl'));
+  (rules[step]||[]).forEach(c=>{
+    if(c.id){const el=document.getElementById(c.id);if(el&&(!el.value.trim()||(c.min&&el.value.length<c.min))){el.classList.add('err-hl');ok=false;}}
+    if(c.rg&&!R[c.rg]){const el=document.getElementById(c.rg);if(el){el.style.outline='2px solid #E24B4A';el.style.borderRadius='8px';setTimeout(()=>{el.style.outline='';},2500);}ok=false;}
+    if(c.cb&&chk(c.cb).length===0){const el=document.getElementById(c.cb);if(el){el.style.outline='2px solid #E24B4A';el.style.borderRadius='8px';setTimeout(()=>{el.style.outline='';},2500);}ok=false;}
+  });
+  return ok;
+}
+
+function next(){
+  if(!validate()) return;
+  if(step<maxStep){step++;show(step);upd();window.scrollTo(0,0);}
+  else submit();
+}
+function prev(){if(step>1){step--;show(step);upd();window.scrollTo(0,0);}}
+
+function buildData(){
+  return {
+    managerId: mgrId, managerName: mgrName,
+    company: v('company'), bin: v('bin'), ownership: v('ownership'), industry: v('industry'),
+    contactName: v('cname'), contactRole: v('crole'), contactEmail: v('cemail'), contactPhone: v('cphone'),
+    usersCount: v('users'), mobileCount: v('mobile')||'—', totalEmployees: v('totalEmp')||'—',
+    growth: R['rg-growth']||'—', branches: R['rg-branches']||'—',
+    currentSed: R['rg-sed']||'—', sedName: v('sedName')||'—',
+    goal: v('goal'), pain: v('pain'), urgency: v('urgency'),
+    modules: chk('cb-mod').join(', ')||'—',
+    aiAgents: chk('cb-ai').join(', ')||'—',
+    integrations: chk('cb-int').join(', ')||'—',
+    deploy: R['rg-deploy']||'—',
+    contractTerm: R['rg-term']||'—', prepay: R['rg-prepay']||'—',
+    budget: R['rg-budget']||'—', deadline: v('deadline'),
+    economicBuyer: v('ebName')+(v('ebRole')?', '+v('ebRole'):''),
+    champion: v('champion')||'—',
+    criteria: chk('cb-crit').join(', ')||'—',
+    notes: v('notes')||'—'
+  };
+}
+
+function buildPrompt(d){
+  const dt = new Date().toLocaleDateString('ru-RU');
+  return `Режим: proposal_brief
+
+Клиент: ${d.company} (БИН: ${d.bin})
+Дата: ${dt}  Менеджер: ${d.managerName}
+
+# Анкета клиента
+
+## Организация
+| Поле | Значение |
+|---|---|
+| Юр. наименование | ${d.company} |
+| БИН/ИИН | ${d.bin} |
+| Вид собственности | ${d.ownership} |
+| Отрасль | ${d.industry} |
+| Контактное лицо | ${d.contactName}, ${d.contactRole} |
+| Email | ${d.contactEmail} |
+| Телефон | ${d.contactPhone} |
+
+## Пользователи и масштаб
+| Параметр | Значение |
+|---|---|
+| N_full | ${d.usersCount} |
+| N_mobile | ${d.mobileCount} |
+| Всего сотрудников | ${d.totalEmployees} |
+| Рост (12 мес.) | ${d.growth} |
+| Филиалы | ${d.branches} |
+
+## Бизнес-задача (MEDDIC: Identify Pain)
+- **Текущая СЭД:** ${d.currentSed}${d.sedName!=='—'?' — '+d.sedName:''}
+- **Цель:** ${d.goal}
+- **Боль:** ${d.pain}
+- **Срочность:** ${d.urgency}
+
+## Процессы и модули (MEDDIC: Decision Criteria)
+- **Модули:** ${d.modules}
+- **AI-агенты:** ${d.aiAgents}
+- **Интеграции:** ${d.integrations}
+- **Развёртывание:** ${d.deploy}
+
+## Коммерческие условия (MEDDIC: Metrics)
+| Параметр | Значение |
+|---|---|
+| Срок договора | ${d.contractTerm} |
+| Авансовая оплата | ${d.prepay} |
+| Статус бюджета | ${d.budget} |
+| Срок заключения | ${d.deadline} |
+
+## Стейкхолдеры (MEDDIC: Economic Buyer / Champion)
+- **Economic Buyer:** ${d.economicBuyer}
+- **Champion:** ${d.champion}
+- **Критерии выбора:** ${d.criteria}
+- **Дополнительно:** ${d.notes}
+
+---
+Задача: подготовь КП по стандарту L7.6 v1.0.
+Используй pricing по L1.4 v10.2 (Приказ ПП19 от 21.04.2026 — ставки клиенту не раскрывать).
+Определи edition (SE / AIE / Platform): N_full=${d.usersCount}, модули: ${d.modules}, deploy: ${d.deploy}.
+Сформируй: Executive Summary, ROI-narrative, таблицу опций (1/2/3 года).
+Если данных недостаточно — укажи missing data явно.`;
+}
+
+let _prompt = '';
+async function submit(){
+  const btn = document.getElementById('bnext');
+  btn.disabled = true; btn.textContent = 'Отправляем...';
+  const d = buildData();
+  _prompt = buildPrompt(d);
+  try {
+    const res = await fetch('/api/submit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({data:d, prompt:_prompt})
+    });
+    if(!res.ok) console.warn('submit error', await res.text());
+  } catch(e){ console.warn('submit fail', e); }
+  document.getElementById('s'+maxStep).style.display='none';
+  document.getElementById('sdone').style.display='block';
+  document.getElementById('nav').style.display='none';
+  document.getElementById('md-out').textContent=_prompt;
+  window.scrollTo(0,0);
+}
+
+function copyP(){
+  navigator.clipboard.writeText(_prompt).catch(()=>{});
+  const b=event.target; b.textContent='✓ Скопировано'; setTimeout(()=>b.textContent='Скопировать промпт d8n Sales',1500);
+}
+
+upd();
+</script>
+</body>
+</html>
