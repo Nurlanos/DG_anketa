@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дашборд — Documentolog</title>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#E05A1B;--bl:#FDF0E8;--bd:#B84A10;--t:#1A1A1A;--t2:#555;--t3:#888;--brd:#E0DDD8;--bg:#FAFAF8;--card:#fff;--r:10px;--f:'Golos Text',sans-serif}
+body{font-family:var(--f);background:var(--bg);color:var(--t);font-size:14px}
+.w{max-width:900px;margin:0 auto;padding:28px 16px 64px}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.hl{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.hi h1{font-size:17px;font-weight:600}
+.hi p{font-size:12px;color:var(--t3)}
+.tabs{display:flex;gap:4px;background:#F0EDEA;padding:4px;border-radius:10px;flex-wrap:wrap}
+.tab{padding:7px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border-radius:7px;border:none;background:none;font-family:var(--f);transition:all .15s}
+.tab.on{background:var(--card);color:var(--brand)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:580px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px}
+.stat .n{font-size:26px;font-weight:600;line-height:1}
+.stat .l{font-size:11px;color:var(--t3);margin-top:4px}
+.stat.hi .n{color:var(--brand)}
+.lgen{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.lgen h3{font-size:13px;font-weight:600;margin-bottom:10px}
+.lr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lsel{flex:1;min-width:150px;padding:8px 12px;border:1px solid var(--brd);border-radius:8px;font-family:var(--f);font-size:13px;background:var(--bg);color:var(--t);-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
+.lurl{flex:2;min-width:180px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);background:var(--bg);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bs{padding:8px 14px;background:var(--brand);color:#fff;border:none;border-radius:7px;font-family:var(--f);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap}
+.bs:hover{background:var(--bd)}
+.bs.sec{background:var(--card);color:var(--t2);border:1px solid var(--brd)}
+.bs.sec:hover{background:var(--bg)}
+.tbl-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden}
+.tbl-hdr{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.tbl-hdr h3{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+table{width:100%;border-collapse:collapse;table-layout:auto}
+th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--brd);background:var(--bg);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--brd);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF5}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+.b-new{background:#E8F5E9;color:#2E7D32}
+.b-kpr{background:#FFF8E1;color:#E65100}
+.b-kps{background:var(--bl);color:var(--brand)}
+.b-con{background:#E3F2FD;color:#1565C0}
+.b-rej{background:#FFEBEE;color:#C62828}
+.b-def{background:#F5F5F5;color:#666}
+.empty{padding:40px;text-align:center;color:var(--t3);font-size:13px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:14px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:24px}
+.modal h2{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.mclose{width:28px;height:28px;background:var(--bg);border:1px solid var(--brd);border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.code{background:#1A1A1A;border-radius:8px;padding:14px;margin-bottom:12px;max-height:320px;overflow-y:auto}
+.code pre{font-family:'JetBrains Mono',monospace;font-size:11px;color:#D4D0C8;white-space:pre-wrap;line-height:1.6}
+.row-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;font-size:12px}
+.rd-item{background:var(--bg);border-radius:6px;padding:8px 10px}
+.rd-item .lbl{color:var(--t3);margin-bottom:2px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hdr">
+    <div class="hl">
+      <div class="logo">DG</div>
+      <div class="hi"><h1>Дашборд менеджера</h1><p>Анкеты клиентов → d8n Sales · Airtable</p></div>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-m="all">Все</button>
+      <button class="tab" data-m="n.omarov">Омаров Нурлан</button>
+      <button class="tab" data-m="a.kuz">Кузьменко Азиза</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat hi"><div class="n" id="st-t">—</div><div class="l">Всего анкет</div></div>
+    <div class="stat"><div class="n" id="st-n">—</div><div class="l">Новые</div></div>
+    <div class="stat"><div class="n" id="st-s">—</div><div class="l">КП отправлено</div></div>
+    <div class="stat"><div class="n" id="st-c">—</div><div class="l">Договоров</div></div>
+  </div>
+
+  <div class="lgen">
+    <h3>Персональная ссылка для клиента</h3>
+    <div class="lr">
+      <select class="lsel" id="lsel" onchange="genLink()">
+        <option value="">— выберите менеджера —</option>
+        <option value="n.omarov">Омаров Нурлан (Упр. №9)</option>
+        <option value="a.kuz">Кузьменко Азиза (Упр. №9)</option>
+        <option value="manager3">Менеджер 3</option>
+      </select>
+      <div class="lurl" id="lurl">Выберите менеджера...</div>
+      <button class="bs" onclick="copyLink()">Копировать</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-hdr">
+      <h3>Заполненные анкеты</h3>
+      <button class="bs sec" onclick="load()">↻ Обновить</button>
+    </div>
+    <div id="tbl-c"><div class="empty">Загрузка данных из Airtable...</div></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2><span id="m-title">Данные клиента</span><button class="mclose" onclick="close()">✕</button></h2>
+    <div class="row-detail" id="m-detail"></div>
+    <div class="code"><pre id="m-code"></pre></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="bs" onclick="copyPrompt()">Скопировать промпт d8n Sales</button>
+      <button class="bs sec" onclick="close()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MANAGERS = {'n.omarov':'Омаров Нурлан','a.kuz':'Кузьменко Азиза','manager3':'Менеджер 3'};
+let rows=[], curMgr='all', _prompt='';
+let _genLink='';
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    curMgr=t.dataset.m;
+    render();
+  });
+});
+
+function genLink(){
+  const v=document.getElementById('lsel').value;
+  if(!v){document.getElementById('lurl').textContent='Выберите менеджера...';_genLink='';return;}
+  _genLink=`${location.origin}/?mgr=${v}`;
+  document.getElementById('lurl').textContent=_genLink;
+}
+function copyLink(){
+  if(!_genLink)return;
+  navigator.clipboard.writeText(_genLink).catch(()=>{});
+  const b=event.target;b.textContent='✓ Скопировано';setTimeout(()=>b.textContent='Копировать',1500);
+}
+
+async function load(){
+  document.getElementById('tbl-c').innerHTML='<div class="empty">Загрузка из Airtable...</div>';
+  try{
+    const url='/api/rows'+(curMgr!=='all'?`?mgr=${curMgr}`:'');
+    const r=await fetch(url);
+    const j=await r.json();
+    rows=j.rows||[];
+    render();
+    updateStats();
+  }catch(e){
+    document.getElementById('tbl-c').innerHTML='<div class="empty">Ошибка загрузки. Проверьте AIRTABLE_TOKEN в Vercel.</div>';
+  }
+}
+
+function badgeCls(s){
+  if(s==='Новое')return 'b-new';
+  if(s==='КП в работе')return 'b-kpr';
+  if(s==='КП отправлено')return 'b-kps';
+  if(s==='Договор')return 'b-con';
+  if(s==='Отказ')return 'b-rej';
+  return 'b-def';
+}
+
+function render(){
+  const list=curMgr==='all'?rows:rows.filter(r=>r.mgr===curMgr);
+  if(!list.length){document.getElementById('tbl-c').innerHTML='<div class="empty">Анкет пока нет</div>';return;}
+  let h=`<table><thead><tr><th>Дата</th><th>Компания</th><th>Менеджер</th><th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Срок</th><th>Статус</th><th></th></tr></thead><tbody>`;
+  list.forEach((r,i)=>{
+    h+=`<tr>
+      <td style="color:var(--t3);white-space:nowrap;font-size:12px">${r.date}</td>
+      <td><strong>${r.company}</strong><div style="font-size:11px;color:var(--t3)">${r.email}</div></td>
+      <td style="font-size:12px;color:var(--t2)">${r.manager}</td>
+      <td>${r.users}</td>
+      <td style="font-size:12px">${r.deploy}</td>
+      <td><span class="badge ${r.budget==='Согласован'?'b-new':r.budget==='Speculative'?'b-def':'b-kpr'}">${r.budget}</span></td>
+      <td style="font-size:12px;white-space:nowrap">${r.deadline}</td>
+      <td><span class="badge ${badgeCls(r.status)}">${r.status}</span></td>
+      <td><button class="bs" onclick="openModal(${i})">→ КП</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('tbl-c').innerHTML=h;
+}
+
+function updateStats(){
+  document.getElementById('st-t').textContent=rows.length;
+  document.getElementById('st-n').textContent=rows.filter(r=>r.status==='Новое').length;
+  document.getElementById('st-s').textContent=rows.filter(r=>r.status==='КП отправлено').length;
+  document.getElementById('st-c').textContent=rows.filter(r=>r.status==='Договор').length;
+}
+
+function openModal(i){
+  const list=curMgr==='all'?rows:rows.filter(r=>r.mgr===curMgr);
+  const r=list[i]; if(!r)return;
+  _prompt=r.prompt||'';
+  document.getElementById('m-title').textContent=r.company;
+  document.getElementById('m-code').textContent=_prompt;
+  document.getElementById('m-detail').innerHTML=`
+    <div class="rd-item"><div class="lbl">Менеджер</div>${r.manager}</div>
+    <div class="rd-item"><div class="lbl">Отрасль</div>${r.industry||'—'}</div>
+    <div class="rd-item"><div class="lbl">N_full</div>${r.users} пользователей</div>
+    <div class="rd-item"><div class="lbl">Бюджет</div>${r.budget}</div>
+    <div class="rd-item"><div class="lbl">Срок договора</div>${r.deadline}</div>
+    <div class="rd-item"><div class="lbl">Deploy</div>${r.deploy}</div>
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+function close(){document.getElementById('modal').classList.remove('open');}
+function copyPrompt(){
+  navigator.clipboard.writeText(_prompt).catch(()=>{});
+  const b=event.target;b.textContent='✓ Скопировано';setTimeout(()=>b.textContent='Скопировать промпт d8n Sales',1500);
+}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)close();});
+
+load();
+</script>
+</body>
+</html>
