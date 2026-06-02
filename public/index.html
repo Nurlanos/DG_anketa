@@ -49,7 +49,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;
 .pm-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .pm-label{font-size:12px;font-weight:600;color:var(--blue)}
 .pm-steps{display:flex;gap:6px}
-.pm-dot{width:8px;height:8px;border-radius:50%;background:var(--brd);transition:all .3s}
+.pm-dot{width:8px;height:8px;min-width:8px;min-height:8px;max-width:8px;max-height:8px;border-radius:50%;background:var(--brd);transition:all .3s;flex-shrink:0;flex-grow:0;display:block}
 .pm-dot.done{background:var(--blue)}
 .pm-dot.active{background:var(--blue);box-shadow:0 0 0 3px rgba(32,86,184,.15)}
 .pb{height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
