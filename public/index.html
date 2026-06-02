@@ -164,33 +164,41 @@ textarea{resize:vertical;min-height:76px;line-height:1.5}
 <!-- TOP NAVIGATION -->
 <div class="topnav">
   <div class="nav-logo">
-    <!-- Логотип: сетка букв D-O / C-U / M-E / N-T / L-O / G с жёлтыми соединителями -->
-    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Буквы в сетке 2 колонки -->
-      <text x="0"  y="7"  font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">D</text>
-      <text x="10" y="7"  font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">O</text>
-      <text x="20" y="7"  font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">C</text>
-      <text x="0"  y="15" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">U</text>
-      <text x="10" y="15" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">M</text>
-      <text x="20" y="15" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">E</text>
-      <text x="0"  y="23" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">N</text>
-      <text x="10" y="23" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">T</text>
-      <text x="0"  y="31" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">L</text>
-      <text x="10" y="31" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">O</text>
-      <text x="0"  y="39" font-family="Inter,Arial,sans-serif" font-size="6" font-weight="700" fill="white">G</text>
-      <!-- Жёлтые точки-соединители -->
-      <circle cx="17" cy="11" r="2" fill="#F5C518"/>
-      <circle cx="17" cy="19" r="2" fill="#F5C518"/>
-      <circle cx="6"  cy="27" r="2" fill="#F5C518"/>
-      <circle cx="17" cy="35" r="2" fill="#F5C518"/>
-    </svg>
+    <!-- Documentolog grid logo: буквы в 3 колонки, жёлтые точки-узлы -->
+    <div style="position:relative;width:34px;height:42px;flex-shrink:0">
+      <!-- строка 1: D O C -->
+      <span style="position:absolute;top:0;left:0;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">D</span>
+      <span style="position:absolute;top:0;left:11px;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">O</span>
+      <span style="position:absolute;top:0;left:22px;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">C</span>
+      <!-- строка 2: U M E -->
+      <span style="position:absolute;top:8px;left:0;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">U</span>
+      <span style="position:absolute;top:8px;left:11px;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">M</span>
+      <span style="position:absolute;top:8px;left:22px;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">E</span>
+      <!-- строка 3: N T _ -->
+      <span style="position:absolute;top:16px;left:0;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">N</span>
+      <span style="position:absolute;top:16px;left:11px;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">T</span>
+      <!-- строка 4: L O _ -->
+      <span style="position:absolute;top:24px;left:0;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">L</span>
+      <span style="position:absolute;top:24px;left:11px;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">O</span>
+      <!-- строка 5: G _ _ -->
+      <span style="position:absolute;top:32px;left:0;font-size:7px;font-weight:800;color:#fff;line-height:1;font-family:'Inter',sans-serif">G</span>
+      <!-- Жёлтые точки-соединители (узлы сети) -->
+      <div style="position:absolute;width:4px;height:4px;background:#F5C518;border-radius:50%;top:5px;left:19px"></div>
+      <div style="position:absolute;width:4px;height:4px;background:#F5C518;border-radius:50%;top:13px;left:8px"></div>
+      <div style="position:absolute;width:4px;height:4px;background:#F5C518;border-radius:50%;top:21px;left:19px"></div>
+      <div style="position:absolute;width:4px;height:4px;background:#F5C518;border-radius:50%;top:29px;left:8px"></div>
+      <!-- Линии соединители (тонкие жёлтые) -->
+      <svg style="position:absolute;inset:0;width:34px;height:42px;opacity:.5" viewBox="0 0 34 42">
+        <polyline points="23,2 21,6 9,10 21,14 9,18 21,22 9,26 21,30" stroke="#F5C518" stroke-width=".8" fill="none"/>
+      </svg>
+    </div>
     <div class="nav-divider"></div>
-    <!-- D8N AI badge -->
+    <!-- D8N AI -->
     <div style="display:flex;align-items:center;gap:7px">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <div>
-        <div style="color:#fff;font-size:14px;font-weight:700;letter-spacing:.3px;line-height:1.1">D8N AI</div>
-        <div style="color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.5px;text-transform:uppercase">ИИ-автоматизация</div>
+        <div style="color:#fff;font-size:15px;font-weight:700;letter-spacing:.2px;line-height:1.1">D8N AI</div>
+        <div style="color:rgba(255,255,255,.38);font-size:9px;letter-spacing:.6px;text-transform:uppercase;margin-top:1px">ИИ-автоматизация</div>
       </div>
     </div>
   </div>
