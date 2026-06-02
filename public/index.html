@@ -11,7 +11,7 @@
 body{font-family:var(--f);background:var(--bg);color:var(--t);font-size:14px;line-height:1.6;min-height:100vh}
 .w{max-width:680px;margin:0 auto;padding:32px 16px 64px}
 .hdr{display:flex;align-items:center;gap:12px;margin-bottom:28px}
-.logo{width:40px;height:40px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:700;font-size:13px;letter-spacing:.5px}
+.logo{width:40px;height:40px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:700;font-size:13px}
 .hi h1{font-size:17px;font-weight:600}
 .hi p{font-size:12px;color:var(--t3)}
 .mgr-b{display:none;align-items:center;gap:6px;background:var(--bl);border:1px solid #F0C4A0;border-radius:20px;padding:4px 12px;font-size:11px;color:var(--brand);font-weight:500;margin-top:8px}
@@ -23,42 +23,76 @@ body{font-family:var(--f);background:var(--bg);color:var(--t);font-size:14px;lin
 .st{font-size:13px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
 .sn{width:22px;height:22px;background:var(--brand);color:#fff;border-radius:50%;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .f{margin-bottom:14px}.f:last-child{margin-bottom:0}
-.f label{font-size:12px;font-weight:500;color:var(--t2);display:block;margin-bottom:5px}
+.f>label{font-size:12px;font-weight:500;color:var(--t2);display:block;margin-bottom:5px}
 .req{color:var(--brand)}
 .hint{font-size:11px;color:var(--t3);margin-top:3px}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:480px){.r2{grid-template-columns:1fr}}
-input,select,textarea{width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:8px;font-family:var(--f);font-size:13px;color:var(--t);background:var(--bg);transition:border .15s;-webkit-appearance:none}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);background:var(--card)}
+
+/* TEXT INPUTS ONLY — не трогаем checkbox/radio */
+input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{
+  width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:8px;
+  font-family:var(--f);font-size:13px;color:var(--t);background:var(--bg);
+  transition:border .15s;-webkit-appearance:none;appearance:none
+}
+input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,
+input[type=number]:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--brand);background:var(--card)
+}
 textarea{resize:vertical;min-height:72px}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
+
+/* RADIO PILLS */
 .rg{display:flex;gap:8px;flex-wrap:wrap}
 .ri{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--brd);border-radius:7px;padding:7px 12px;cursor:pointer;user-select:none;transition:all .15s}
 .ri:hover{border-color:#ccc}
 .ri.sel{background:var(--bl);border-color:var(--brand)}
 .ri span{font-size:13px}
-.cb{display:flex;flex-direction:column;gap:8px}
-.ci{display:flex;align-items:flex-start;gap:8px;cursor:pointer;user-select:none}
-.ci input{width:16px;height:16px;min-width:16px;margin-top:2px;accent-color:var(--brand);cursor:pointer}
-.ci span{font-size:13px;line-height:1.5}
+
+/* CHECKBOXES — кастомные, не затронуты глобальным input */
+.cb{display:flex;flex-direction:column;gap:10px}
+.ci{display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none;padding:2px 0}
+.ci input[type=checkbox]{
+  flex-shrink:0;width:18px;height:18px;margin-top:1px;
+  cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  border:2px solid var(--brd);border-radius:4px;
+  background:var(--card);
+  transition:all .15s;
+  position:relative
+}
+.ci input[type=checkbox]:hover{border-color:var(--brand)}
+.ci input[type=checkbox]:checked{
+  background:var(--brand);border-color:var(--brand)
+}
+.ci input[type=checkbox]:checked::after{
+  content:'';position:absolute;
+  left:3px;top:0px;width:8px;height:11px;
+  border:2px solid #fff;border-top:none;border-left:none;
+  transform:rotate(45deg)
+}
+.ci span{font-size:13px;line-height:1.5;color:var(--t)}
+
+/* NAV BUTTONS */
 .nav{display:flex;justify-content:space-between;margin-top:18px;gap:12px}
 .bp{padding:10px 20px;background:var(--card);color:var(--t2);border:1px solid var(--brd);border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
 .bp:hover{background:var(--bg)}
 .bn{padding:10px 28px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;margin-left:auto}
 .bn:hover{background:var(--bd)}
 .bn:disabled{background:#ccc;cursor:not-allowed}
+
+/* SUCCESS SCREEN */
 .done{text-align:center;padding:48px 20px}
-.di{width:56px;height:56px;background:#E8F5E9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
-.done h2{font-size:20px;font-weight:600;margin-bottom:8px}
-.done p{color:var(--t2);max-width:440px;margin:0 auto 20px}
-.cb2{background:#1A1A1A;border-radius:var(--r);padding:14px;text-align:left;margin-bottom:14px;max-height:260px;overflow-y:auto}
-.cb2 pre{font-family:'JetBrains Mono',monospace;font-size:11px;color:#D4D0C8;white-space:pre-wrap;line-height:1.6}
+.di{width:60px;height:60px;background:#E8F5E9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:26px}
+.done h2{font-size:22px;font-weight:600;margin-bottom:10px}
+.done p{color:var(--t2);max-width:440px;margin:0 auto 8px;line-height:1.7}
+.done .sub{font-size:12px;color:var(--t3);margin-bottom:24px}
 .acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.bc{padding:10px 18px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer}
+.bc{padding:10px 22px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
 .bc:hover{background:var(--bd)}
 .bc.s{background:var(--card);color:var(--t2);border:1px solid var(--brd)}
 .bc.s:hover{background:var(--bg)}
-.err-hl{border-color:#E24B4A!important}
+.err-hl{border-color:#E24B4A!important;background:#FFF5F5!important}
 </style>
 </head>
 <body>
@@ -239,14 +273,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     </div>
   </div>
 
-  <!-- SUCCESS -->
+  <!-- SUCCESS — только для клиента, без промпта -->
   <div id="sdone" style="display:none" class="card done">
     <div class="di">✓</div>
     <h2>Анкета отправлена!</h2>
     <p>Ваш менеджер получил данные и подготовит коммерческое предложение в течение 1 рабочего дня.</p>
-    <div class="cb2"><pre id="md-out"></pre></div>
+    <p class="sub">Если у вас возникнут вопросы — менеджер свяжется с вами по указанному email.</p>
     <div class="acts">
-      <button class="bc" onclick="copyP()">Скопировать промпт d8n Sales</button>
       <button class="bc s" onclick="location.reload()">Заполнить ещё раз</button>
     </div>
   </div>
@@ -288,16 +321,23 @@ document.querySelectorAll('.rg').forEach(g => {
 });
 
 function v(id){ return (document.getElementById(id)?.value||'').trim(); }
-function chk(id){ return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i=>i.value); }
+function chk(id){ return Array.from(document.querySelectorAll('#'+id+' input[type=checkbox]:checked')).map(i=>i.value); }
+
 function upd(){
   const pct = Math.round(step/maxStep*100);
   document.getElementById('pf').style.width = pct+'%';
-  document.getElementById('sl').textContent = `Шаг ${step} из ${maxStep}`;
+  document.getElementById('sl').textContent = 'Шаг '+step+' из '+maxStep;
   document.getElementById('sp').textContent = pct+'%';
   document.getElementById('bprev').style.visibility = step>1?'visible':'hidden';
   document.getElementById('bnext').textContent = step===maxStep?'Отправить анкету →':'Далее →';
 }
 function show(n){ for(let i=1;i<=4;i++) document.getElementById('s'+i).style.display=i===n?'block':'none'; }
+
+function flash(el){
+  el.style.outline='2px solid #E24B4A';
+  el.style.borderRadius='8px';
+  setTimeout(()=>{el.style.outline='';},2500);
+}
 
 function validate(){
   const rules = {
@@ -309,15 +349,18 @@ function validate(){
   let ok=true;
   document.querySelectorAll('.err-hl').forEach(e=>e.classList.remove('err-hl'));
   (rules[step]||[]).forEach(c=>{
-    if(c.id){const el=document.getElementById(c.id);if(el&&(!el.value.trim()||(c.min&&el.value.length<c.min))){el.classList.add('err-hl');ok=false;}}
-    if(c.rg&&!R[c.rg]){const el=document.getElementById(c.rg);if(el){el.style.outline='2px solid #E24B4A';el.style.borderRadius='8px';setTimeout(()=>{el.style.outline='';},2500);}ok=false;}
-    if(c.cb&&chk(c.cb).length===0){const el=document.getElementById(c.cb);if(el){el.style.outline='2px solid #E24B4A';el.style.borderRadius='8px';setTimeout(()=>{el.style.outline='';},2500);}ok=false;}
+    if(c.id){
+      const el=document.getElementById(c.id);
+      if(el&&(!el.value.trim()||(c.min&&el.value.length<c.min))){el.classList.add('err-hl');ok=false;}
+    }
+    if(c.rg&&!R[c.rg]){const el=document.getElementById(c.rg);if(el)flash(el);ok=false;}
+    if(c.cb&&chk(c.cb).length===0){const el=document.getElementById(c.cb);if(el)flash(el);ok=false;}
   });
   return ok;
 }
 
 function next(){
-  if(!validate()) return;
+  if(!validate())return;
   if(step<maxStep){step++;show(step);upd();window.scrollTo(0,0);}
   else submit();
 }
@@ -408,30 +451,23 @@ function buildPrompt(d){
 Если данных недостаточно — укажи missing data явно.`;
 }
 
-let _prompt = '';
 async function submit(){
   const btn = document.getElementById('bnext');
   btn.disabled = true; btn.textContent = 'Отправляем...';
   const d = buildData();
-  _prompt = buildPrompt(d);
+  const prompt = buildPrompt(d);
   try {
-    const res = await fetch('/api/submit',{
+    await fetch('/api/submit',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({data:d, prompt:_prompt})
+      body:JSON.stringify({data:d, prompt})
     });
-    if(!res.ok) console.warn('submit error', await res.text());
-  } catch(e){ console.warn('submit fail', e); }
+  } catch(e){ console.warn('submit fail',e); }
+  // Показываем клиенту чистый success — без промпта
   document.getElementById('s'+maxStep).style.display='none';
   document.getElementById('sdone').style.display='block';
   document.getElementById('nav').style.display='none';
-  document.getElementById('md-out').textContent=_prompt;
   window.scrollTo(0,0);
-}
-
-function copyP(){
-  navigator.clipboard.writeText(_prompt).catch(()=>{});
-  const b=event.target; b.textContent='✓ Скопировано'; setTimeout(()=>b.textContent='Скопировать промпт d8n Sales',1500);
 }
 
 upd();
