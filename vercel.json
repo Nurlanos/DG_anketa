@@ -5,7 +5,6 @@
   "rewrites": [
     { "source": "/api/submit", "destination": "/api/submit" },
     { "source": "/api/rows",   "destination": "/api/rows" },
-    { "source": "/dashboard",  "destination": "/public/dashboard.html" },
-    { "source": "/",           "destination": "/public/index.html" }
+    { "source": "/dashboard",  "destination": "/dashboard.html" }
   ]
 }
