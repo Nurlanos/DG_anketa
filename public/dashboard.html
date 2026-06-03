@@ -3,85 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Дашборд — Documentolog</title>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<title>Дашборд менеджера — Documentolog</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--brand:#E05A1B;--bl:#FDF0E8;--bd:#B84A10;--t:#1A1A1A;--t2:#555;--t3:#888;--brd:#E0DDD8;--bg:#FAFAF8;--card:#fff;--r:10px;--f:'Golos Text',sans-serif}
-body{font-family:var(--f);background:var(--bg);color:var(--t);font-size:14px}
-.w{max-width:900px;margin:0 auto;padding:28px 16px 64px}
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.hl{display:flex;align-items:center;gap:10px}
-.logo{width:36px;height:36px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
-.hi h1{font-size:17px;font-weight:600}
-.hi p{font-size:12px;color:var(--t3)}
-.tabs{display:flex;gap:4px;background:#F0EDEA;padding:4px;border-radius:10px;flex-wrap:wrap}
-.tab{padding:7px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border-radius:7px;border:none;background:none;font-family:var(--f);transition:all .15s}
-.tab.on{background:var(--card);color:var(--brand)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-@media(max-width:580px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px}
-.stat .n{font-size:26px;font-weight:600;line-height:1}
-.stat .l{font-size:11px;color:var(--t3);margin-top:4px}
-.stat.hi .n{color:var(--brand)}
-.lgen{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px;margin-bottom:14px}
-.lgen h3{font-size:13px;font-weight:600;margin-bottom:10px}
+:root{
+  --navy:#0D1F4E;--blue:#2056B8;--blue-h:#1748A3;--blue-l:#EBF2FF;
+  --yellow:#F5C518;
+  --text:#1A1A2E;--t2:#4B5563;--t3:#9CA3AF;
+  --brd:#E5E7EB;--bg:#F3F6FB;--card:#fff;
+  --r:8px;--f:'Inter',sans-serif
+}
+body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* NAVBAR */
+.topnav{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:14px}
+.nav-divider{width:1px;height:28px;background:rgba(255,255,255,.15)}
+
+/* MAIN */
+.main{max-width:960px;margin:0 auto;padding:24px 16px 64px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px}
+.stat .n{font-size:28px;font-weight:700;line-height:1;color:var(--navy)}
+.stat .l{font-size:11px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+.stat.hi .n{color:var(--blue)}
+
+/* LINK GEN */
+.lgen{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
+.lgen h3{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px}
 .lr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.lsel{flex:1;min-width:150px;padding:8px 12px;border:1px solid var(--brd);border-radius:8px;font-family:var(--f);font-size:13px;background:var(--bg);color:var(--t);-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
-.lurl{flex:2;min-width:180px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);background:var(--bg);border:1px solid var(--brd);border-radius:6px;padding:8px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bs{padding:8px 14px;background:var(--brand);color:#fff;border:none;border-radius:7px;font-family:var(--f);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap}
-.bs:hover{background:var(--bd)}
-.bs.sec{background:var(--card);color:var(--t2);border:1px solid var(--brd)}
-.bs.sec:hover{background:var(--bg)}
+.lsel{flex:1;min-width:160px;padding:9px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;background:var(--bg);color:var(--text);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
+.lsel:focus{outline:none;border-color:var(--blue)}
+.lurl{flex:2;min-width:180px;font-family:'Courier New',monospace;font-size:11px;color:var(--t2);background:var(--bg);border:1.5px solid var(--brd);border-radius:6px;padding:9px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{padding:9px 16px;background:var(--yellow);color:var(--navy);border:none;border-radius:6px;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn:hover{background:#E0B400}
+.btn.sec{background:var(--card);color:var(--t2);border:1.5px solid var(--brd);font-weight:500}
+.btn.sec:hover{border-color:var(--blue);color:var(--blue)}
+.btn.blue{background:var(--blue);color:#fff;font-weight:600}
+.btn.blue:hover{background:var(--blue-h)}
+
+/* FILTER TABS */
+.tabs{display:flex;gap:0;background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.tab{flex:1;padding:10px 8px;text-align:center;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border-right:1px solid var(--brd);transition:all .15s;border:none;background:none;font-family:var(--f)}
+.tab:not(:last-child){border-right:1px solid var(--brd)}
+.tab.on{background:var(--blue);color:#fff;font-weight:600}
+.tab:hover:not(.on){background:var(--blue-l);color:var(--blue)}
+
+/* TABLE */
 .tbl-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden}
-.tbl-hdr{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.tbl-hdr h3{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-table{width:100%;border-collapse:collapse;table-layout:auto}
-th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--brd);background:var(--bg);white-space:nowrap}
-td{padding:11px 12px;border-bottom:1px solid var(--brd);font-size:13px;vertical-align:middle}
+.tbl-head{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.tbl-head h3{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:680px}
+th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--brd);background:var(--bg);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--brd);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#FAFAF5}
-.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+tr:hover td{background:#F8FAFF}
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
 .b-new{background:#E8F5E9;color:#2E7D32}
-.b-kpr{background:#FFF8E1;color:#E65100}
-.b-kps{background:var(--bl);color:var(--brand)}
-.b-con{background:#E3F2FD;color:#1565C0}
-.b-rej{background:#FFEBEE;color:#C62828}
+.b-wip{background:#FFF8E1;color:#E65100}
+.b-sent{background:var(--blue-l);color:var(--blue)}
+.b-deal{background:#E3F2FD;color:#1565C0}
+.b-no{background:#FFEBEE;color:#C62828}
 .b-def{background:#F5F5F5;color:#666}
-.empty{padding:40px;text-align:center;color:var(--t3);font-size:13px}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:16px}
+.empty{padding:48px;text-align:center;color:var(--t3);font-size:13px}
+.empty .ico{font-size:32px;margin-bottom:12px}
+.err-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13px;color:#991B1B;display:none}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
 .modal-bg.open{display:flex}
-.modal{background:var(--card);border-radius:14px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:24px}
-.modal h2{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-.mclose{width:28px;height:28px;background:var(--bg);border:1px solid var(--brd);border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
-.code{background:#1A1A1A;border-radius:8px;padding:14px;margin-bottom:12px;max-height:320px;overflow-y:auto}
-.code pre{font-family:'JetBrains Mono',monospace;font-size:11px;color:#D4D0C8;white-space:pre-wrap;line-height:1.6}
-.row-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;font-size:12px}
-.rd-item{background:var(--bg);border-radius:6px;padding:8px 10px}
-.rd-item .lbl{color:var(--t3);margin-bottom:2px;font-size:11px}
+.modal{background:var(--card);border-radius:12px;max-width:660px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-head{background:var(--navy);padding:16px 20px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-head h2{font-size:15px;font-weight:600;color:#fff}
+.modal-close{width:28px;height:28px;background:rgba(255,255,255,.1);border:none;border-radius:50%;cursor:pointer;font-size:16px;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:20px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+@media(max-width:480px){.detail-grid{grid-template-columns:1fr}}
+.det{background:var(--bg);border-radius:6px;padding:10px 12px}
+.det .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:3px}
+.det .val{font-size:13px;color:var(--navy);font-weight:500}
+.code-box{background:#0D1F4E;border-radius:8px;padding:16px;margin-bottom:14px;max-height:320px;overflow-y:auto}
+.code-box pre{font-family:'Courier New',monospace;font-size:11px;color:#CBD5E1;white-space:pre-wrap;line-height:1.6;margin:0}
+.code-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:8px}
+.modal-foot{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
-<div class="w">
-  <div class="hdr">
-    <div class="hl">
-      <div class="logo">DG</div>
-      <div class="hi"><h1>Дашборд менеджера</h1><p>Анкеты клиентов → d8n Sales · Airtable</p></div>
+
+<!-- NAVBAR -->
+<div class="topnav">
+  <div class="nav-logo">
+    <div style="position:relative;width:36px;height:45px;flex-shrink:0">
+      <div style="display:grid;grid-template-columns:repeat(3,9px);grid-template-rows:repeat(4,9px);gap:3px;position:relative;z-index:2">
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">D</span>
+        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">C</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">U</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">M</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">E</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">N</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">T</span>
+        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">L</span>
+        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
+        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">G</span>
+      </div>
+      <svg style="position:absolute;top:0;left:0;width:36px;height:45px;z-index:1" viewBox="0 0 36 45">
+        <line x1="16.5" y1="4.5" x2="28.5" y2="28.5" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,2.5" opacity="0.75"/>
+        <line x1="28.5" y1="28.5" x2="16.5" y2="40.5" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,2.5" opacity="0.75"/>
+      </svg>
     </div>
-    <div class="tabs" id="tabs">
-      <button class="tab on" data-m="all">Все</button>
-      <button class="tab" data-m="n.omarov">Омаров Нурлан</button>
-      <button class="tab" data-m="a.kuz">Кузьменко Азиза</button>
+    <div class="nav-divider"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <div>
+        <div style="color:#fff;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;line-height:1.1">D8N AI</div>
+        <div style="color:rgba(255,255,255,.38);font-size:9px;letter-spacing:.6px;text-transform:uppercase;font-family:'Inter',sans-serif;margin-top:1px">Дашборд менеджера</div>
+      </div>
     </div>
   </div>
+  <a href="/" style="font-size:12px;color:rgba(255,255,255,.5);text-decoration:none;transition:.15s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">← Форма клиента</a>
+</div>
 
+<div class="main">
+  <!-- STATS -->
   <div class="stats">
     <div class="stat hi"><div class="n" id="st-t">—</div><div class="l">Всего анкет</div></div>
     <div class="stat"><div class="n" id="st-n">—</div><div class="l">Новые</div></div>
     <div class="stat"><div class="n" id="st-s">—</div><div class="l">КП отправлено</div></div>
-    <div class="stat"><div class="n" id="st-c">—</div><div class="l">Договоров</div></div>
+    <div class="stat"><div class="n" id="st-d">—</div><div class="l">Договоров</div></div>
   </div>
 
+  <!-- LINK GENERATOR -->
   <div class="lgen">
     <h3>Персональная ссылка для клиента</h3>
     <div class="lr">
@@ -92,133 +151,180 @@ tr:hover td{background:#FAFAF5}
         <option value="manager3">Менеджер 3</option>
       </select>
       <div class="lurl" id="lurl">Выберите менеджера...</div>
-      <button class="bs" onclick="copyLink()">Копировать</button>
+      <button class="btn" onclick="copyLink()">Скопировать ссылку</button>
     </div>
   </div>
 
+  <!-- ERROR BOX -->
+  <div class="err-box" id="err-box"></div>
+
+  <!-- FILTER TABS -->
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-m="all">Все</button>
+    <button class="tab" data-m="n.omarov">Омаров Нурлан</button>
+    <button class="tab" data-m="a.kuz">Кузьменко Азиза</button>
+  </div>
+
+  <!-- TABLE -->
   <div class="tbl-wrap">
-    <div class="tbl-hdr">
+    <div class="tbl-head">
       <h3>Заполненные анкеты</h3>
-      <button class="bs sec" onclick="load()">↻ Обновить</button>
+      <button class="btn sec" onclick="loadData()">↻ Обновить</button>
     </div>
-    <div id="tbl-c"><div class="empty">Загрузка данных из Airtable...</div></div>
+    <div class="tbl-scroll">
+      <div id="tbl-c"><div class="empty"><div class="ico">📋</div>Загрузка данных из Airtable...</div></div>
+    </div>
   </div>
 </div>
 
 <!-- MODAL -->
 <div class="modal-bg" id="modal">
   <div class="modal">
-    <h2><span id="m-title">Данные клиента</span><button class="mclose" onclick="closeModal()">✕</button></h2>
-    <div class="row-detail" id="m-detail"></div>
-    <div class="code"><pre id="m-code"></pre></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="bs" onclick="copyPrompt()">Скопировать промпт d8n Sales</button>
-      <button class="bs sec" onclick="closeModal()">Закрыть</button>
+    <div class="modal-head">
+      <h2 id="m-title">Данные клиента</h2>
+      <button class="modal-close" id="m-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-grid" id="m-detail"></div>
+      <div class="code-box">
+        <div class="code-lbl">Промпт для d8n Sales</div>
+        <pre id="m-code"></pre>
+      </div>
+      <div class="modal-foot">
+        <button class="btn blue" onclick="copyPrompt()">Скопировать промпт</button>
+        <button class="btn sec" id="m-close2">Закрыть</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-const MANAGERS = {'n.omarov':'Омаров Нурлан','a.kuz':'Кузьменко Азиза','manager3':'Менеджер 3'};
-let rows=[], curMgr='all', _prompt='';
-let _genLink='';
+let rows = [], curMgr = 'all', _prompt = '', _genLink = '';
 
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+// Close modal — через id, без конфликта с window.close
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('m-close').addEventListener('click', closeModal);
+document.getElementById('m-close2').addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
     t.classList.add('on');
-    curMgr=t.dataset.m;
+    curMgr = t.dataset.m;
     render();
   });
 });
 
-function genLink(){
-  const v=document.getElementById('lsel').value;
-  if(!v){document.getElementById('lurl').textContent='Выберите менеджера...';_genLink='';return;}
-  _genLink=`${location.origin}/?mgr=${v}`;
-  document.getElementById('lurl').textContent=_genLink;
+// Link generator
+function genLink() {
+  const v = document.getElementById('lsel').value;
+  if (!v) { document.getElementById('lurl').textContent = 'Выберите менеджера...'; _genLink = ''; return; }
+  _genLink = location.origin + '/?mgr=' + v;
+  document.getElementById('lurl').textContent = _genLink;
 }
-function copyLink(){
-  if(!_genLink)return;
-  navigator.clipboard.writeText(_genLink).catch(()=>{});
-  const b=event.target;b.textContent='✓ Скопировано';setTimeout(()=>b.textContent='Копировать',1500);
+function copyLink() {
+  if (!_genLink) return;
+  navigator.clipboard.writeText(_genLink).catch(() => {});
+  const b = event.target;
+  b.textContent = '✓ Скопировано';
+  setTimeout(() => b.textContent = 'Скопировать ссылку', 1500);
 }
 
-async function load(){
-  document.getElementById('tbl-c').innerHTML='<div class="empty">Загрузка из Airtable...</div>';
-  try{
-    const url='/api/rows'+(curMgr!=='all'?`?mgr=${curMgr}`:'');
-    const r=await fetch(url);
-    const j=await r.json();
-    rows=j.rows||[];
+// Load data
+async function loadData() {
+  document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">⏳</div>Загрузка из Airtable...</div>';
+  document.getElementById('err-box').style.display = 'none';
+  try {
+    const url = '/api/rows' + (curMgr !== 'all' ? '?mgr=' + curMgr : '');
+    const res = await fetch(url);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'API error ' + res.status);
+    rows = json.rows || [];
     render();
     updateStats();
-  }catch(e){
-    document.getElementById('tbl-c').innerHTML='<div class="empty">Ошибка загрузки. Проверьте AIRTABLE_TOKEN в Vercel.</div>';
+  } catch(e) {
+    const box = document.getElementById('err-box');
+    box.style.display = 'block';
+    box.textContent = 'Ошибка загрузки: ' + e.message + '. Проверьте что AIRTABLE_TOKEN добавлен в Vercel → Settings → Environment Variables.';
+    document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">⚠️</div>Нет данных</div>';
   }
 }
 
-function badgeCls(s){
-  if(s==='Новое')return 'b-new';
-  if(s==='КП в работе')return 'b-kpr';
-  if(s==='КП отправлено')return 'b-kps';
-  if(s==='Договор')return 'b-con';
-  if(s==='Отказ')return 'b-rej';
+function badgeCls(s) {
+  if (s === 'Новое') return 'b-new';
+  if (s === 'КП в работе') return 'b-wip';
+  if (s === 'КП отправлено') return 'b-sent';
+  if (s === 'Договор') return 'b-deal';
+  if (s === 'Отказ') return 'b-no';
   return 'b-def';
 }
 
-function render(){
-  const list=curMgr==='all'?rows:rows.filter(r=>r.mgr===curMgr);
-  if(!list.length){document.getElementById('tbl-c').innerHTML='<div class="empty">Анкет пока нет</div>';return;}
-  let h=`<table><thead><tr><th>Дата</th><th>Компания</th><th>Менеджер</th><th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Срок</th><th>Статус</th><th></th></tr></thead><tbody>`;
-  list.forEach((r,i)=>{
-    h+=`<tr>
-      <td style="color:var(--t3);white-space:nowrap;font-size:12px">${r.date}</td>
-      <td><strong>${r.company}</strong><div style="font-size:11px;color:var(--t3)">${r.email}</div></td>
+function render() {
+  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
+  if (!list.length) {
+    document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">📭</div>Анкет пока нет</div>';
+    return;
+  }
+  let h = `<table><thead><tr>
+    <th>Дата</th><th>Компания</th><th>Менеджер</th>
+    <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Срок</th><th>Статус</th><th></th>
+  </tr></thead><tbody>`;
+  list.forEach((r, i) => {
+    h += `<tr>
+      <td style="color:var(--t3);font-size:11px;white-space:nowrap">${r.date}</td>
+      <td><div style="font-weight:600;color:var(--navy)">${r.company}</div><div style="font-size:11px;color:var(--t3)">${r.email}</div></td>
       <td style="font-size:12px;color:var(--t2)">${r.manager}</td>
-      <td>${r.users}</td>
+      <td style="font-weight:600">${r.users}</td>
       <td style="font-size:12px">${r.deploy}</td>
-      <td><span class="badge ${r.budget==='Согласован'?'b-new':r.budget==='Speculative'?'b-def':'b-kpr'}">${r.budget}</span></td>
+      <td><span class="badge ${r.budget === 'Согласован' ? 'b-new' : r.budget === 'Speculative' ? 'b-def' : 'b-wip'}">${r.budget}</span></td>
       <td style="font-size:12px;white-space:nowrap">${r.deadline}</td>
       <td><span class="badge ${badgeCls(r.status)}">${r.status}</span></td>
-      <td><button class="bs" onclick="openModal(${i})">→ КП</button></td>
+      <td><button class="btn blue" style="padding:6px 12px;font-size:12px" onclick="openModal(${i})">→ КП</button></td>
     </tr>`;
   });
-  h+='</tbody></table>';
-  document.getElementById('tbl-c').innerHTML=h;
+  h += '</tbody></table>';
+  document.getElementById('tbl-c').innerHTML = h;
 }
 
-function updateStats(){
-  document.getElementById('st-t').textContent=rows.length;
-  document.getElementById('st-n').textContent=rows.filter(r=>r.status==='Новое').length;
-  document.getElementById('st-s').textContent=rows.filter(r=>r.status==='КП отправлено').length;
-  document.getElementById('st-c').textContent=rows.filter(r=>r.status==='Договор').length;
+function updateStats() {
+  document.getElementById('st-t').textContent = rows.length;
+  document.getElementById('st-n').textContent = rows.filter(r => r.status === 'Новое').length;
+  document.getElementById('st-s').textContent = rows.filter(r => r.status === 'КП отправлено').length;
+  document.getElementById('st-d').textContent = rows.filter(r => r.status === 'Договор').length;
 }
 
-function openModal(i){
-  const list=curMgr==='all'?rows:rows.filter(r=>r.mgr===curMgr);
-  const r=list[i]; if(!r)return;
-  _prompt=r.prompt||'';
-  document.getElementById('m-title').textContent=r.company;
-  document.getElementById('m-code').textContent=_prompt;
-  document.getElementById('m-detail').innerHTML=`
-    <div class="rd-item"><div class="lbl">Менеджер</div>${r.manager}</div>
-    <div class="rd-item"><div class="lbl">Отрасль</div>${r.industry||'—'}</div>
-    <div class="rd-item"><div class="lbl">N_full</div>${r.users} пользователей</div>
-    <div class="rd-item"><div class="lbl">Бюджет</div>${r.budget}</div>
-    <div class="rd-item"><div class="lbl">Срок договора</div>${r.deadline}</div>
-    <div class="rd-item"><div class="lbl">Deploy</div>${r.deploy}</div>
+function openModal(i) {
+  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
+  const r = list[i];
+  if (!r) return;
+  _prompt = r.prompt || '';
+  document.getElementById('m-title').textContent = r.company;
+  document.getElementById('m-code').textContent = _prompt;
+  document.getElementById('m-detail').innerHTML = `
+    <div class="det"><div class="lbl">Менеджер</div><div class="val">${r.manager}</div></div>
+    <div class="det"><div class="lbl">Отрасль</div><div class="val">${r.industry || '—'}</div></div>
+    <div class="det"><div class="lbl">Пользователей</div><div class="val">${r.users} чел.</div></div>
+    <div class="det"><div class="lbl">Развёртывание</div><div class="val">${r.deploy}</div></div>
+    <div class="det"><div class="lbl">Бюджет</div><div class="val">${r.budget}</div></div>
+    <div class="det"><div class="lbl">Срок договора</div><div class="val">${r.deadline}</div></div>
   `;
   document.getElementById('modal').classList.add('open');
 }
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-function copyPrompt(){
-  navigator.clipboard.writeText(_prompt).catch(()=>{});
-  const b=event.target;b.textContent='✓ Скопировано';setTimeout(()=>b.textContent='Скопировать промпт d8n Sales',1500);
-}
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
-load();
+function copyPrompt() {
+  navigator.clipboard.writeText(_prompt).catch(() => {});
+  const b = event.target;
+  b.textContent = '✓ Скопировано';
+  setTimeout(() => b.textContent = 'Скопировать промпт', 1500);
+}
+
+loadData();
 </script>
 </body>
 </html>
