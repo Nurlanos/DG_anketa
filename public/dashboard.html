@@ -70,6 +70,12 @@ tr:hover td{background:#F8FAFF}
 .b-deal{background:#E3F2FD;color:#1565C0}
 .b-no{background:#FFEBEE;color:#C62828}
 .b-def{background:#F5F5F5;color:#666}
+.status-sel{font-size:12px;font-weight:600;padding:4px 8px;border-radius:20px;border:none;cursor:pointer;font-family:var(--f);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;padding-right:22px;transition:all .15s}
+.status-sel.s-new{background:#E8F5E9;color:#2E7D32}
+.status-sel.s-wip{background:#FFF8E1;color:#E65100}
+.status-sel.s-sent{background:#EBF2FF;color:#2056B8}
+.status-sel.s-deal{background:#E3F2FD;color:#1565C0}
+.status-sel.s-no{background:#FFEBEE;color:#C62828}
 .empty{padding:48px;text-align:center;color:var(--t3);font-size:13px}
 .empty .ico{font-size:32px;margin-bottom:12px}
 .err-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13px;color:#991B1B;display:none}
@@ -265,17 +271,30 @@ function badgeCls(s) {
   return 'b-def';
 }
 
+function statusClass(s) {
+  if (s === 'Новое') return 's-new';
+  if (s === 'КП в работе') return 's-wip';
+  if (s === 'КП отправлено') return 's-sent';
+  if (s === 'Договор') return 's-deal';
+  if (s === 'Отказ') return 's-no';
+  return 's-new';
+}
+
 function render() {
   const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
   if (!list.length) {
     document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">📭</div>Анкет пока нет</div>';
     return;
   }
+  const STATUSES = ['Новое','КП в работе','КП отправлено','Договор','Отказ'];
   let h = `<table><thead><tr>
     <th>Дата</th><th>Компания</th><th>Менеджер</th>
-    <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Срок</th><th>Статус</th><th></th>
+    <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Статус</th><th></th>
   </tr></thead><tbody>`;
   list.forEach((r, i) => {
+    const opts = STATUSES.map(s =>
+      `<option value="${s}" ${s === r.status ? 'selected' : ''}>${s}</option>`
+    ).join('');
     h += `<tr>
       <td style="color:var(--t3);font-size:11px;white-space:nowrap">${r.date}</td>
       <td><div style="font-weight:600;color:var(--navy)">${r.company}</div><div style="font-size:11px;color:var(--t3)">${r.email}</div></td>
@@ -283,13 +302,48 @@ function render() {
       <td style="font-weight:600">${r.users}</td>
       <td style="font-size:12px">${r.deploy}</td>
       <td><span class="badge ${r.budget === 'Согласован' ? 'b-new' : r.budget === 'Speculative' ? 'b-def' : 'b-wip'}">${r.budget}</span></td>
-      <td style="font-size:12px;white-space:nowrap">${r.deadline}</td>
-      <td><span class="badge ${badgeCls(r.status)}">${r.status}</span></td>
+      <td>
+        <select class="status-sel ${statusClass(r.status)}"
+          onchange="updateStatus('${r.id}', this.value, this, ${i})">${opts}
+        </select>
+      </td>
       <td><button class="btn blue" style="padding:6px 12px;font-size:12px" onclick="openModal(${i})">→ КП</button></td>
     </tr>`;
   });
   h += '</tbody></table>';
   document.getElementById('tbl-c').innerHTML = h;
+}
+
+async function updateStatus(recordId, newStatus, selectEl, idx) {
+  const oldCls = selectEl.className;
+  selectEl.disabled = true;
+  selectEl.style.opacity = '0.5';
+  try {
+    const res = await fetch('/api/update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId, status: newStatus })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      // Update local data
+      const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
+      const globalIdx = rows.indexOf(list[idx]);
+      if (globalIdx !== -1) rows[globalIdx].status = newStatus;
+      // Update select style
+      selectEl.className = 'status-sel ' + statusClass(newStatus);
+      updateStats();
+    } else {
+      alert('Ошибка: ' + (data.error || 'неизвестно'));
+      selectEl.className = oldCls;
+    }
+  } catch(e) {
+    alert('Ошибка сети');
+    selectEl.className = oldCls;
+  } finally {
+    selectEl.disabled = false;
+    selectEl.style.opacity = '1';
+  }
 }
 
 function updateStats() {
