@@ -108,12 +108,12 @@ tr:hover td{background:#FAFAF5}
 <!-- MODAL -->
 <div class="modal-bg" id="modal">
   <div class="modal">
-    <h2><span id="m-title">Данные клиента</span><button class="mclose" onclick="close()">✕</button></h2>
+    <h2><span id="m-title">Данные клиента</span><button class="mclose" onclick="closeModal()">✕</button></h2>
     <div class="row-detail" id="m-detail"></div>
     <div class="code"><pre id="m-code"></pre></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="bs" onclick="copyPrompt()">Скопировать промпт d8n Sales</button>
-      <button class="bs sec" onclick="close()">Закрыть</button>
+      <button class="bs sec" onclick="closeModal()">Закрыть</button>
     </div>
   </div>
 </div>
@@ -211,12 +211,12 @@ function openModal(i){
   `;
   document.getElementById('modal').classList.add('open');
 }
-function close(){document.getElementById('modal').classList.remove('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
 function copyPrompt(){
   navigator.clipboard.writeText(_prompt).catch(()=>{});
   const b=event.target;b.textContent='✓ Скопировано';setTimeout(()=>b.textContent='Скопировать промпт d8n Sales',1500);
 }
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)close();});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
 load();
 </script>
