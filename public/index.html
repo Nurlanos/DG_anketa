@@ -300,10 +300,10 @@ textarea{resize:vertical;min-height:76px;line-height:1.5}
         <div class="f"><label>Используется ли сейчас СЭД?<span class="req">*</span></label>
           <div class="rg" id="rg-sed">
             <div class="ri" data-v="Нет"><span>Нет</span></div>
-            <div class="ri" data-v="Да — хотим сменить"><span>Да — хотим сменить</span></div>
+            <div class="ri" data-v="Да"><span>Да</span></div>
           </div>
         </div>
-        <div id="sed-row" style="display:none" class="f"><label>Какая система и причина смены</label><input id="sedName" type="text" placeholder="Directum — медленная, нет мобильного доступа"></div>
+        <div id="sed-row" style="display:none" class="f"><label>Какая система? Есть ли причины для её замены?</label><input id="sedName" type="text" placeholder="Directum — медленная, нет мобильного доступа"></div>
         <div class="f"><label>Основная цель внедрения<span class="req">*</span></label>
           <select id="goal"><option value="">— выберите —</option><option>Compliance / соответствие требованиям</option><option>Повышение эффективности</option><option>Цифровая трансформация</option><option>Контроль исполнения</option><option>Рост / масштабирование</option></select>
         </div>
@@ -463,7 +463,7 @@ document.querySelectorAll('.rg').forEach(g=>{
     item.addEventListener('click',()=>{
       g.querySelectorAll('.ri').forEach(r=>r.classList.remove('sel'));
       item.classList.add('sel');R[g.id]=item.dataset.v;
-      if(g.id==='rg-sed') document.getElementById('sed-row').style.display=item.dataset.v.startsWith('Да')?'block':'none';
+      if(g.id==='rg-sed') document.getElementById('sed-row').style.display=item.dataset.v === 'Да'?'block':'none';
     });
   });
 });
