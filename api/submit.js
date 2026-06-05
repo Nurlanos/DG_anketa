@@ -1,4 +1,16 @@
-const MANAGER_EMAIL  = 'astananur@gmail.com';
+// Маппинг менеджер → email
+// Добавляйте новых менеджеров сюда
+const MANAGER_EMAILS = {
+  'n.omarov': 'astananur@gmail.com',
+  'a.kuz':    'astananur@gmail.com',   // заменить на реальный email Азизы
+  'manager3': 'astananur@gmail.com',   // заменить на реальный email
+};
+const FALLBACK_EMAIL = 'astananur@gmail.com';
+
+// Email получателя = почта менеджера или fallback
+function getManagerEmail(managerId) {
+  return MANAGER_EMAILS[managerId] || FALLBACK_EMAIL;
+}
 const RESEND_KEY     = process.env.RESEND_API_KEY || 're_8UGpHFbF_7jsHzk9qayhwrtVQpYWSHn3a';
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN || null;
 const BASE_ID        = 'appHakMP7mBJhUu7p';
@@ -59,7 +71,7 @@ export default async function handler(req, res) {
         headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: 'DG Anketa <onboarding@resend.dev>',
-          to: [MANAGER_EMAIL],
+          to: [getManagerEmail(data.managerId)],
           subject: `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${data.deploy} / ${data.budget}`,
           html,
         }),
