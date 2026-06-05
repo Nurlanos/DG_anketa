@@ -255,7 +255,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
         </div>
         <div class="r2">
           <div class="f"><label><span class="tip-wrap">Вид собственности<span class="tip-icon" data-tip-title="Вид собственности" data-tip-text="Определяет процедуру закупки: госкомпании часто закупают через тендер (ПГЗ), частные — напрямую.">?</span></span><span class="req">*</span></label>
-            <select id="ownership"><option value="">—</option><option>Частная</option><option>Государственная</option><option>Квазигосударственная</option></select></div>
+            <select id="ownership" onchange="checkUsers();updateScore()"><option value="">—</option><option>Частная</option><option>Государственная</option><option>Квазигосударственная</option></select></div>
           <div class="f"><label><span class="tip-wrap">Отрасль<span class="tip-icon" data-tip-title="Отрасль" data-tip-text="Помогает подобрать релевантные кейсы и лучшие практики внедрения из вашей сферы.">?</span></span><span class="req">*</span></label>
             <select id="industry"><option value="">—</option><option>Финансы / Банки</option><option>Строительство</option><option>IT / Телеком</option><option>Медиа / Издания</option><option>СПК / Холдинги</option><option>Производство</option><option>Здравоохранение</option><option>Государственный сектор</option><option>Другое</option></select></div>
         </div>
@@ -620,20 +620,25 @@ function getSegment(){
     reasons.push('On-premise / PaaS → SE или AIE');
   }
 
-  // ── Business triggers (только если НЕТ сигналов SE/AIE) ──
-  // Business = только базовый ЭДО + ЭЦП, без кастомизации
+  // ── Business triggers ──
+  // Business = только базовый ЭДО + ЭЦП, без кастомизации, до 50 польз.
+  const ownership = document.getElementById('ownership')?.value||'';
+  const bizTier   = users>0 && users<=50 ? getBizTier(users, ownership) : null;
+  const isGov     = ownership==='Государственная'||ownership==='Квазигосударственная';
+
   const onlyBasicEDO = modules.length <= 1 &&
     modules.every(m=>m.includes('ЭДО')) &&
     !needsIntegration && !needsAdvancedBPM && !needsComms && !needsAI && !needsOnPrem;
 
-  if(onlyBasicEDO || (score.se===0 && score.aie===0)){
+  if(users<=50 && bizTier && (onlyBasicEDO || (score.se===0 && score.aie===0))){
     score.biz += 3;
-    if(onlyBasicEDO) reasons.push('Базовый ЭДО + ЭЦП, без интеграций → Business');
+    reasons.push(`Business ${bizTier.tier} — ${bizTier.price} (${bizTier.note})`);
   }
 
-  // N_full — слабый дополнительный сигнал, не основной
-  if(users > 0 && users <= 50 && score.se===0 && score.aie===0){
-    score.biz += 1;
+  // Gov — отдельный тариф для госорганов
+  if(isGov && users<=5 && score.aie===0){
+    score.biz += 2;
+    reasons.push('Государственная организация ≤5 польз. → Business Gov (165 000 ₸/мес)');
   }
 
   // ── Winner ──
@@ -658,20 +663,42 @@ function updateScore(){
   validateComparison();
 }
 
+// Business тарифы по N_full
+function getBizTier(users, ownership){
+  if(ownership==='Государственная'||ownership==='Квазигосударственная'){
+    return users<=5 ? {tier:'Gov',price:'165 000 ₸/мес',note:'для акиматов и госорганов'} : null;
+  }
+  if(users<=2)  return {tier:'Start',     price:'Бесплатно',      note:'до 2 польз. · 5 док/мес · внешний ЭДО · ЭЦП'};
+  if(users<=20) return {tier:'Start Plus', price:'55 000 ₸/мес',  note:'до 20 польз. · API · 1С · Adobe Sign'};
+  if(users<=50) return {tier:'Standard',   price:'33 000 ₸/польз', note:'15–50 польз. · внутр.+внеш. ЭДО · ЕСЭДО · dg messenger'};
+  return null;
+}
+
 function checkUsers(){
-  const users = parseInt(document.getElementById('users')?.value||0)||0;
-  const hint  = document.getElementById('users-hint');
+  const users    = parseInt(document.getElementById('users')?.value||0)||0;
+  const ownership= document.getElementById('ownership')?.value||'';
+  const hint     = document.getElementById('users-hint');
   if(!hint) return;
-  if(users===0){hint.style.color='var(--t3)';hint.textContent='Сотрудники, работающие с документами';return;}
-  if(users>=1&&users<=50){
-    hint.style.color='var(--teal)';
-    hint.textContent=`✓ ${users} польз. — подходит Business, SE, AIE`;
-  } else if(users>50){
+
+  if(users===0){
+    hint.style.color='var(--t3)';
+    hint.innerHTML='Сотрудники, работающие с документами';
+    return;
+  }
+
+  const bizTier = getBizTier(users, ownership);
+
+  if(users>50){
     hint.style.color='var(--blue)';
-    hint.textContent=`✓ ${users} польз. — Business недоступен (макс. 50), доступны SE и AIE`;
-    // Auto-uncheck Business in comparison
+    hint.innerHTML=`✓ ${users} польз. &mdash; <strong>Business недоступен</strong> (макс. 50), доступны <strong>SE</strong> и <strong>AIE</strong>`;
     const bizCb = document.querySelector('#compare-opts input[value="biz"]');
     if(bizCb&&bizCb.checked){bizCb.checked=false;validateComparison();}
+  } else if(bizTier){
+    hint.style.color='var(--teal)';
+    hint.innerHTML=`✓ Business <strong>${bizTier.tier}</strong> &mdash; ${bizTier.price} &mdash; ${bizTier.note}`;
+  } else {
+    hint.style.color='var(--t3)';
+    hint.innerHTML='Сотрудники, работающие с документами';
   }
 }
 
@@ -705,10 +732,20 @@ function validateComparison(){
   // ── Business max 50 ──
   if(hasBiz && users>50){
     warnEl.className='warn-box error show';
-    warnEl.innerHTML=`<strong>❌ Business недоступен при ${users} пользователях</strong>Business рассчитан на 1–50 пользователей. При большем объёме выберите SE или AIE.`;
+    warnEl.innerHTML=`<strong>❌ Business недоступен при ${users} пользователях</strong>Business рассчитан на 1–50 пользователей. При большем объёме — SE или AIE.`;
     const bizCb=document.querySelector('#compare-opts input[value="biz"]');
     if(bizCb)bizCb.checked=false;
     return;
+  }
+
+  // ── Business tier info ──
+  if(hasBiz && users>0 && users<=50){
+    const ownership2 = document.getElementById('ownership')?.value||'';
+    const tier = getBizTier(users, ownership2);
+    if(tier && !hasSE && !hasAIE){
+      warnEl.className='warn-box info show';
+      warnEl.innerHTML=`<strong>📋 Business ${tier.tier}</strong>${tier.price} · ${tier.note}`;
+    }
   }
 
   // ── SE/AIE min 10 ──
@@ -894,7 +931,7 @@ function buildData(){
 
 const SEG_LABELS={biz:'Documentolog Business',se:'d8n Standard Edition (SE)',aie:'d8n AI Edition (AIE)'};
 const SEG_DESC={
-  biz:'ЭДО, ЭЦП, внешний обмен. До 50 пользователей. Старт без внедрения.',
+  biz:'ЭДО, ЭЦП, внешний обмен. 1–50 пользователей. Тарифы: Start (до 2, бесплатно), Start Plus (до 20, 55 000 ₸/мес), Standard (15–50, 33 000 ₸/польз), Gov (до 5, 165 000 ₸/мес).',
   se:'Автоматизация BPM без AI. Фундамент цифровой трансформации. От 10 пользователей.',
   aie:'Полная AI-трансформация: BPM + 9 AI-агентов + коммуникации. От 10 пользователей.'
 };
