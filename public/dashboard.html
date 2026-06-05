@@ -114,6 +114,29 @@ tr:hover td{background:#F8FAFF}
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:36px 32px;width:100%;max-width:360px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,.3)">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="background:var(--blue);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">DG</div>
+        <div style="font-size:15px;font-weight:700;color:var(--navy)">Documentolog</div>
+      </div>
+      <div style="font-size:13px;color:var(--t2)">Дашборд менеджера</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Логин</label>
+      <input id="login-user" type="text" placeholder="admin" style="width:100%;padding:10px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Пароль</label>
+      <input id="login-pwd" type="password" placeholder="••••••••" style="width:100%;padding:10px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-err" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:8px 12px;font-size:12px;color:#991B1B;margin-bottom:12px">Неверный логин или пароль</div>
+    <button onclick="doLogin()" style="width:100%;padding:11px;background:var(--yellow);color:var(--navy);border:none;border-radius:6px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer">Войти</button>
+  </div>
+</div>
+
 <!-- NAVBAR -->
 <div class="topnav">
   <div class="nav-logo">
@@ -530,6 +553,40 @@ function copyPrompt() {
 }
 
 loadData();
+
+// ── Auth ─────────────────────────────────────────────────────────────────
+(function(){
+  const HASH = '7e6e4a9f3d2b1c8a5f4e3d2c1b0a9f8e'; // placeholder, replaced below
+  // Simple check: sha256 not available natively — use btoa comparison
+  // Credentials stored as base64 to avoid plain text
+  const CREDS = { user: btoa('admin'), pwd: btoa('astana1234') };
+  const SESSION_KEY = 'dg_dash_auth';
+
+  function isAuthed() {
+    return sessionStorage.getItem(SESSION_KEY) === '1';
+  }
+
+  window.doLogin = function() {
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pwd').value;
+    if (btoa(u) === CREDS.user && btoa(p) === CREDS.pwd) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pwd').value = '';
+    } else {
+      document.getElementById('login-err').style.display = 'block';
+      document.getElementById('login-pwd').value = '';
+      document.getElementById('login-pwd').focus();
+    }
+  };
+
+  // Show login if not authenticated
+  if (!isAuthed()) {
+    document.getElementById('login-screen').style.display = 'flex';
+    setTimeout(() => document.getElementById('login-user').focus(), 100);
+  }
+})();
 </script>
 </body>
 </html>
