@@ -951,8 +951,8 @@ function showTip(icon) {
   const title = icon.dataset.tipTitle || '';
   const text  = icon.dataset.tipText  || '';
   tipEl.innerHTML = `<strong>${title}</strong>${text}`;
-  tipEl.classList.remove('arr-left','arr-right','arr-top','arr-bottom');
-  tipEl.style.opacity = '0';
+  tipEl.classList.remove('arr-left','arr-right','arr-top','arr-bottom','show');
+  tipEl.style.opacity = '';
   tipEl.style.display = 'block';
 
   const rect   = icon.getBoundingClientRect();
