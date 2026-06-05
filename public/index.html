@@ -504,41 +504,90 @@ let step=1,maxStep=5,R={};
 const STEP_LABELS=['Организация и контакт','Масштаб и боль','Решения и AI','Инфраструктура','Коммерческие условия'];
 
 // ── Segmentation scoring ──────────────────────────────────────────────────
+// Главный критерий — функциональные потребности, не кол-во пользователей.
+// Business = коробочный ЭДО/ЭЦП без кастомизации.
+// SE = нужны интеграции, кастомные процессы или расширенный BPM.
+// AIE = нужны AI-агенты.
 function getSegment(){
-  const users=parseInt(document.getElementById('users')?.value||0)||0;
-  const aiChecked=document.querySelectorAll('#cb-ai input:checked').length;
-  const deploy=R['rg-deploy']||'';
-  const customAi=R['rg-custom-ai']||'';
-  const legalEntities=parseInt(document.getElementById('legalEntities')?.value||1)||1;
+  const modules   = Array.from(document.querySelectorAll('#cb-mod input:checked')).map(i=>i.value);
+  const comms     = Array.from(document.querySelectorAll('#cb-comms input:checked')).map(i=>i.value);
+  const integrations = Array.from(document.querySelectorAll('#cb-int input:checked')).map(i=>i.value);
+  const aiChecked = document.querySelectorAll('#cb-ai input:checked').length;
+  const customAi  = R['rg-custom-ai']||'';
+  const deploy    = R['rg-deploy']||'';
+  const legalEntities = parseInt(document.getElementById('legalEntities')?.value||1)||1;
+  const users     = parseInt(document.getElementById('users')?.value||0)||0;
 
-  let score={biz:0,se:0,aie:0};
-  let reasons=[];
+  // Сигналы SE/AIE — потребность в гибкости / расширении
+  const needsIntegration = integrations.length > 0;
+  const needsAdvancedBPM = modules.some(m=>['Кадровый + HR','Финансовый (счета, акты, бюджетирование)',
+    'Управление заседаниями / протоколы','ITSM / Service Desk','CRM'].includes(m));
+  const needsComms = comms.length > 0;
+  const isHolding = legalEntities > 1;
+  const needsOnPrem = deploy.includes('On-premise') || deploy.includes('PaaS');
 
-  // Users
-  if(users>0&&users<=50){score.biz+=3;reasons.push(`До 50 пользователей (Business-сегмент)`);}
-  else if(users>50&&users<=200){score.se+=2;score.aie+=1;reasons.push(`51–200 пользователей (SE / AIE)`);}
-  else if(users>200){score.aie+=2;score.se+=1;reasons.push(`Более 200 пользователей (масштаб AIE)`);}
+  // Сигналы AIE
+  const needsAI = aiChecked >= 1;
+  const needsCustomAI = customAi === 'Да' || customAi === 'Возможно';
 
-  // AI agents
-  if(aiChecked>=3){score.aie+=3;reasons.push(`${aiChecked} AI-агентов выбрано → AIE`);}
-  else if(aiChecked>=1){score.aie+=1;score.se+=1;}
+  let score = {biz:0, se:0, aie:0};
+  let reasons = [];
 
-  // Custom AI
-  if(customAi==='Да'){score.aie+=2;reasons.push('Нужны кастомные AI-агенты → AIE');}
+  // ── AIE triggers (сильные) ──
+  if(needsAI){
+    score.aie += 3;
+    reasons.push(`${aiChecked} AI-агент(а) выбрано → d8n AIE`);
+  }
+  if(customAi==='Да'){score.aie+=2; reasons.push('Нужны кастомные AI-агенты → AIE');}
   else if(customAi==='Возможно'){score.aie+=1;}
 
-  // Deploy
-  if(deploy.includes('On-premise')){score.aie+=1;score.se+=1;reasons.push('On-premise — SE или AIE');}
+  // ── SE triggers ──
+  if(needsIntegration){
+    score.se += 3;
+    reasons.push('Нужны интеграции (1С, ERP, SSO...) → SE или AIE');
+  }
+  if(needsAdvancedBPM){
+    score.se += 2;
+    reasons.push('Расширенный BPM (HR, Финансы, ITSM...) → SE или AIE');
+  }
+  if(needsComms){
+    score.se += 1;
+    reasons.push('Коммуникации dg (почта, диск...) → SE или AIE');
+  }
+  if(isHolding){
+    score.se += 1;
+    reasons.push(`Группа компаний (${legalEntities} ЮЛ) → SE или AIE`);
+  }
+  if(needsOnPrem){
+    score.se += 1;
+    reasons.push('On-premise / PaaS → SE или AIE');
+  }
 
-  // Holdings
-  if(legalEntities>3){score.aie+=1;reasons.push('Группа компаний (3+ ЮЛ) → AIE');}
+  // ── Business triggers (только если НЕТ сигналов SE/AIE) ──
+  // Business = только базовый ЭДО + ЭЦП, без кастомизации
+  const onlyBasicEDO = modules.length <= 1 &&
+    modules.every(m=>m.includes('ЭДО')) &&
+    !needsIntegration && !needsAdvancedBPM && !needsComms && !needsAI && !needsOnPrem;
 
-  // Determine winner
-  const max=Math.max(score.biz,score.se,score.aie);
-  let seg='se';
-  if(score.aie===max)seg='aie';
-  else if(score.biz===max&&score.biz>score.se)seg='biz';
-  return{seg,score,reasons};
+  if(onlyBasicEDO || (score.se===0 && score.aie===0)){
+    score.biz += 3;
+    if(onlyBasicEDO) reasons.push('Базовый ЭДО + ЭЦП, без интеграций → Business');
+  }
+
+  // N_full — слабый дополнительный сигнал, не основной
+  if(users > 0 && users <= 50 && score.se===0 && score.aie===0){
+    score.biz += 1;
+  }
+
+  // ── Winner ──
+  // AIE побеждает SE если оба набрали очки (SE — подмножество AIE)
+  const max = Math.max(score.biz, score.se, score.aie);
+  let seg = 'se'; // default
+  if(score.aie === max && score.aie > 0) seg = 'aie';
+  else if(score.se === max && score.se > 0) seg = 'se';
+  else if(score.biz > 0) seg = 'biz';
+
+  return {seg, score, reasons};
 }
 
 function updateScore(){
