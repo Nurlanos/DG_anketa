@@ -942,10 +942,12 @@ updateScore();
 <div id="tip-global"></div>
 <script>
 // ── Global tooltip system ────────────────────────────────────────────────
-const tipEl = document.getElementById('tip-global');
-let tipTimeout;
+let tipEl;
+document.addEventListener('DOMContentLoaded', () => { tipEl = document.getElementById('tip-global'); });
 
 function showTip(icon) {
+  if (!tipEl) tipEl = document.getElementById('tip-global');
+  if (!tipEl) return;
   const title = icon.dataset.tipTitle || '';
   const text  = icon.dataset.tipText  || '';
   tipEl.innerHTML = `<strong>${title}</strong>${text}`;
