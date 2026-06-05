@@ -3,17 +3,9 @@
   "buildCommand": "echo ok",
   "outputDirectory": "public",
   "rewrites": [
-    { "source": "/api/submit", "destination": "/api/submit" },
-    { "source": "/api/rows",   "destination": "/api/rows" },
-    { "source": "/api/update", "destination": "/api/update" },
-    { "source": "/dashboard",  "destination": "/dashboard.html" }
-  ],
-  "headers": [
-    {
-      "source": "/dashboard",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
-      ]
-    }
+    { "source": "/api/submit",    "destination": "/api/submit" },
+    { "source": "/api/rows",      "destination": "/api/rows" },
+    { "source": "/api/update",    "destination": "/api/update" },
+    { "source": "/dashboard",     "destination": "/api/dashboard" }
   ]
 }
