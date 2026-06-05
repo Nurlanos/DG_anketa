@@ -292,7 +292,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <div class="card-head"><span class="sn">2</span><span class="card-title">Пользователи и масштаб</span></div>
       <div class="card-body">
         <div class="r2">
-          <div class="f"><label><span class="tip-wrap">Офисных пользователей СЭД (N_full)<span class="tip-icon" data-tip-title="N_full — офисные пользователи" data-tip-text="Сотрудники, которые будут работать с документами в системе. Основа для расчёта стоимости лицензий.">?</span></span><span class="req">*</span></label><input id="users" type="number" placeholder="50" min="1" oninput="updateScore()"><div class="hint">Сотрудники, работающие с документами</div></div>
+          <div class="f"><label><span class="tip-wrap">Офисных пользователей СЭД (N_full)<span class="tip-icon" data-tip-title="N_full — офисные пользователи" data-tip-text="Сотрудники, которые будут работать с документами в системе. Основа для расчёта стоимости лицензий.">?</span></span><span class="req">*</span></label><input id="users" type="number" placeholder="50" min="1" oninput="updateScore();checkUsers()"><div class="hint" id="users-hint">Сотрудники, работающие с документами</div></div>
           <div class="f"><label><span class="tip-wrap">Линейный / полевой персонал (N_mobile)<span class="tip-icon" data-tip-title="N_mobile — мобильные пользователи" data-tip-text="Сотрудники, которым нужен мобильный доступ (заявки, кадровые документы, графики). Лицензируются отдельно — дешевле полной лицензии.">?</span></span></label><input id="mobile" type="number" placeholder="20" min="0"><div class="hint">Мобильный доступ: заявки, HR, графики</div></div>
         </div>
         <div class="r2">
@@ -658,6 +658,23 @@ function updateScore(){
   validateComparison();
 }
 
+function checkUsers(){
+  const users = parseInt(document.getElementById('users')?.value||0)||0;
+  const hint  = document.getElementById('users-hint');
+  if(!hint) return;
+  if(users===0){hint.style.color='var(--t3)';hint.textContent='Сотрудники, работающие с документами';return;}
+  if(users>=1&&users<=50){
+    hint.style.color='var(--teal)';
+    hint.textContent=`✓ ${users} польз. — подходит Business, SE, AIE`;
+  } else if(users>50){
+    hint.style.color='var(--blue)';
+    hint.textContent=`✓ ${users} польз. — Business недоступен (макс. 50), доступны SE и AIE`;
+    // Auto-uncheck Business in comparison
+    const bizCb = document.querySelector('#compare-opts input[value="biz"]');
+    if(bizCb&&bizCb.checked){bizCb.checked=false;validateComparison();}
+  }
+}
+
 function validateComparison(){
   const users = parseInt(document.getElementById('users')?.value||0)||0;
   const checked = Array.from(document.querySelectorAll('#compare-opts input:checked')).map(i=>i.value);
@@ -677,6 +694,29 @@ function validateComparison(){
   warnEl.className='warn-box';
   warnEl.innerHTML='';
   document.querySelectorAll('.compare-opt').forEach(el=>el.classList.remove('disabled'));
+
+  // ── RULE 0: N_full validation ──
+  if(users===0){
+    warnEl.className='warn-box warn show';
+    warnEl.innerHTML='<strong>⚠️ Укажите количество пользователей</strong>Поле N_full обязательно — от него зависит доступность решений и расчёт стоимости КП.';
+    return;
+  }
+
+  // ── Business max 50 ──
+  if(hasBiz && users>50){
+    warnEl.className='warn-box error show';
+    warnEl.innerHTML=`<strong>❌ Business недоступен при ${users} пользователях</strong>Business рассчитан на 1–50 пользователей. При большем объёме выберите SE или AIE.`;
+    const bizCb=document.querySelector('#compare-opts input[value="biz"]');
+    if(bizCb)bizCb.checked=false;
+    return;
+  }
+
+  // ── SE/AIE min 10 ──
+  if((hasSE||hasAIE) && users>0 && users<10){
+    warnEl.className='warn-box error show';
+    warnEl.innerHTML=`<strong>❌ SE и AIE требуют минимум 10 пользователей</strong>Текущее количество: ${users}. При меньшем объёме доступен только Business (1–50 польз.).<div class="warn-override">Если лицензий будет 10+ — <a onclick="allowMinOverride()">указать планируемый рост</a></div>`;
+    return;
+  }
 
   // ── RULE 1: Business + SE/AIE одновременно — конфликт ──
   if(hasBiz && (hasSE || hasAIE)){
@@ -731,6 +771,13 @@ Business — коробочный продукт: жёстко заданный 
 }
 
 let _conflictAllowed = false;
+let _minOverride = false;
+
+function allowMinOverride(){
+  _minOverride = true;
+  document.getElementById('warn-main').className='warn-box info show';
+  document.getElementById('warn-main').innerHTML='<strong>✓ Учтён планируемый рост</strong>КП будет подготовлено с учётом целевого количества пользователей. Менеджер уточнит детали.';
+}
 let _aieSmallAllowed = false;
 
 function allowConflict(){
@@ -793,7 +840,7 @@ function flash(el){el.style.outline='2px solid #EF4444';el.style.borderRadius='6
 function validate(){
   const rules={
     1:[{id:'company'},{id:'bin',min:12},{id:'ownership'},{id:'industry'},{id:'cname'},{id:'crole'},{id:'cemail'},{id:'cphone'},{id:'ebName'}],
-    2:[{id:'users'},{rg:'rg-sed'},{id:'goal'},{id:'pain'},{id:'vision12'}],
+    2:[{id:'users',min_val:1},{rg:'rg-sed'},{id:'goal'},{id:'pain'},{id:'vision12'}],
     3:[{cb:'cb-mod'}],
     4:[{rg:'rg-deploy'}],
     5:[{rg:'rg-term'},{rg:'rg-prepay'},{rg:'rg-budget'},{id:'deadline'}]
@@ -801,7 +848,13 @@ function validate(){
   let ok=true;
   document.querySelectorAll('.err-hl').forEach(e=>e.classList.remove('err-hl'));
   (rules[step]||[]).forEach(c=>{
-    if(c.id){const el=document.getElementById(c.id);if(el&&(!el.value.trim()||(c.min&&el.value.length<c.min))){el.classList.add('err-hl');ok=false;}}
+    if(c.id){const el=document.getElementById(c.id);if(el){
+  const val=el.value.trim();
+  let bad=!val;
+  if(c.min&&val.length<c.min)bad=true;
+  if(c.min_val&&(parseInt(val)||0)<c.min_val)bad=true;
+  if(bad){el.classList.add('err-hl');ok=false;}
+}}
     if(c.rg&&!R[c.rg]){const el=document.getElementById(c.rg);if(el)flash(el);ok=false;}
     if(c.cb&&chk(c.cb).length===0){const el=document.getElementById(c.cb);if(el)flash(el);ok=false;}
   });
