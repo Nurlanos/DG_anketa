@@ -236,7 +236,6 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <div class="pm-label" id="sl">Шаг 1 из 5</div>
       <div class="seg-bar">
         <span style="font-size:10px;color:var(--t3)">Сегмент:</span>
-        <span class="seg-chip seg-biz" id="chip-biz">Business</span>
         <span class="seg-chip seg-se" id="chip-se">d8n SE</span>
         <span class="seg-chip seg-aie" id="chip-aie">d8n AIE</span>
       </div>
@@ -505,10 +504,6 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="compare-section">
       <h4>Хотите сравнить несколько решений?</h4>
       <div class="compare-options" id="compare-opts">
-        <label class="compare-opt" id="copt-biz">
-          <input type="checkbox" value="biz" onchange="validateComparison()">
-          <span>Business</span>
-        </label>
         <label class="compare-opt" id="copt-se">
           <input type="checkbox" value="se" onchange="validateComparison()">
           <span>d8n SE</span>
@@ -561,248 +556,113 @@ let step=1,maxStep=5,R={};
 const STEP_LABELS=['Организация и контакт','Масштаб и боль','Решения и AI','Инфраструктура','Коммерческие условия'];
 
 // ── Segmentation scoring ──────────────────────────────────────────────────
-// Главный критерий — функциональные потребности, не кол-во пользователей.
-// Business = коробочный ЭДО/ЭЦП без кастомизации.
-// SE = нужны интеграции, кастомные процессы или расширенный BPM.
-// AIE = нужны AI-агенты.
+// Только SE и AIE. Business — другое подразделение, не рассчитываем.
+// SE: нужны интеграции / расширенный BPM / коммуникации dg.
+// AIE: нужен хотя бы 1 AI-агент.
 function getSegment(){
-  const modules   = Array.from(document.querySelectorAll('#cb-mod input:checked')).map(i=>i.value);
-  const comms     = Array.from(document.querySelectorAll('#cb-comms input:checked')).map(i=>i.value);
+  const modules      = Array.from(document.querySelectorAll('#cb-mod input:checked')).map(i=>i.value);
   const integrations = Array.from(document.querySelectorAll('#cb-int input:checked')).map(i=>i.value);
-  const aiChecked = document.querySelectorAll('#cb-ai input:checked').length;
-  const customAi  = R['rg-custom-ai']||'';
-  const deploy    = R['rg-deploy']||'';
-  const legalEntities = parseInt(document.getElementById('legalEntities')?.value||1)||1;
-  const users     = parseInt(document.getElementById('users')?.value||0)||0;
+  const aiChecked    = document.querySelectorAll('#cb-ai input:checked').length;
+  const customAi     = R['rg-custom-ai']||'';
+  const comms        = Array.from(document.querySelectorAll('#cb-comms input:checked')).map(i=>i.value);
+  const deploy       = R['rg-deploy']||'';
+  const legalEntities= parseInt(document.getElementById('legalEntities')?.value||1)||1;
+  const users        = parseInt(document.getElementById('users')?.value||0)||0;
 
-  // Сигналы SE/AIE — потребность в гибкости / расширении
   const needsIntegration = integrations.length > 0;
   const needsAdvancedBPM = modules.some(m=>['Кадровый + HR','Финансовый (счета, акты, бюджетирование)',
     'Управление заседаниями / протоколы','ITSM / Service Desk','CRM'].includes(m));
-  const needsComms = comms.length > 0;
-  const isHolding = legalEntities > 1;
-  const needsOnPrem = deploy.includes('On-premise') || deploy.includes('PaaS');
+  const needsComms   = comms.length > 0;
+  const isHolding    = legalEntities > 1;
+  const needsOnPrem  = deploy.includes('On-premise') || deploy.includes('PaaS');
+  const needsAI      = aiChecked >= 1;
+  const needsCustomAI= customAi === 'Да' || customAi === 'Возможно';
 
-  // Сигналы AIE
-  const needsAI = aiChecked >= 1;
-  const needsCustomAI = customAi === 'Да' || customAi === 'Возможно';
-
-  let score = {biz:0, se:0, aie:0};
+  let score = { se: 0, aie: 0 };
   let reasons = [];
 
-  // ── AIE triggers (сильные) ──
-  if(needsAI){
-    score.aie += 3;
-    reasons.push(`${aiChecked} AI-агент(а) выбрано → d8n AIE`);
-  }
-  if(customAi==='Да'){score.aie+=2; reasons.push('Нужны кастомные AI-агенты → AIE');}
-  else if(customAi==='Возможно'){score.aie+=1;}
+  // AIE
+  if(needsAI){ score.aie += 3; reasons.push(`${aiChecked} AI-агент(а) → d8n AIE`); }
+  if(customAi==='Да'){ score.aie += 2; reasons.push('Custom AI-агенты → AIE'); }
+  else if(customAi==='Возможно'){ score.aie += 1; }
 
-  // ── SE triggers ──
-  if(needsIntegration){
-    score.se += 3;
-    reasons.push('Нужны интеграции (1С, ERP, SSO...) → SE или AIE');
-  }
-  if(needsAdvancedBPM){
-    score.se += 2;
-    reasons.push('Расширенный BPM (HR, Финансы, ITSM...) → SE или AIE');
-  }
-  if(needsComms){
-    score.se += 1;
-    reasons.push('Коммуникации dg (почта, диск...) → SE или AIE');
-  }
-  if(isHolding){
-    score.se += 1;
-    reasons.push(`Группа компаний (${legalEntities} ЮЛ) → SE или AIE`);
-  }
-  if(needsOnPrem){
-    score.se += 1;
-    reasons.push('On-premise / PaaS → SE или AIE');
-  }
+  // SE
+  if(needsIntegration){ score.se += 3; reasons.push('Интеграции (1С, ERP...) → SE или AIE'); }
+  if(needsAdvancedBPM){ score.se += 2; reasons.push('Расширенный BPM → SE или AIE'); }
+  if(needsComms)      { score.se += 1; reasons.push('Коммуникации dg → SE или AIE'); }
+  if(isHolding)       { score.se += 1; reasons.push(`Группа компаний (${legalEntities} ЮЛ) → SE или AIE`); }
+  if(needsOnPrem)     { score.se += 1; reasons.push('On-premise / PaaS → SE или AIE'); }
 
-  // ── Business triggers ──
-  // Business = только базовый ЭДО + ЭЦП, без кастомизации, до 50 польз.
-  const ownership = document.getElementById('ownership')?.value||'';
-  const bizTier   = users>0 && users<=50 ? getBizTier(users, ownership) : null;
-  const isGov     = ownership==='Государственная'||ownership==='Квазигосударственная';
+  // Default SE if nothing yet
+  if(score.se === 0 && score.aie === 0){ score.se = 1; }
 
-  const onlyBasicEDO = modules.length <= 1 &&
-    modules.every(m=>m.includes('ЭДО')) &&
-    !needsIntegration && !needsAdvancedBPM && !needsComms && !needsAI && !needsOnPrem;
-
-  if(users<=50 && bizTier && (onlyBasicEDO || (score.se===0 && score.aie===0))){
-    score.biz += 3;
-    reasons.push(`Business ${bizTier.tier} — ${bizTier.note}`);
-  }
-
-  // Gov — отдельный тариф для госорганов
-  if(isGov && users<=5 && score.aie===0){
-    score.biz += 2;
-    reasons.push('Государственная организация ≤5 польз. → Business Gov');
-  }
-
-  // ── Winner ──
-  // AIE побеждает SE если оба набрали очки (SE — подмножество AIE)
-  const max = Math.max(score.biz, score.se, score.aie);
-  let seg = 'se'; // default
-  if(score.aie === max && score.aie > 0) seg = 'aie';
-  else if(score.se === max && score.se > 0) seg = 'se';
-  else if(score.biz > 0) seg = 'biz';
-
-  return {seg, score, reasons};
+  const seg = score.aie > 0 ? 'aie' : 'se';
+  return { seg, score, reasons };
 }
 
 function updateScore(){
   const {seg}=getSegment();
-  document.getElementById('chip-biz').classList.toggle('active',seg==='biz');
-  document.getElementById('chip-se').classList.toggle('active',seg==='se');
-  document.getElementById('chip-aie').classList.toggle('active',seg==='aie');
+  const cs=document.getElementById('chip-se');
+  const ca=document.getElementById('chip-aie');
+  if(cs) cs.classList.toggle('active',seg==='se');
+  if(ca) ca.classList.toggle('active',seg==='aie');
   // Pre-check recommended segment in comparison block
   const recCb = document.querySelector(`#compare-opts input[value="${seg}"]`);
   if(recCb && !recCb.checked){recCb.checked=true;}
   validateComparison();
 }
 
-// Business тарифы по N_full
-function getBizTier(users, ownership){
-  if(ownership==='Государственная'||ownership==='Квазигосударственная'){
-    return users<=5 ? {tier:'Gov',price:'',note:'до 5 польз. · для акиматов и госорганов'} : null;
-  }
-  if(users<=2)  return {tier:'Start',      price:'', note:'до 2 польз. · 5 док/мес · внешний ЭДО · ЭЦП'};
-  if(users<=20) return {tier:'Start Plus', price:'', note:'до 20 польз. · внешний ЭДО · API · 1С · Adobe Sign'};
-  if(users<=50) return {tier:'Standard',   price:'', note:'15–50 польз. · внутренний + внешний ЭДО · ЕСЭДО · dg messenger'};
-  return null;
-}
-
 function checkUsers(){
   const users    = parseInt(document.getElementById('users')?.value||0)||0;
-  const ownership= document.getElementById('ownership')?.value||'';
   const hint     = document.getElementById('users-hint');
   if(!hint) return;
-
   if(users===0){
     hint.style.color='var(--t3)';
     hint.innerHTML='Сотрудники, работающие с документами';
     return;
   }
-
-  const bizTier = getBizTier(users, ownership);
-
-  if(users>50){
-    hint.style.color='var(--blue)';
-    hint.innerHTML=`✓ ${users} польз. &mdash; <strong>Business недоступен</strong> (макс. 50), доступны <strong>SE</strong> и <strong>AIE</strong>`;
-    const bizCb = document.querySelector('#compare-opts input[value="biz"]');
-    if(bizCb&&bizCb.checked){bizCb.checked=false;validateComparison();}
-  } else if(bizTier){
-    hint.style.color='var(--teal)';
-    hint.innerHTML=`✓ Business <strong>${bizTier.tier}</strong> &mdash; ${bizTier.note}`;
+  if(users<10){
+    hint.style.color='#E65100';
+    hint.innerHTML=`⚠️ ${users} польз. — SE и AIE требуют минимум 10 пользователей. <span style="color:var(--t3)">Для меньшего объёма есть Documentolog Business — менее гибкий, но доступный вариант (другое подразделение).</span>`;
   } else {
-    hint.style.color='var(--t3)';
-    hint.innerHTML='Сотрудники, работающие с документами';
+    hint.style.color='var(--teal)';
+    hint.innerHTML=`✓ ${users} польз. — подходит для d8n SE и d8n AIE`;
   }
+  updateScore();
 }
 
 function validateComparison(){
-  const users = parseInt(document.getElementById('users')?.value||0)||0;
-  const checked = Array.from(document.querySelectorAll('#compare-opts input:checked')).map(i=>i.value);
-  const {seg,score} = getSegment();
-  const warnEl = document.getElementById('warn-main');
-  const hasBiz = checked.includes('biz');
-  const hasSE  = checked.includes('se');
-  const hasAIE = checked.includes('aie');
-  const aiChecked = document.querySelectorAll('#cb-ai input:checked').length;
-  const integrations = document.querySelectorAll('#cb-int input:checked').length;
-  const advBPM = Array.from(document.querySelectorAll('#cb-mod input:checked'))
-    .map(i=>i.value)
-    .some(m=>['Кадровый + HR','Финансовый (счета, акты, бюджетирование)',
-      'Управление заседаниями / протоколы','ITSM / Service Desk','CRM'].includes(m));
+  const users    = parseInt(document.getElementById('users')?.value||0)||0;
+  const checked  = Array.from(document.querySelectorAll('#compare-opts input:checked')).map(i=>i.value);
+  const hasSE    = checked.includes('se');
+  const hasAIE   = checked.includes('aie');
+  const aiChecked= document.querySelectorAll('#cb-ai input:checked').length;
+  const warnEl   = document.getElementById('warn-main');
+  if(!warnEl) return;
 
-  // Reset
   warnEl.className='warn-box';
   warnEl.innerHTML='';
-  document.querySelectorAll('.compare-opt').forEach(el=>el.classList.remove('disabled'));
 
-  // ── RULE 0: N_full validation ──
+  // N_full не заполнен
   if(users===0){
     warnEl.className='warn-box warn show';
-    warnEl.innerHTML='<strong>⚠️ Укажите количество пользователей</strong>Поле N_full обязательно — от него зависит доступность решений и расчёт стоимости КП.';
+    warnEl.innerHTML='<strong>⚠️ Укажите количество пользователей</strong>Поле N_full обязательно для расчёта КП.';
     return;
   }
 
-  // ── Business max 50 ──
-  if(hasBiz && users>50){
+  // Меньше 10 — не подходят SE/AIE
+  if((hasSE||hasAIE) && users<10){
     warnEl.className='warn-box error show';
-    warnEl.innerHTML=`<strong>❌ Business недоступен при ${users} пользователях</strong>Business рассчитан на 1–50 пользователей. При большем объёме — SE или AIE.`;
-    const bizCb=document.querySelector('#compare-opts input[value="biz"]');
-    if(bizCb)bizCb.checked=false;
+    warnEl.innerHTML=`<strong>❌ SE и AIE требуют минимум 10 пользователей</strong>
+Текущее количество: ${users}. Для меньшего объёма существует Documentolog Business — коробочный продукт без гибкой настройки (другое подразделение).
+<div class="warn-override"><a onclick="allowMinOverride()">Указать планируемый рост до 10+</a></div>`;
     return;
   }
 
-  // ── Business tier info ──
-  if(hasBiz && users>0 && users<=50){
-    const ownership2 = document.getElementById('ownership')?.value||'';
-    const tier = getBizTier(users, ownership2);
-    if(tier && !hasSE && !hasAIE){
-      warnEl.className='warn-box info show';
-      warnEl.innerHTML=`<strong>📋 Business ${tier.tier}</strong>${tier.note}`;
-    }
-  }
-
-  // ── SE/AIE min 10 ──
-  if((hasSE||hasAIE) && users>0 && users<10){
-    warnEl.className='warn-box error show';
-    warnEl.innerHTML=`<strong>❌ SE и AIE требуют минимум 10 пользователей</strong>Текущее количество: ${users}. При меньшем объёме доступен только Business (1–50 польз.).<div class="warn-override">Если лицензий будет 10+ — <a onclick="allowMinOverride()">указать планируемый рост</a></div>`;
-    return;
-  }
-
-  // ── RULE 1: Business + SE/AIE одновременно — конфликт ──
-  if(hasBiz && (hasSE || hasAIE)){
-    warnEl.className='warn-box error show';
-    warnEl.innerHTML=`<strong>⚠️ Конфликт решений</strong>
-Business — это коробочный продукт без интеграций и кастомных процессов.
-Включать его в сравнение с SE/AIE нецелесообразно: клиент всё равно выберет SE/AIE если нужны интеграции или расширенный BPM.
-<div class="warn-override">Если клиент настаивает — <a onclick="allowConflict()">разрешить сравнение</a></div>`;
-    return;
-  }
-
-  // ── RULE 2: AIE с очень маленьким масштабом — жёсткое предупреждение ──
-  if(hasAIE && users > 0 && users < 25 && aiChecked === 0){
-    warnEl.className='warn-box error show';
-    warnEl.innerHTML=`<strong>❌ Нецелесообразно при ${users} пользователях</strong>
-d8n AIE включает 9 AI-агентов — стоимость значительно выше SE.
-При менее 25 пользователях без явной потребности в AI затраты на 1 сотрудника делают AIE экономически невыгодным.
-<strong>Рекомендация:</strong> начните с SE, при росте — апгрейд со скидкой.
-<div class="warn-override"><a onclick="allowAIESmall()">Клиент осознанно хочет AIE — включить в сравнение</a></div>`;
-    // Uncheck AIE
-    const aieCb = document.querySelector('#compare-opts input[value="aie"]');
-    if(aieCb) aieCb.checked = false;
-    return;
-  }
-
-  // ── RULE 3: AIE при 25–50 польз. и нет AI — предупреждение (не блок) ──
-  if(hasAIE && users >= 25 && users <= 50 && aiChecked === 0){
-    warnEl.className='warn-box warn show';
-    warnEl.innerHTML=`<strong>⚠️ AIE дорогостоящий вариант для ${users} пользователей</strong>
-Вы не выбрали AI-агенты, но хотите сравнить AIE. Включим в КП, но стоимость будет заметно выше SE.
-Рекомендуем добавить интересующие AI-агенты в шаге 3 для обоснования выбора AIE.`;
-    return;
-  }
-
-  // ── RULE 4: SE выбран, но есть AI-агенты — мягкое предложение ──
-  if(hasSE && !hasAIE && aiChecked >= 1){
+  // SE выбран, есть AI-агенты — подсказать AIE
+  if(hasSE && !hasAIE && aiChecked>=1){
     warnEl.className='warn-box info show';
-    warnEl.innerHTML=`<strong>💡 Вы выбрали AI-агенты, но не включили d8n AIE</strong>
-SE не включает AI-агенты. Добавьте AIE в сравнение — менеджер покажет разницу в цене и функционале.`;
-    return;
-  }
-
-  // ── RULE 5: Business выбран, но есть интеграции или расширенный BPM ──
-  if(hasBiz && !hasSE && !hasAIE && (integrations > 0 || advBPM)){
-    warnEl.className='warn-box warn show';
-    warnEl.innerHTML=`<strong>⚠️ Business не поддерживает выбранный функционал</strong>
-Business — коробочный продукт: жёстко заданный функционал, без кастомных интеграций и расширенного BPM.
-Интеграции с 1С, HR-модуль, ITSM — доступны только в SE/AIE.
-Рекомендуем добавить SE в сравнение.`;
+    warnEl.innerHTML='<strong>💡 Вы выбрали AI-агенты, но не добавили d8n AIE</strong>SE не включает AI-агенты. Добавьте AIE для сравнения — менеджер покажет разницу.';
     return;
   }
 }
@@ -929,9 +789,8 @@ function buildData(){
   };
 }
 
-const SEG_LABELS={biz:'Documentolog Business',se:'d8n Standard Edition (SE)',aie:'d8n AI Edition (AIE)'};
+const SEG_LABELS={se:'d8n Standard Edition (SE)',aie:'d8n AI Edition (AIE)'};
 const SEG_DESC={
-  biz:'ЭДО, ЭЦП, внешний обмен. 1–50 пользователей. Тарифы: Start (до 2), Start Plus (до 20), Standard (15–50), Gov (до 5, для госорганов).',
   se:'Автоматизация BPM без AI. Фундамент цифровой трансформации. От 10 пользователей.',
   aie:'Полная AI-трансформация: BPM + 9 AI-агентов + коммуникации. От 10 пользователей.'
 };
@@ -1004,7 +863,7 @@ async function submit(){
   // Show result
   const {seg,reasons}=getSegment();
   const segLabels={biz:'Business',se:'d8n SE',aie:'d8n AIE'};
-  const segIcos={biz:'📄',se:'⚙️',aie:'🤖'};
+  const segIcos={se:'⚙️',aie:'🤖'};
   const reasonsHtml=reasons.map(r=>`<div class="seg-reason">${r}</div>`).join('');
   document.getElementById('seg-result-block').innerHTML=`
     <div class="seg-result">
