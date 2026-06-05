@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "echo ok",
+  "buildCommand": "npm install",
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/submit", "destination": "/api/submit" },
