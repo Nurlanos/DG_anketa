@@ -80,6 +80,17 @@ tr:hover td{background:#F8FAFF}
 .empty{padding:48px;text-align:center;color:var(--t3);font-size:13px}
 .empty .ico{font-size:32px;margin-bottom:12px}
 .err-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13px;color:#991B1B;display:none}
+.mgr-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.mgr-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:6px;padding:8px 12px;flex-wrap:wrap}
+.mgr-row .mgr-info{flex:1;min-width:160px}
+.mgr-row .mgr-name{font-size:13px;font-weight:600;color:var(--navy)}
+.mgr-row .mgr-email{font-size:11px;color:var(--t3);margin-top:1px}
+.mgr-row .mgr-id{font-family:'Courier New',monospace;font-size:10px;background:var(--blue-l);color:var(--blue);padding:2px 7px;border-radius:10px}
+.modal-sm{background:var(--card);border-radius:12px;max-width:420px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.form-row{margin-bottom:12px}
+.form-row label{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px}
+.form-row input{width:100%;padding:9px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;color:var(--text);background:var(--bg);outline:none;-webkit-appearance:none}
+.form-row input:focus{border-color:var(--blue);background:var(--card)}
 
 /* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
@@ -147,19 +158,13 @@ tr:hover td{background:#F8FAFF}
     <div class="stat"><div class="n" id="st-d">—</div><div class="l">Договоров</div></div>
   </div>
 
-  <!-- LINK GENERATOR -->
+  <!-- MANAGER MANAGEMENT + LINK GENERATOR -->
   <div class="lgen">
-    <h3>Персональная ссылка для клиента</h3>
-    <div class="lr">
-      <select class="lsel" id="lsel" onchange="genLink()">
-        <option value="">— выберите менеджера —</option>
-        <option value="n.omarov">Омаров Нурлан (Упр. №9)</option>
-        <option value="a.kuz">Кузьменко Азиза (Упр. №9)</option>
-        <option value="manager3">Менеджер 3</option>
-      </select>
-      <div class="lurl" id="lurl">Выберите менеджера...</div>
-      <button class="btn" onclick="copyLink()">Скопировать ссылку</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <h3 style="margin:0">Менеджеры и персональные ссылки</h3>
+      <button class="btn" onclick="openAddMgr()">+ Добавить менеджера</button>
     </div>
+    <div class="mgr-list" id="mgr-list"></div>
   </div>
 
   <!-- ERROR BOX -->
@@ -208,6 +213,148 @@ tr:hover td{background:#F8FAFF}
 <script>
 let rows = [], curMgr = 'all', _prompt = '', _genLink = '';
 
+// ── Manager registry (stored in localStorage) ────────────────────────────
+const DEFAULT_MANAGERS = [
+  { id: 'n.omarov', name: 'Омаров Нурлан', dept: 'Упр. №9', email: 'astananur@gmail.com' },
+  { id: 'a.kuz',    name: 'Кузьменко Азиза', dept: 'Упр. №9', email: '' },
+];
+
+function loadManagers() {
+  try {
+    const saved = localStorage.getItem('dg_managers');
+    return saved ? JSON.parse(saved) : DEFAULT_MANAGERS;
+  } catch { return DEFAULT_MANAGERS; }
+}
+function saveManagers(mgrs) {
+  try { localStorage.setItem('dg_managers', JSON.stringify(mgrs)); } catch {}
+}
+
+let managers = loadManagers();
+
+function renderManagers() {
+  const list = document.getElementById('mgr-list');
+  if (!list) return;
+  list.innerHTML = managers.map((m, i) => `
+    <div class="mgr-row">
+      <div class="mgr-info">
+        <div class="mgr-name">${m.name} <span class="mgr-id">${m.id}</span></div>
+        <div class="mgr-email">${m.email || '<span style="color:#EF4444">email не указан</span>'} · ${m.dept || ''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="copyMgrLink('${m.id}')">Скопировать ссылку</button>
+        <button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="editMgr(${i})">Изменить</button>
+        ${managers.length > 1 ? `<button class="btn sec" style="padding:6px 10px;font-size:11px;color:#EF4444;border-color:#FECACA" onclick="deleteMgr(${i})">✕</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  // Update filter tabs
+  const tabs = document.getElementById('tabs');
+  if (tabs) {
+    const managerTabs = managers.map(m =>
+      `<button class="tab${curMgr===m.id?' on':''}" data-m="${m.id}">${m.name.split(' ')[0]}</button>`
+    ).join('');
+    tabs.innerHTML = `<button class="tab${curMgr==='all'?' on':''}" data-m="all">Все</button>${managerTabs}`;
+    tabs.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+        t.classList.add('on');
+        curMgr = t.dataset.m;
+        render();
+      });
+    });
+  }
+}
+
+function copyMgrLink(mgrId) {
+  const url = location.origin + '/?mgr=' + mgrId;
+  navigator.clipboard.writeText(url).catch(() => {});
+  event.target.textContent = '✓ Скопировано';
+  setTimeout(() => event.target.textContent = 'Скопировать ссылку', 1500);
+}
+
+// ── Add/Edit manager modal ────────────────────────────────────────────────
+let _editIdx = -1;
+
+function openAddMgr(idx = -1) {
+  _editIdx = idx;
+  const m = idx >= 0 ? managers[idx] : { id: '', name: '', dept: '', email: '' };
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('m-title').textContent = idx >= 0 ? 'Изменить менеджера' : 'Добавить менеджера';
+  document.getElementById('m-code').style.display = 'none';
+  document.querySelector('.code-box').style.display = 'none';
+  document.querySelector('.modal-foot').innerHTML = `
+    <button class="btn blue" onclick="saveMgr()">Сохранить</button>
+    <button class="btn sec" onclick="closeModal()">Отмена</button>
+  `;
+  document.getElementById('m-detail').innerHTML = `
+    <div class="form-row" style="grid-column:1/-1">
+      <label>ФИО менеджера<span style="color:#EF4444">*</span></label>
+      <input id="mgr-f-name" type="text" value="${m.name}" placeholder="Иванов Иван">
+    </div>
+    <div class="form-row">
+      <label>Email (куда приходят анкеты)<span style="color:#EF4444">*</span></label>
+      <input id="mgr-f-email" type="email" value="${m.email}" placeholder="manager@company.kz">
+    </div>
+    <div class="form-row">
+      <label>Отдел / подразделение</label>
+      <input id="mgr-f-dept" type="text" value="${m.dept}" placeholder="Упр. №9">
+    </div>
+    <div class="form-row" style="${idx >= 0 ? 'display:none' : ''}">
+      <label>ID (латиница, без пробелов)<span style="color:#EF4444">*</span></label>
+      <input id="mgr-f-id" type="text" value="${m.id}" placeholder="i.ivanov">
+    </div>
+    <div style="grid-column:1/-1;font-size:11px;color:var(--t3);padding:4px 0">
+      Ссылка для клиента: <span style="font-family:monospace;color:var(--blue)">${location.origin}/?mgr=${m.id||'[id]'}</span>
+    </div>
+  `;
+}
+
+function editMgr(idx) { openAddMgr(idx); }
+
+function saveMgr() {
+  const name  = document.getElementById('mgr-f-name')?.value.trim();
+  const email = document.getElementById('mgr-f-email')?.value.trim();
+  const dept  = document.getElementById('mgr-f-dept')?.value.trim();
+  const idEl  = document.getElementById('mgr-f-id');
+  const id    = _editIdx >= 0 ? managers[_editIdx].id : (idEl?.value.trim().toLowerCase().replace(/\s+/g,'') || '');
+
+  if (!name || !email || !id) { alert('Заполните обязательные поля'); return; }
+  if (!email.includes('@')) { alert('Некорректный email'); return; }
+
+  if (_editIdx >= 0) {
+    managers[_editIdx] = { ...managers[_editIdx], name, email, dept };
+  } else {
+    if (managers.find(m => m.id === id)) { alert('Менеджер с таким ID уже существует'); return; }
+    managers.push({ id, name, dept, email });
+  }
+  saveManagers(managers);
+
+  // Also update server-side mapping via API
+  updateServerMapping();
+
+  renderManagers();
+  closeModal();
+}
+
+function deleteMgr(idx) {
+  if (!confirm(`Удалить менеджера ${managers[idx].name}?`)) return;
+  managers.splice(idx, 1);
+  saveManagers(managers);
+  renderManagers();
+}
+
+async function updateServerMapping() {
+  // Send updated manager list to server to update email routing
+  try {
+    await fetch('/api/managers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ managers })
+    });
+  } catch(e) { console.warn('Server mapping update skipped:', e); }
+}
+
 // Close modal — через id, без конфликта с window.close
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
@@ -244,6 +391,9 @@ function copyLink() {
 }
 
 // Load data
+// Render managers on init
+renderManagers();
+
 async function loadData() {
   document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">⏳</div>Загрузка из Airtable...</div>';
   document.getElementById('err-box').style.display = 'none';
