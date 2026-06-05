@@ -3,9 +3,9 @@
   "buildCommand": "echo ok",
   "outputDirectory": "public",
   "rewrites": [
-    { "source": "/api/submit",    "destination": "/api/submit" },
-    { "source": "/api/rows",      "destination": "/api/rows" },
-    { "source": "/api/update",    "destination": "/api/update" },
-    { "source": "/dashboard",     "destination": "/api/dashboard" }
+    { "source": "/api/submit", "destination": "/api/submit" },
+    { "source": "/api/rows",   "destination": "/api/rows" },
+    { "source": "/api/update", "destination": "/api/update" },
+    { "source": "/dashboard",  "destination": "/dashboard.html" }
   ]
 }
