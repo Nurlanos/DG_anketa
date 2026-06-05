@@ -155,6 +155,16 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 .bc{padding:10px 22px;background:var(--blue-l);color:var(--blue);border:1.5px solid #C7DCFF;border-radius:6px;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
 .bc:hover{background:var(--blue);color:#fff}
 .err-hl{border-color:#EF4444!important;background:#FEF2F2!important}
+
+/* TOOLTIPS */
+.tip-wrap{position:relative;display:inline-flex;align-items:center;gap:5px}
+.tip-icon{width:16px;height:16px;background:var(--blue-l);border:1.5px solid #C7DCFF;border-radius:50%;color:var(--blue);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;user-select:none;transition:all .15s}
+.tip-icon:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tip-bubble{position:absolute;left:24px;top:-4px;background:#1A2340;color:#E8EDF5;font-size:12px;line-height:1.55;padding:10px 14px;border-radius:8px;width:260px;z-index:50;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.tip-bubble::before{content:'';position:absolute;left:-5px;top:10px;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:5px solid #1A2340}
+.tip-bubble strong{color:#F5C518;display:block;margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.tip-wrap:hover .tip-bubble,.tip-icon:focus+.tip-bubble{opacity:1}
+@media(max-width:480px){.tip-bubble{left:auto;right:0;top:24px}.tip-bubble::before{display:none}}
 </style>
 </head>
 <body>
@@ -235,16 +245,16 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <div class="card-head"><span class="sn">1</span><span class="card-title">Организация</span></div>
       <div class="card-body">
         <div class="r2">
-          <div class="f"><label>Наименование<span class="req">*</span></label><input id="company" type="text" placeholder='АО "Компания"'></div>
-          <div class="f"><label>БИН / ИИН<span class="req">*</span></label><input id="bin" type="text" placeholder="000000000000" maxlength="12"></div>
+          <div class="f"><label><span class="tip-wrap">Наименование<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Юридическое название</strong>Используется для КП и договора. Важно указать полное официальное наименование.</span></span><span class="req">*</span></label><input id="company" type="text" placeholder='АО "Компания"'></div>
+          <div class="f"><label><span class="tip-wrap">БИН / ИИН<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>БИН / ИИН</strong>Бизнес-идентификационный номер (12 цифр). Нужен для верификации компании и подготовки договора.</span></span><span class="req">*</span></label><input id="bin" type="text" placeholder="000000000000" maxlength="12"></div>
         </div>
         <div class="r2">
-          <div class="f"><label>Вид собственности<span class="req">*</span></label>
+          <div class="f"><label><span class="tip-wrap">Вид собственности<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Вид собственности</strong>Определяет процедуру закупки: госкомпании часто закупают через тендер (ПГЗ), частные — напрямую.</span></span><span class="req">*</span></label>
             <select id="ownership"><option value="">—</option><option>Частная</option><option>Государственная</option><option>Квазигосударственная</option></select></div>
-          <div class="f"><label>Отрасль<span class="req">*</span></label>
+          <div class="f"><label><span class="tip-wrap">Отрасль<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Отрасль</strong>Помогает подобрать релевантные кейсы и лучшие практики внедрения из вашей сферы.</span></span><span class="req">*</span></label>
             <select id="industry"><option value="">—</option><option>Финансы / Банки</option><option>Строительство</option><option>IT / Телеком</option><option>Медиа / Издания</option><option>СПК / Холдинги</option><option>Производство</option><option>Здравоохранение</option><option>Государственный сектор</option><option>Другое</option></select></div>
         </div>
-        <div class="f"><label>Холдинговая структура (дочерние компании войдут в проект?)</label>
+        <div class="f"><label><span class="tip-wrap">Холдинговая структура (дочерние компании войдут в проект?)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Холдинг</strong>Если несколько ЮЛ — возможно групповое лицензирование со скидкой. Влияет на объём и стоимость проекта.</span></span></label>
           <div class="rg" id="rg-holding">
             <div class="ri" data-v="Нет"><span>Нет</span></div>
             <div class="ri" data-v="Да"><span>Да</span></div>
@@ -256,16 +266,16 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <div class="card-head light"><span class="sn" style="background:var(--blue)">→</span><span class="card-title dark">Контактное лицо</span></div>
       <div class="card-body">
         <div class="r2">
-          <div class="f"><label>ФИО<span class="req">*</span></label><input id="cname" type="text" placeholder="Иванов Иван"></div>
-          <div class="f"><label>Должность<span class="req">*</span></label><input id="crole" type="text" placeholder="Директор по IT"></div>
+          <div class="f"><label><span class="tip-wrap">ФИО<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Контактное лицо</strong>Человек, с которым менеджер будет согласовывать КП и детали проекта.</span></span><span class="req">*</span></label><input id="cname" type="text" placeholder="Иванов Иван"></div>
+          <div class="f"><label><span class="tip-wrap">Должность<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Должность</strong>Помогает понять уровень принятия решений и правильно выстроить коммуникацию.</span></span><span class="req">*</span></label><input id="crole" type="text" placeholder="Директор по IT"></div>
         </div>
         <div class="r2">
-          <div class="f"><label>Email<span class="req">*</span></label><input id="cemail" type="email" placeholder="name@company.kz"></div>
-          <div class="f"><label>Телефон<span class="req">*</span></label><input id="cphone" type="tel" placeholder="+7 700 000 0000"></div>
+          <div class="f"><label><span class="tip-wrap">Email<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Email</strong>На этот адрес придёт КП и дальнейшая переписка.</span></span><span class="req">*</span></label><input id="cemail" type="email" placeholder="name@company.kz"></div>
+          <div class="f"><label><span class="tip-wrap">Телефон<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Телефон</strong>Для оперативной связи по вопросам КП.</span></span><span class="req">*</span></label><input id="cphone" type="tel" placeholder="+7 700 000 0000"></div>
         </div>
         <div class="r2">
-          <div class="f"><label>Economic Buyer (кто подписывает)<span class="req">*</span></label><input id="ebName" type="text" placeholder="ФИО, должность"></div>
-          <div class="f"><label>Champion (внутренний сторонник)</label><input id="champion" type="text" placeholder="ФИО, должность"></div>
+          <div class="f"><label><span class="tip-wrap">Economic Buyer (кто подписывает)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Economic Buyer</strong>Тот, кто финально подписывает бюджет. Знание этого человека ускоряет сделку — менеджер подготовит материалы именно для него.</span></span><span class="req">*</span></label><input id="ebName" type="text" placeholder="ФИО, должность"></div>
+          <div class="f"><label><span class="tip-wrap">Champion (внутренний сторонник)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Champion (сторонник)</strong>Сотрудник внутри компании, который продвигает проект. Помогает менеджеру правильно выстроить аргументацию для руководства.</span></span></label><input id="champion" type="text" placeholder="ФИО, должность"></div>
         </div>
       </div>
     </div>
@@ -277,16 +287,16 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <div class="card-head"><span class="sn">2</span><span class="card-title">Пользователи и масштаб</span></div>
       <div class="card-body">
         <div class="r2">
-          <div class="f"><label>Офисных пользователей СЭД (N_full)<span class="req">*</span></label><input id="users" type="number" placeholder="50" min="1" oninput="updateScore()"><div class="hint">Сотрудники, работающие с документами</div></div>
-          <div class="f"><label>Линейный / полевой персонал (N_mobile)</label><input id="mobile" type="number" placeholder="20" min="0"><div class="hint">Мобильный доступ: заявки, HR, графики</div></div>
+          <div class="f"><label><span class="tip-wrap">Офисных пользователей СЭД (N_full)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>N_full — офисные пользователи</strong>Сотрудники, которые будут работать с документами в системе. Основа для расчёта стоимости лицензий.</span></span><span class="req">*</span></label><input id="users" type="number" placeholder="50" min="1" oninput="updateScore()"><div class="hint">Сотрудники, работающие с документами</div></div>
+          <div class="f"><label><span class="tip-wrap">Линейный / полевой персонал (N_mobile)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>N_mobile — мобильные пользователи</strong>Сотрудники, которым нужен мобильный доступ (заявки, кадровые документы, графики). Лицензируются отдельно — дешевле полной лицензии.</span></span></label><input id="mobile" type="number" placeholder="20" min="0"><div class="hint">Мобильный доступ: заявки, HR, графики</div></div>
         </div>
         <div class="r2">
-          <div class="f"><label>Всего сотрудников в компании</label><input id="totalEmp" type="number" placeholder="500" min="1"></div>
-          <div class="f"><label>Количество юридических лиц в группе</label><input id="legalEntities" type="number" placeholder="1" min="1"></div>
+          <div class="f"><label><span class="tip-wrap">Всего сотрудников в компании<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Всего сотрудников</strong>Общий масштаб компании. Влияет на оценку потенциала роста и выбор модели развёртывания.</span></span></label><input id="totalEmp" type="number" placeholder="500" min="1"></div>
+          <div class="f"><label><span class="tip-wrap">Количество юридических лиц в группе<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Юридические лица</strong>Если несколько ЮЛ входят в периметр проекта — рассчитаем групповую лицензию. Часто выгоднее отдельных договоров.</span></span></label><input id="legalEntities" type="number" placeholder="1" min="1"></div>
         </div>
         <div class="r2">
-          <div class="f"><label>Количество филиалов / городов</label><input id="branches" type="text" placeholder="3 города, 5 филиалов"></div>
-          <div class="f"><label>Рост штата на 2–3 года</label>
+          <div class="f"><label><span class="tip-wrap">Количество филиалов / городов<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Филиалы и города</strong>Влияет на инфраструктурные требования и модель развёртывания. Много городов → SaaS обычно выгоднее On-premise.</span></span></label><input id="branches" type="text" placeholder="3 города, 5 филиалов"></div>
+          <div class="f"><label><span class="tip-wrap">Рост штата на 2–3 года<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Рост штата</strong>Учитываем при расчёте multi-year контракта — фиксируем цену на рост, чтобы избежать резкого скачка стоимости.</span></span></label>
             <div class="rg" id="rg-growth">
               <div class="ri" data-v="Стабильно"><span>Стабильно</span></div>
               <div class="ri" data-v="+10–30%"><span>+10–30%</span></div>
@@ -299,19 +309,19 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head"><span class="sn">3</span><span class="card-title">Текущая ситуация и боль</span></div>
       <div class="card-body">
-        <div class="f"><label>Используется ли сейчас СЭД?<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Используется ли сейчас СЭД?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Текущая СЭД</strong>Если уже есть система — поможем спланировать миграцию данных и переход без остановки процессов.</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-sed">
             <div class="ri" data-v="Нет"><span>Нет</span></div>
             <div class="ri" data-v="Да"><span>Да</span></div>
           </div>
         </div>
         <div id="sed-row" style="display:none" class="f"><label>Какая система? Есть ли причины для её замены?</label><input id="sedName" type="text" placeholder="Directum — медленная, нет мобильного доступа"></div>
-        <div class="f"><label>Основная цель внедрения<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Основная цель внедрения<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Цель проекта</strong>Определяет приоритет функционала в КП и аргументацию ROI. «Compliance» и «Цифровая трансформация» — разные акценты в предложении.</span></span><span class="req">*</span></label>
           <select id="goal"><option value="">—</option><option>Compliance / соответствие требованиям</option><option>Повышение эффективности</option><option>Цифровая трансформация / AI</option><option>Контроль исполнения</option><option>Рост / масштабирование</option></select>
         </div>
-        <div class="f"><label>Что сейчас работает плохо?<span class="req">*</span></label><textarea id="pain" placeholder="3 самых болезненных процесса: согласование, договоры, кадровый ЭДО..."></textarea></div>
-        <div class="f"><label>Что должно измениться через 12 месяцев?<span class="req">*</span></label><textarea id="vision12" placeholder="Успех проекта будет, если..."></textarea></div>
-        <div class="f"><label>Почему важно решить это сейчас?</label><textarea id="urgency" placeholder="Дедлайн, регуляторные требования, конкурентное давление..."></textarea></div>
+        <div class="f"><label><span class="tip-wrap">Что сейчас работает плохо?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Боль клиента</strong>Ключевой вопрос. Чем конкретнее — тем точнее КП и убедительнее ROI-расчёт. Называйте процессы: «договоры согласуются 2 недели», «HR заявки на бумаге».</span></span><span class="req">*</span></label><textarea id="pain" placeholder="3 самых болезненных процесса: согласование, договоры, кадровый ЭДО..."></textarea></div>
+        <div class="f"><label><span class="tip-wrap">Что должно измениться через 12 месяцев?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Видение успеха</strong>Станет критерием приёмки этапов внедрения. Помогает правильно расставить приоритеты в дорожной карте.</span></span><span class="req">*</span></label><textarea id="vision12" placeholder="Успех проекта будет, если..."></textarea></div>
+        <div class="f"><label><span class="tip-wrap">Почему важно решить это сейчас?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Срочность</strong>Понимаем внешние дедлайны: регуляторные требования, окончание контракта с текущим вендором, решение совета директоров. Влияет на скорость подготовки КП.</span></span></label><textarea id="urgency" placeholder="Дедлайн, регуляторные требования, конкурентное давление..."></textarea></div>
       </div>
     </div>
   </div>
@@ -321,7 +331,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head"><span class="sn">4</span><span class="card-title">BPM-модули d8n.ai</span></div>
       <div class="card-body">
-        <div class="f"><label>Какие процессы нужно автоматизировать?<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Какие процессы нужно автоматизировать?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>BPM-модули</strong>Определяет состав решения. Business = только ЭДО. SE = любые 3 модуля. AIE = все 8 + AI-агенты. Чем больше модулей — тем целесообразнее SE/AIE.</span></span><span class="req">*</span></label>
           <div class="cb" id="cb-mod">
             <label class="ci"><input type="checkbox" value="ЭДО (входящая/исходящая корреспонденция)"><span>ЭДО — входящая / исходящая корреспонденция</span></label>
             <label class="ci"><input type="checkbox" value="Кадровый + HR"><span>Кадровый + HR (отпуска, личные дела, онбординг)</span></label>
@@ -333,7 +343,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
             <label class="ci"><input type="checkbox" value="CRM"><span>CRM (клиенты, сделки)</span></label>
           </div>
         </div>
-        <div class="f"><label>Коммуникационные сервисы dg (интересно?)</label>
+        <div class="f"><label><span class="tip-wrap">Коммуникационные сервисы dg (интересно?)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Сервисы dg</strong>Замена Outlook, Telegram, Google Drive — всё внутри периметра компании. Данные не покидают вашу инфраструктуру. Включены в SE и AIE.</span></span></label>
           <div class="cb" id="cb-comms">
             <label class="ci"><input type="checkbox" value="dg mail (корпоративная почта)"><span>dg mail — корпоративная почта</span></label>
             <label class="ci"><input type="checkbox" value="dg messenger"><span>dg messenger — замена Telegram/WhatsApp</span></label>
@@ -346,7 +356,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head ai"><span class="sn sn-ai">AI</span><span class="card-title ai-t">AI-агенты d8n.ai</span></div>
       <div class="card-body">
-        <div class="f"><label>Интересные AI-агенты (влияет на сегмент AIE)</label>
+        <div class="f"><label><span class="tip-wrap">Интересные AI-агенты (влияет на сегмент AIE)<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>AI-агенты d8n.ai</strong>Каждый агент работает на вашей базе знаний — даёт ответы по вашим процессам и регламентам, а не generic-шаблоны. Выбор любого агента → сегмент d8n AIE.</span></span></label>
           <div class="cb" id="cb-ai">
             <label class="ci"><input type="checkbox" value="Executive (C-уровень, контроль поручений)" onchange="updateScore()"><span>Executive — для руководителей C-уровня</span></label>
             <label class="ci"><input type="checkbox" value="Assistant (личный помощник всех сотрудников)" onchange="updateScore()"><span>Assistant — личный AI-помощник каждому сотруднику</span></label>
@@ -357,7 +367,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
             <label class="ci"><input type="checkbox" value="Support-агент" onchange="updateScore()"><span>Support — клиентский сервис / IT-поддержка</span></label>
           </div>
         </div>
-        <div class="f"><label>Потребность в индивидуальных (custom) AI-агентах?</label>
+        <div class="f"><label><span class="tip-wrap">Потребность в индивидуальных (custom) AI-агентах?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Custom AI-агенты</strong>Агенты под уникальные процессы вашей компании. Примеры: агент закупок, агент контроля качества, агент работы с клиентами. Разрабатываются Documentolog под ваше ТЗ.</span></span></label>
           <div class="rg" id="rg-custom-ai">
             <div class="ri" data-v="Нет"><span>Нет</span></div>
             <div class="ri" data-v="Возможно"><span>Возможно</span></div>
@@ -373,21 +383,21 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head"><span class="sn">5</span><span class="card-title">Инфраструктура и развёртывание</span></div>
       <div class="card-body">
-        <div class="f"><label>Модель развёртывания<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Модель развёртывания<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>SaaS vs On-premise</strong>SaaS — данные в защищённых ЦОД Documentolog в РК, быстрый старт, нет затрат на инфраструктуру. On-premise — данные у вас, нужны серверы и GPU для AI. PaaS — гибрид.</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-deploy">
             <div class="ri" data-v="SaaS (облако Documentolog)" onmouseup="updateScore()"><span>SaaS (облако)</span></div>
             <div class="ri" data-v="On-premise (наши серверы)" onmouseup="updateScore()"><span>On-premise</span></div>
             <div class="ri" data-v="PaaS / гибрид" onmouseup="updateScore()"><span>PaaS / гибрид</span></div>
           </div>
         </div>
-        <div class="f"><label>Есть собственные GPU-серверы для локальной LLM?</label>
+        <div class="f"><label><span class="tip-wrap">Есть собственные GPU-серверы для локальной LLM?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>GPU для локальной LLM</strong>AI-агенты работают на языковой модели класса 100B+ параметров. В SaaS — наши GPU. On-premise — нужны ваши. Без GPU локальные AI-агенты не работают.</span></span></label>
           <div class="rg" id="rg-gpu">
             <div class="ri" data-v="Нет"><span>Нет</span></div>
             <div class="ri" data-v="Есть"><span>Есть</span></div>
             <div class="ri" data-v="Готовы обеспечить"><span>Готовы обеспечить</span></div>
           </div>
         </div>
-        <div class="f"><label>Ключевые системы для интеграции</label>
+        <div class="f"><label><span class="tip-wrap">Ключевые системы для интеграции<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Интеграции</strong>Наличие интеграций — главный сигнал для выбора SE/AIE вместо Business. Business не поддерживает кастомные интеграции.</span></span></label>
           <div class="cb" id="cb-int">
             <label class="ci"><input type="checkbox" value="1С (ERP/бухгалтерия)"><span>1С (ERP / бухгалтерия)</span></label>
             <label class="ci"><input type="checkbox" value="SAP / ERP"><span>SAP / ERP</span></label>
@@ -397,7 +407,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
             <label class="ci"><input type="checkbox" value="Самописные системы"><span>Самописные системы</span></label>
           </div>
         </div>
-        <div class="f"><label>Требования к безопасности / данным</label>
+        <div class="f"><label><span class="tip-wrap">Требования к безопасности / данным<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Безопасность и комплаенс</strong>Локализация ПД в РК — законодательное требование для казахстанских компаний. Влияет на выбор SaaS (ЦОД в РК) или On-premise.</span></span></label>
           <div class="cb" id="cb-sec">
             <label class="ci"><input type="checkbox" value="Локализация ПД (данные только в РК)"><span>Локализация персональных данных (только РК)</span></label>
             <label class="ci"><input type="checkbox" value="ISO 27001 / SOC2 аудит вендора"><span>Требуется аудит вендора (ISO 27001 / SOC2)</span></label>
@@ -409,7 +419,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head light"><span class="sn" style="background:var(--blue)">→</span><span class="card-title dark">Модель услуг</span></div>
       <div class="card-body">
-        <div class="f"><label>Предпочтительная модель внедрения</label>
+        <div class="f"><label><span class="tip-wrap">Предпочтительная модель внедрения<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>DIY / Hybrid / Full Service</strong>DIY — вы внедряете сами по нашей методологии (дешевле, дольше). Full Service — мы берём всё на себя (быстрее, дороже). Hybrid — оптимальный баланс для большинства.</span></span></label>
           <div class="rg" id="rg-service">
             <div class="ri" data-v="DIY (сами, с методологией)"><span>DIY — сами</span></div>
             <div class="ri" data-v="Hybrid (совместно)"><span>Hybrid</span></div>
@@ -426,28 +436,28 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head"><span class="sn">6</span><span class="card-title">Коммерческие условия</span></div>
       <div class="card-body">
-        <div class="f"><label>Срок договора<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Срок договора<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Срок договора</strong>Multi-year контракт (2–3 года) фиксирует цену и даёт скидку. При росте компании — защита от повышения тарифов.</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-term">
             <div class="ri" data-v="1 год"><span>1 год</span></div>
             <div class="ri" data-v="2 года"><span>2 года</span></div>
             <div class="ri" data-v="3 года"><span>3 года</span></div>
           </div>
         </div>
-        <div class="f"><label>Авансовая оплата<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Авансовая оплата<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Авансовая оплата</strong>Предоплата на квартал/год вперёд — дополнительная скидка. Влияет на итоговую стоимость КП.</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-prepay">
             <div class="ri" data-v="Нет"><span>Нет</span></div>
             <div class="ri" data-v="Ежеквартально"><span>Ежеквартально</span></div>
             <div class="ri" data-v="Ежегодно"><span>Ежегодно</span></div>
           </div>
         </div>
-        <div class="f"><label>Предпочтение OPEX / CAPEX</label>
+        <div class="f"><label><span class="tip-wrap">Предпочтение OPEX / CAPEX<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>OPEX vs CAPEX</strong>OPEX (подписка) — равномерная нагрузка на бюджет, без капитальных затрат. CAPEX (лицензии на баланс) — единовременная покупка, актив на балансе компании.</span></span></label>
           <div class="rg" id="rg-opex">
             <div class="ri" data-v="OPEX (подписка)"><span>OPEX (подписка)</span></div>
             <div class="ri" data-v="CAPEX (лицензии на баланс)"><span>CAPEX (баланс)</span></div>
             <div class="ri" data-v="Без разницы"><span>Без разницы</span></div>
           </div>
         </div>
-        <div class="f"><label>Статус бюджета<span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Статус бюджета<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Статус бюджета</strong>Помогает понять зрелость сделки и правильно расставить приоритеты. «Согласован» → готовим детальное КП. «Speculative» → сначала executive summary.</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-budget">
             <div class="ri" data-v="Согласован"><span>Согласован</span></div>
             <div class="ri" data-v="В процессе согласования"><span>В процессе</span></div>
@@ -455,10 +465,10 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
           </div>
         </div>
         <div class="r2">
-          <div class="f"><label>Когда заключить договор?<span class="req">*</span></label>
+          <div class="f"><label><span class="tip-wrap">Когда заключить договор?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Дедлайн сделки</strong>Определяет срочность подготовки КП и внедрения. Если дедлайн жёсткий — предложим ускоренный старт Foundation за 2 недели.</span></span><span class="req">*</span></label>
             <select id="deadline"><option value="">—</option><option>2 недели</option><option>До конца месяца</option><option>В этом квартале</option><option>Неизвестно</option></select>
           </div>
-          <div class="f"><label>Закупка через тендер (ПГЗ)?</label>
+          <div class="f"><label><span class="tip-wrap">Закупка через тендер (ПГЗ)?<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Тендер (ПГЗ)</strong>Если закупка через госпортал — подключим тендерный отдел Documentolog. Другой процесс, другие документы и сроки.</span></span></label>
             <div class="rg" id="rg-tender">
               <div class="ri" data-v="Нет"><span>Нет</span></div>
               <div class="ri" data-v="Да"><span>Да</span></div>
@@ -470,7 +480,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head light"><span class="sn" style="background:var(--blue)">→</span><span class="card-title dark">Критерии и дополнительно</span></div>
       <div class="card-body">
-        <div class="f"><label>Критерии выбора поставщика</label>
+        <div class="f"><label><span class="tip-wrap">Критерии выбора поставщика<span class="tip-icon" tabindex="0">?</span><span class="tip-bubble"><strong>Критерии выбора</strong>Помогает менеджеру сделать правильные акценты в КП: цена → ROI-расчёт, безопасность → compliance-раздел, сроки → дорожная карта.</span></span></label>
           <div class="cb" id="cb-crit">
             <label class="ci"><input type="checkbox" value="Цена"><span>Цена</span></label>
             <label class="ci"><input type="checkbox" value="Функционал и AI"><span>Функционал и AI-возможности</span></label>
