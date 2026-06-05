@@ -11,184 +11,90 @@ const MANAGER_EMAILS = {
 const FALLBACK_EMAIL = 'astananur@gmail.com';
 function getManagerEmail(id) { return MANAGER_EMAILS[id] || FALLBACK_EMAIL; }
 
-const SEG_LABEL = { biz: 'Business', se: 'd8n SE', aie: 'd8n AIE' };
+const SEG_LABEL = { se: 'd8n Standard Edition (SE)', aie: 'd8n AI Edition (AIE)' };
 
-// ── Generate DOCX via raw XML (no npm deps) ───────────────────────────────
-function buildDocxBuffer(data, prompt) {
-  const JSZip = require('jszip');
-
-  function esc(s) {
-    return String(s || '—')
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
-  }
-
-  function row(label, value, shade) {
-    const bg = shade ? 'EBF2FF' : 'FFFFFF';
-    const labelBg = shade ? 'D0E4FF' : 'F0F4FF';
-    return `<w:tr>
-      <w:tc><w:tcPr><w:tcW w:w="3000" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="${labelBg}"/></w:tcPr>
-        <w:p><w:r><w:rPr><w:b/><w:color w:val="1E3A6E"/><w:sz w:val="18"/></w:rPr><w:t>${esc(label)}</w:t></w:r></w:p></w:tc>
-      <w:tc><w:tcPr><w:tcW w:w="6360" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="${bg}"/></w:tcPr>
-        <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">${esc(value)}</w:t></w:r></w:p></w:tc>
-    </w:tr>`;
-  }
-
-  function section(title, rows) {
-    return `
-    <w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="6" w:color="2056B8"/></w:pBdr><w:spacing w:before="240" w:after="120"/></w:pPr>
-      <w:r><w:rPr><w:b/><w:color w:val="0D1F4E"/><w:sz w:val="24"/></w:rPr><w:t>${esc(title)}</w:t></w:r></w:p>
-    <w:tbl>
-      <w:tblPr><w:tblW w:w="9360" w:type="dxa"/>
-        <w:tblBorders>
-          <w:top w:val="single" w:sz="2" w:color="DDEEFF"/>
-          <w:left w:val="single" w:sz="2" w:color="DDEEFF"/>
-          <w:bottom w:val="single" w:sz="2" w:color="DDEEFF"/>
-          <w:right w:val="single" w:sz="2" w:color="DDEEFF"/>
-          <w:insideH w:val="single" w:sz="2" w:color="DDEEFF"/>
-          <w:insideV w:val="single" w:sz="2" w:color="DDEEFF"/>
-        </w:tblBorders>
-      </w:tblPr>
-      <w:tblGrid><w:gridCol w:w="3000"/><w:gridCol w:w="6360"/></w:tblGrid>
-      ${rows}
-    </w:tbl>`;
-  }
-
+function buildMarkdown(data, prompt) {
   const dt = new Date().toLocaleDateString('ru-RU');
-  const seg = SEG_LABEL[data.segment] || data.segment;
+  return `# Анкета клиента — ${data.company}
 
-  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<w:body>
+**Дата:** ${dt}
+**Менеджер:** ${data.managerName}
+**Сегмент:** ${SEG_LABEL[data.segment] || data.segment}
 
-  <w:p><w:pPr><w:jc w:val="center"/><w:shd w:val="clear" w:fill="0D1F4E"/></w:pPr>
-    <w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/><w:sz w:val="32"/></w:rPr>
-      <w:t>Анкета клиента Documentolog</w:t></w:r></w:p>
+---
 
-  <w:p><w:pPr><w:jc w:val="center"/><w:shd w:val="clear" w:fill="0D1F4E"/><w:spacing w:after="200"/></w:pPr>
-    <w:r><w:rPr><w:color w:val="99BBFF"/><w:sz w:val="18"/></w:rPr>
-      <w:t>${esc(data.company)} · ${esc(dt)} · Менеджер: ${esc(data.managerName)}</w:t></w:r></w:p>
+## 1. Организация
 
-  <w:p><w:pPr><w:shd w:val="clear" w:fill="EBF2FF"/><w:spacing w:before="120" w:after="200"/>
-    <w:ind w:left="200"/><w:pBdr><w:left w:val="single" w:sz="12" w:color="2056B8"/></w:pBdr></w:pPr>
-    <w:r><w:rPr><w:color w:val="475569"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">Рекомендованный сегмент: </w:t></w:r>
-    <w:r><w:rPr><w:b/><w:color w:val="2056B8"/><w:sz w:val="20"/></w:rPr><w:t>${esc(seg)}</w:t></w:r></w:p>
+| Поле | Значение |
+|---|---|
+| Компания | ${data.company} |
+| БИН / ИИН | ${data.bin} |
+| Собственность | ${data.ownership} |
+| Отрасль | ${data.industry} |
+| Холдинг / ЮЛ | ${data.holding} / ${data.legalEntities} юр. лиц |
+| Контактное лицо | ${data.contactName}, ${data.contactRole} |
+| Email | ${data.contactEmail} |
+| Телефон | ${data.contactPhone} |
+| Economic Buyer | ${data.economicBuyer} |
+| Champion | ${data.champion} |
 
-  ${section('1. Организация', [
-    row('Компания', data.company, false),
-    row('БИН / ИИН', data.bin, true),
-    row('Собственность', data.ownership, false),
-    row('Отрасль', data.industry, true),
-    row('Холдинг / ЮЛ', `${data.holding} / ${data.legalEntities} юр. лиц`, false),
-    row('Контактное лицо', `${data.contactName}, ${data.contactRole}`, true),
-    row('Email', data.contactEmail, false),
-    row('Телефон', data.contactPhone, true),
-    row('Economic Buyer', data.economicBuyer, false),
-    row('Champion', data.champion, true),
-  ].join(''))}
+## 2. Масштаб
 
-  ${section('2. Масштаб', [
-    row('N_full (офисные)', data.usersCount, false),
-    row('N_mobile (линейные)', data.mobileCount, true),
-    row('Всего сотрудников', data.totalEmployees, false),
-    row('Филиалы', data.branches, true),
-    row('Рост штата', data.growth, false),
-  ].join(''))}
+| Параметр | Значение |
+|---|---|
+| N_full (офисные) | ${data.usersCount} |
+| N_mobile (линейные) | ${data.mobileCount} |
+| Всего сотрудников | ${data.totalEmployees} |
+| Филиалы | ${data.branches} |
+| Рост штата | ${data.growth} |
 
-  ${section('3. Бизнес-задача', [
-    row('Текущая СЭД', data.currentSed + (data.sedName && data.sedName !== '—' ? ' — ' + data.sedName : ''), false),
-    row('Цель внедрения', data.goal, true),
-    row('Боль', data.pain, false),
-    row('Видение (12 мес.)', data.vision12, true),
-    row('Срочность', data.urgency, false),
-  ].join(''))}
+## 3. Бизнес-задача
 
-  ${section('4. Модули и AI', [
-    row('BPM-модули', data.modules, false),
-    row('Коммуникации dg', data.comms, true),
-    row('AI-агенты', data.aiAgents, false),
-    row('Custom AI', data.customAi, true),
-    row('Развёртывание', data.deploy, false),
-    row('GPU', data.gpu, true),
-    row('Интеграции', data.integrations, false),
-    row('Безопасность', data.security, true),
-    row('Модель услуг', data.serviceModel, false),
-  ].join(''))}
+| Параметр | Значение |
+|---|---|
+| Текущая СЭД | ${data.currentSed}${data.sedName && data.sedName !== '—' ? ' — ' + data.sedName : ''} |
+| Цель внедрения | ${data.goal} |
+| Срочность | ${data.urgency} |
 
-  ${section('5. Коммерческие условия', [
-    row('Срок договора', data.contractTerm, false),
-    row('Авансовая оплата', data.prepay, true),
-    row('OPEX / CAPEX', data.opex, false),
-    row('Статус бюджета', data.budget, true),
-    row('Дедлайн', data.deadline, false),
-    row('Тендер (ПГЗ)', data.tender, true),
-    row('Критерии выбора', data.criteria, false),
-    row('Примечания', data.notes, true),
-  ].join(''))}
+**Боль:**
+${data.pain}
 
-  <w:p><w:pPr><w:spacing w:before="280" w:after="120"/>
-    <w:pBdr><w:bottom w:val="single" w:sz="6" w:color="2056B8"/></w:pBdr></w:pPr>
-    <w:r><w:rPr><w:b/><w:color w:val="0D1F4E"/><w:sz w:val="24"/></w:rPr>
-      <w:t>Промпт для d8n Sales</w:t></w:r></w:p>
-  <w:p><w:pPr><w:shd w:val="clear" w:fill="F8FAFC"/></w:pPr>
-    <w:r><w:rPr><w:rFonts w:ascii="Courier New" w:hAnsi="Courier New"/><w:sz w:val="16"/><w:color w:val="334155"/></w:rPr>
-      <w:t xml:space="preserve">${esc(prompt)}</w:t></w:r></w:p>
+**Видение через 12 месяцев:**
+${data.vision12}
 
-  <w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="400"/></w:pPr>
-    <w:r><w:rPr><w:color w:val="94A3B8"/><w:sz w:val="16"/></w:rPr>
-      <w:t>Documentolog Group · d8n.ai · ${esc(dt)}</w:t></w:r></w:p>
+## 4. Модули и AI
 
-  <w:sectPr>
-    <w:pgSz w:w="11906" w:h="16838"/>
-    <w:pgMar w:top="1000" w:right="1000" w:bottom="1000" w:left="1000"/>
-  </w:sectPr>
-</w:body>
-</w:document>`;
+| Параметр | Значение |
+|---|---|
+| BPM-модули | ${data.modules} |
+| Коммуникации dg | ${data.comms} |
+| AI-агенты | ${data.aiAgents} |
+| Custom AI | ${data.customAi} |
+| Развёртывание | ${data.deploy} |
+| GPU | ${data.gpu} |
+| Интеграции | ${data.integrations} |
+| Безопасность | ${data.security} |
+| Модель услуг | ${data.serviceModel} |
 
-  const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>`;
+## 5. Коммерческие условия
 
-  const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:docDefaults><w:rPrDefault><w:rPr>
-    <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
-    <w:sz w:val="20"/>
-  </w:rPr></w:rPrDefault></w:docDefaults>
-</w:styles>`;
+| Параметр | Значение |
+|---|---|
+| Срок договора | ${data.contractTerm} |
+| Авансовая оплата | ${data.prepay} |
+| OPEX / CAPEX | ${data.opex} |
+| Статус бюджета | ${data.budget} |
+| Дедлайн | ${data.deadline} |
+| Тендер (ПГЗ) | ${data.tender} |
+| Критерии выбора | ${data.criteria} |
+| Примечания | ${data.notes} |
 
-  const appXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-  <Application>Documentolog Anketa</Application>
-</Properties>`;
+---
 
-  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-</Types>`;
+## Промпт для d8n Sales
 
-  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>`;
-
-  const zip = new JSZip();
-  zip.file('[Content_Types].xml', contentTypes);
-  zip.file('_rels/.rels', rootRels);
-  zip.file('word/document.xml', documentXml);
-  zip.file('word/styles.xml', stylesXml);
-  zip.file('word/_rels/document.xml.rels', relsXml);
-  zip.file('docProps/app.xml', appXml);
-
-  return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
+${prompt}
+`;
 }
 
 export default async function handler(req, res) {
@@ -203,18 +109,11 @@ export default async function handler(req, res) {
     if (!data?.company) return res.status(400).json({ error: 'Missing data' });
 
     const results = { email: null, airtable: null };
+    const mdContent = buildMarkdown(data, prompt);
+    const mdBase64  = Buffer.from(mdContent, 'utf8').toString('base64');
+    const filename  = `anketa_${(data.company||'client').replace(/[^\wа-яёА-ЯЁ]/gi,'_').slice(0,30)}_${new Date().toISOString().slice(0,10)}.md`;
 
-    // 1. Build DOCX
-    let docxBase64 = null;
-    try {
-      const buf = await buildDocxBuffer(data, prompt);
-      docxBase64 = buf.toString('base64');
-      console.log('DOCX built, size:', buf.length);
-    } catch(e) {
-      console.warn('DOCX error:', e.message);
-    }
-
-    // 2. Email
+    // Email
     try {
       const html = `<div style="font-family:-apple-system,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#0D1F4E;padding:20px 24px;border-radius:10px 10px 0 0">
@@ -241,24 +140,25 @@ export default async function handler(req, res) {
             <div style="font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;margin-bottom:8px">Промпт для d8n Sales</div>
             <pre style="font-family:'Courier New',monospace;font-size:10px;color:#475569;white-space:pre-wrap;margin:0;line-height:1.6">${prompt}</pre>
           </div>
-          ${docxBase64 ? '<div style="padding:12px 20px;background:#F0FDF4;border-top:1px solid #BBF7D0;font-size:12px;color:#166534">📎 Полная анкета во вложении (.docx)</div>' : ''}
-          <div style="padding:12px 20px;border-top:1px solid #E2E8F0;text-align:center;font-size:11px;color:#94A3B8">Менеджер: ${data.managerName} · Documentolog Group</div>
+          <div style="padding:12px 20px;background:#F0FDF4;border-top:1px solid #BBF7D0;font-size:12px;color:#166534">
+            📎 Полная анкета во вложении (.md)
+          </div>
+          <div style="padding:12px 20px;border-top:1px solid #E2E8F0;text-align:center;font-size:11px;color:#94A3B8">
+            Менеджер: ${data.managerName} · Documentolog Group
+          </div>
         </div>
       </div>`;
-
-      const filename = `anketa_${(data.company||'client').replace(/[^\w\u0400-\u04FF]/g,'_').slice(0,30)}_${new Date().toISOString().slice(0,10)}.docx`;
-      const emailPayload = {
-        from:    'DG Anketa <onboarding@resend.dev>',
-        to:      [getManagerEmail(data.managerId)],
-        subject: `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment]||data.segment}`,
-        html,
-        ...(docxBase64 ? { attachments: [{ filename, content: docxBase64 }] } : {}),
-      };
 
       const emailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(emailPayload),
+        body: JSON.stringify({
+          from:        'DG Anketa <onboarding@resend.dev>',
+          to:          [getManagerEmail(data.managerId)],
+          subject:     `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment]||data.segment}`,
+          html,
+          attachments: [{ filename, content: mdBase64 }],
+        }),
       });
       const emailJson = await emailRes.json();
       results.email = emailJson.id ? 'sent:' + emailJson.id : 'error:' + JSON.stringify(emailJson);
@@ -268,7 +168,7 @@ export default async function handler(req, res) {
       console.error('Email error:', e.message);
     }
 
-    // 3. Airtable
+    // Airtable
     if (AT_TOKEN) {
       try {
         const fields = {
