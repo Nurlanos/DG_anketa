@@ -113,6 +113,26 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 .bn:disabled{background:var(--brd);color:var(--t3);cursor:not-allowed}
 .bn svg{width:16px;height:16px}
 
+/* COMPARISON SELECTOR */
+.compare-section{background:var(--blue-l);border:1.5px solid #C7DCFF;border-radius:var(--r);padding:14px 16px;margin-top:14px}
+.compare-section h4{font-size:12px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.compare-options{display:flex;gap:8px;flex-wrap:wrap}
+.compare-opt{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--brd);border-radius:6px;padding:8px 14px;cursor:pointer;user-select:none;transition:all .15s}
+.compare-opt:hover{border-color:var(--blue)}
+.compare-opt input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.compare-opt span{font-size:13px;font-weight:500;color:var(--text)}
+.compare-opt.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* WARNING / ADVICE BOXES */
+.warn-box{border-radius:var(--r);padding:12px 14px;margin-top:10px;font-size:12px;line-height:1.6;display:none}
+.warn-box.show{display:block}
+.warn-box.warn{background:#FFF8E1;border:1.5px solid #F5C518;color:#7A5800}
+.warn-box.error{background:#FEF2F2;border:1.5px solid #FECACA;color:#991B1B}
+.warn-box.info{background:var(--blue-l);border:1.5px solid #C7DCFF;color:#1E3A6E}
+.warn-box strong{font-weight:700;display:block;margin-bottom:3px}
+.warn-override{margin-top:8px;font-size:11px;color:var(--t3)}
+.warn-override a{color:var(--blue);cursor:pointer;text-decoration:underline}
+
 /* SEGMENT RESULT */
 .seg-result{padding:24px;text-align:center}
 .seg-badge{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:16px 24px;margin:0 auto 20px;border:2px solid}
@@ -465,6 +485,28 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     </div>
   </div>
 
+  <!-- COMPARISON SELECTOR (step 5, shown in card) -->
+  <div id="compare-block" style="display:none">
+    <div class="compare-section">
+      <h4>Хотите сравнить несколько решений?</h4>
+      <div class="compare-options" id="compare-opts">
+        <label class="compare-opt" id="copt-biz">
+          <input type="checkbox" value="biz" onchange="validateComparison()">
+          <span>Business</span>
+        </label>
+        <label class="compare-opt" id="copt-se">
+          <input type="checkbox" value="se" onchange="validateComparison()">
+          <span>d8n SE</span>
+        </label>
+        <label class="compare-opt" id="copt-aie">
+          <input type="checkbox" value="aie" onchange="validateComparison()">
+          <span>d8n AIE</span>
+        </label>
+      </div>
+      <div class="warn-box" id="warn-main"></div>
+    </div>
+  </div>
+
   <!-- SUCCESS -->
   <div id="sdone" style="display:none" class="card">
     <div class="card-head" style="justify-content:center"><span class="card-title">Documentolog · d8n.ai</span></div>
@@ -595,6 +637,101 @@ function updateScore(){
   document.getElementById('chip-biz').classList.toggle('active',seg==='biz');
   document.getElementById('chip-se').classList.toggle('active',seg==='se');
   document.getElementById('chip-aie').classList.toggle('active',seg==='aie');
+  // Pre-check recommended segment in comparison block
+  const recCb = document.querySelector(`#compare-opts input[value="${seg}"]`);
+  if(recCb && !recCb.checked){recCb.checked=true;}
+  validateComparison();
+}
+
+function validateComparison(){
+  const users = parseInt(document.getElementById('users')?.value||0)||0;
+  const checked = Array.from(document.querySelectorAll('#compare-opts input:checked')).map(i=>i.value);
+  const {seg,score} = getSegment();
+  const warnEl = document.getElementById('warn-main');
+  const hasBiz = checked.includes('biz');
+  const hasSE  = checked.includes('se');
+  const hasAIE = checked.includes('aie');
+  const aiChecked = document.querySelectorAll('#cb-ai input:checked').length;
+  const integrations = document.querySelectorAll('#cb-int input:checked').length;
+  const advBPM = Array.from(document.querySelectorAll('#cb-mod input:checked'))
+    .map(i=>i.value)
+    .some(m=>['Кадровый + HR','Финансовый (счета, акты, бюджетирование)',
+      'Управление заседаниями / протоколы','ITSM / Service Desk','CRM'].includes(m));
+
+  // Reset
+  warnEl.className='warn-box';
+  warnEl.innerHTML='';
+  document.querySelectorAll('.compare-opt').forEach(el=>el.classList.remove('disabled'));
+
+  // ── RULE 1: Business + SE/AIE одновременно — конфликт ──
+  if(hasBiz && (hasSE || hasAIE)){
+    warnEl.className='warn-box error show';
+    warnEl.innerHTML=`<strong>⚠️ Конфликт решений</strong>
+Business — это коробочный продукт без интеграций и кастомных процессов.
+Включать его в сравнение с SE/AIE нецелесообразно: клиент всё равно выберет SE/AIE если нужны интеграции или расширенный BPM.
+<div class="warn-override">Если клиент настаивает — <a onclick="allowConflict()">разрешить сравнение</a></div>`;
+    return;
+  }
+
+  // ── RULE 2: AIE с очень маленьким масштабом — жёсткое предупреждение ──
+  if(hasAIE && users > 0 && users < 25 && aiChecked === 0){
+    warnEl.className='warn-box error show';
+    warnEl.innerHTML=`<strong>❌ Нецелесообразно при ${users} пользователях</strong>
+d8n AIE включает 9 AI-агентов — стоимость значительно выше SE.
+При менее 25 пользователях без явной потребности в AI затраты на 1 сотрудника делают AIE экономически невыгодным.
+<strong>Рекомендация:</strong> начните с SE, при росте — апгрейд со скидкой.
+<div class="warn-override"><a onclick="allowAIESmall()">Клиент осознанно хочет AIE — включить в сравнение</a></div>`;
+    // Uncheck AIE
+    const aieCb = document.querySelector('#compare-opts input[value="aie"]');
+    if(aieCb) aieCb.checked = false;
+    return;
+  }
+
+  // ── RULE 3: AIE при 25–50 польз. и нет AI — предупреждение (не блок) ──
+  if(hasAIE && users >= 25 && users <= 50 && aiChecked === 0){
+    warnEl.className='warn-box warn show';
+    warnEl.innerHTML=`<strong>⚠️ AIE дорогостоящий вариант для ${users} пользователей</strong>
+Вы не выбрали AI-агенты, но хотите сравнить AIE. Включим в КП, но стоимость будет заметно выше SE.
+Рекомендуем добавить интересующие AI-агенты в шаге 3 для обоснования выбора AIE.`;
+    return;
+  }
+
+  // ── RULE 4: SE выбран, но есть AI-агенты — мягкое предложение ──
+  if(hasSE && !hasAIE && aiChecked >= 1){
+    warnEl.className='warn-box info show';
+    warnEl.innerHTML=`<strong>💡 Вы выбрали AI-агенты, но не включили d8n AIE</strong>
+SE не включает AI-агенты. Добавьте AIE в сравнение — менеджер покажет разницу в цене и функционале.`;
+    return;
+  }
+
+  // ── RULE 5: Business выбран, но есть интеграции или расширенный BPM ──
+  if(hasBiz && !hasSE && !hasAIE && (integrations > 0 || advBPM)){
+    warnEl.className='warn-box warn show';
+    warnEl.innerHTML=`<strong>⚠️ Business не поддерживает выбранный функционал</strong>
+Business — коробочный продукт: жёстко заданный функционал, без кастомных интеграций и расширенного BPM.
+Интеграции с 1С, HR-модуль, ITSM — доступны только в SE/AIE.
+Рекомендуем добавить SE в сравнение.`;
+    return;
+  }
+}
+
+let _conflictAllowed = false;
+let _aieSmallAllowed = false;
+
+function allowConflict(){
+  _conflictAllowed = true;
+  document.getElementById('warn-main').className='warn-box warn show';
+  document.getElementById('warn-main').innerHTML=`<strong>⚠️ Сравнение включено по запросу клиента</strong>
+Менеджер объяснит клиенту различия и нецелесообразность выбора Business при наличии потребностей SE/AIE.`;
+}
+
+function allowAIESmall(){
+  _aieSmallAllowed = true;
+  const aieCb = document.querySelector('#compare-opts input[value="aie"]');
+  if(aieCb) aieCb.checked = true;
+  document.getElementById('warn-main').className='warn-box info show';
+  document.getElementById('warn-main').innerHTML=`<strong>✓ AIE включён в сравнение</strong>
+КП будет содержать обоснование стоимости при данном масштабе и сценарий роста.`;
 }
 
 // ── Radio groups ──────────────────────────────────────────────────────────
@@ -619,6 +756,9 @@ function upd(){
   document.getElementById('pf').style.width=pct+'%';
   document.getElementById('sl').textContent=`Шаг ${step} из ${maxStep} — ${STEP_LABELS[step-1]}`;
   document.getElementById('bprev').style.visibility=step>1?'visible':'hidden';
+  // Show compare block only on last step
+  const cb = document.getElementById('compare-block');
+  if(cb) cb.style.display = step===maxStep ? 'block' : 'none';
   const btn=document.getElementById('bnext');
   if(step===maxStep){btn.innerHTML='Отправить анкету <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';}
   else{btn.innerHTML='Далее <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';}
