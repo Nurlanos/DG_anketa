@@ -560,26 +560,21 @@ function copyPrompt() {
 
 loadData();
 
-// ── Auth ─────────────────────────────────────────────────────────────────
+  // ── Auth ─────────────────────────────────────────────────────────────────
 (function(){
-  const HASH = '7e6e4a9f3d2b1c8a5f4e3d2c1b0a9f8e'; // placeholder, replaced below
-  // Simple check: sha256 not available natively — use btoa comparison
-  // Credentials stored as base64 to avoid plain text
-  const CREDS = { user: btoa('admin'), pwd: btoa('astana1234') };
-  const SESSION_KEY = 'dg_dash_auth';
+  const CREDS = { user: 'admin', pwd: 'astana1234' };
+  const KEY   = 'dg_dash_v1';
 
   function isAuthed() {
-    return sessionStorage.getItem(SESSION_KEY) === '1';
+    try { return localStorage.getItem(KEY) === btoa(CREDS.user + ':' + CREDS.pwd); } catch{ return false; }
   }
 
   window.doLogin = function() {
-    const u = document.getElementById('login-user').value.trim();
-    const p = document.getElementById('login-pwd').value;
-    if (btoa(u) === CREDS.user && btoa(p) === CREDS.pwd) {
-      sessionStorage.setItem(SESSION_KEY, '1');
+    const u = (document.getElementById('login-user').value || '').trim();
+    const p = (document.getElementById('login-pwd').value  || '');
+    if (u === CREDS.user && p === CREDS.pwd) {
+      try { localStorage.setItem(KEY, btoa(u + ':' + p)); } catch{}
       document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('login-user').value = '';
-      document.getElementById('login-pwd').value = '';
     } else {
       document.getElementById('login-err').style.display = 'block';
       document.getElementById('login-pwd').value = '';
@@ -587,7 +582,12 @@ loadData();
     }
   };
 
-  // Show login if not authenticated
+  window.doLogout = function() {
+    try { localStorage.removeItem(KEY); } catch{}
+    document.getElementById('login-screen').style.display = 'flex';
+    setTimeout(() => document.getElementById('login-user').focus(), 100);
+  };
+
   if (!isAuthed()) {
     document.getElementById('login-screen').style.display = 'flex';
     setTimeout(() => document.getElementById('login-user').focus(), 100);
