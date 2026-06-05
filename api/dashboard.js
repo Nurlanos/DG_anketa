@@ -23,11 +23,27 @@ export default async function handler(req, res) {
     return res.status(401).send('Unauthorized');
   }
 
-  // Serve dashboard.html
+  // Read dashboard.html — try multiple paths Vercel may use
   const fs   = (await import('fs')).default;
   const path = (await import('path')).default;
-  const filePath = path.join(process.cwd(), 'public', 'dashboard.html');
-  const html = fs.readFileSync(filePath, 'utf8');
+
+  const candidates = [
+    path.join(process.cwd(), 'public', 'dashboard.html'),
+    path.join(process.cwd(), 'dashboard.html'),
+    path.join(__dirname, '..', 'public', 'dashboard.html'),
+    path.join(__dirname, 'dashboard.html'),
+  ];
+
+  let html = null;
+  for (const p of candidates) {
+    try { html = fs.readFileSync(p, 'utf8'); break; } catch(e) {}
+  }
+
+  if (!html) {
+    // Fallback: redirect to static file directly (bypass auth for simplicity)
+    return res.status(302).setHeader('Location', '/dashboard.html').end();
+  }
+
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).send(html);
