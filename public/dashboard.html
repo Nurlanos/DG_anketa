@@ -481,7 +481,7 @@ function render() {
       <td style="font-size:12px;color:var(--t2)">${r.manager}</td>
       <td style="font-weight:600">${r.users}</td>
       <td style="font-size:12px">${r.deploy}</td>
-      <td><span class="badge ${r.budget === 'Согласован' ? 'b-new' : r.budget === 'Speculative' ? 'b-def' : 'b-wip'}">${r.budget}</span></td>
+      <td><span class="badge ${r.budget === 'Согласован' ? 'b-new' : (r.budget === 'Speculative' || (r.budget||'').startsWith('Предварительно')) ? 'b-def' : 'b-wip'}">${r.budget}</span></td>
       <td>
         <select class="status-sel ${statusClass(r.status)}"
           onchange="updateStatus('${r.id}', this.value, this, ${i})">${opts}

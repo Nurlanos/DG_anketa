@@ -274,8 +274,8 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
           <div class="f"><label><span class="tip-wrap">Должность<span class="tip-icon" data-tip-title="Должность" data-tip-text="Помогает понять уровень принятия решений и правильно выстроить коммуникацию.">?</span></span><span class="req">*</span></label><input id="crole" type="text" placeholder="Директор по IT"></div>
         </div>
         <div class="r2">
-          <div class="f"><label><span class="tip-wrap">Email<span class="tip-icon" data-tip-title="Email" data-tip-text="На этот адрес придёт КП и дальнейшая переписка.">?</span></span><span class="req">*</span></label><input id="cemail" type="email" placeholder="name@company.kz"></div>
-          <div class="f"><label><span class="tip-wrap">Телефон<span class="tip-icon" data-tip-title="Телефон" data-tip-text="Для оперативной связи по вопросам КП.">?</span></span><span class="req">*</span></label><input id="cphone" type="tel" placeholder="+7 700 000 0000"></div>
+          <div class="f"><label><span class="tip-wrap">Email<span class="tip-icon" data-tip-title="Email" data-tip-text="На этот адрес придёт КП и дальнейшая переписка. Нужен рабочий адрес с символом @.">?</span></span><span class="req">*</span></label><input id="cemail" type="email" placeholder="name@company.kz" autocomplete="email" inputmode="email"><div class="hint" id="cemail-hint">Формат: name@company.kz</div></div>
+          <div class="f"><label><span class="tip-wrap">Телефон<span class="tip-icon" data-tip-title="Телефон" data-tip-text="Международный формат Казахстана: +7 и 10 цифр, без пробелов и скобок. Пример: +77011231212.">?</span></span><span class="req">*</span></label><input id="cphone" type="tel" placeholder="+77011231212" autocomplete="tel" inputmode="tel" maxlength="12"><div class="hint" id="cphone-hint">Формат: +77011231212 (+7 и 10 цифр)</div></div>
         </div>
         <div class="r2">
           <div class="f"><label><span class="tip-wrap">Economic Buyer (кто подписывает)<span class="tip-icon" data-tip-title="Economic Buyer" data-tip-text="Тот, кто финально подписывает бюджет. Знание этого человека ускоряет сделку — менеджер подготовит материалы именно для него.">?</span></span><span class="req">*</span></label><input id="ebName" type="text" placeholder="ФИО, должность"></div>
@@ -344,7 +344,6 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
             <label class="ci"><input type="checkbox" value="Договоры (согласование, хранение)"><span>Договоры — согласование, хранение</span></label>
             <label class="ci"><input type="checkbox" value="ВНД (нормативные документы)"><span>ВНД — внутренние нормативные документы</span></label>
             <label class="ci"><input type="checkbox" value="ITSM / Service Desk"><span>ITSM / Service Desk</span></label>
-            <label class="ci"><input type="checkbox" value="CRM"><span>CRM (клиенты, сделки)</span></label>
           </div>
         </div>
         <div class="f"><label><span class="tip-wrap">Коммуникационные сервисы dg (интересно?)<span class="tip-icon" data-tip-title="Сервисы dg" data-tip-text="Замена Outlook, Telegram, Google Drive — всё внутри периметра компании. Данные не покидают вашу инфраструктуру. Включены в SE и AIE.">?</span></span></label>
@@ -362,7 +361,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <div class="card-body">
         <div class="f"><label><span class="tip-wrap">Интересные AI-агенты (влияет на сегмент AIE)<span class="tip-icon" data-tip-title="AI-агенты d8n.ai" data-tip-text="Каждый агент работает на вашей базе знаний — даёт ответы по вашим процессам и регламентам, а не generic-шаблоны. Выбор любого агента → сегмент d8n AIE.">?</span></span></label>
           <div class="cb" id="cb-ai">
-            <label class="ci"><input type="checkbox" value="Executive (C-уровень, контроль поручений)" onchange="updateScore()"><span>Executive — для руководителей C-уровня</span></label>
+            <label class="ci"><input type="checkbox" value="Executive (для топ-руководства, контроль поручений)" onchange="updateScore()"><span>Executive — для топ-руководства</span></label>
             <label class="ci"><input type="checkbox" value="Assistant (личный помощник всех сотрудников)" onchange="updateScore()"><span>Assistant — личный AI-помощник каждому сотруднику</span></label>
             <label class="ci"><input type="checkbox" value="Канцелярия-агент" onchange="updateScore()"><span>Канцелярия — мониторинг исполнения поручений</span></label>
             <label class="ci"><input type="checkbox" value="Legal-агент" onchange="updateScore()"><span>Legal — проверка договоров на риски</span></label>
@@ -387,12 +386,13 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="card">
       <div class="card-head"><span class="sn">5</span><span class="card-title">Инфраструктура и развёртывание</span></div>
       <div class="card-body">
-        <div class="f"><label><span class="tip-wrap">Модель развёртывания<span class="tip-icon" data-tip-title="SaaS vs On-premise" data-tip-text="SaaS — данные в защищённых ЦОД Documentolog в РК, быстрый старт, нет затрат на инфраструктуру. On-premise — данные у вас, нужны серверы и GPU для AI. PaaS — гибрид.">?</span></span><span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Модель развёртывания<span class="tip-icon" data-tip-title="SaaS / On-premise / PaaS" data-tip-text="SaaS — данные в защищённых ЦОД Documentolog в РК, быстрый старт, без своих серверов. On-premise — всё у вас на серверах, нужен свой GPU для AI. PaaS (гибрид) — платформа Documentolog в облаке, а критичные данные / LLM / интеграции остаются во внутреннем контуре компании.">?</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-deploy">
             <div class="ri" data-v="SaaS (облако Documentolog)" onmouseup="updateScore()"><span>SaaS (облако)</span></div>
             <div class="ri" data-v="On-premise (наши серверы)" onmouseup="updateScore()"><span>On-premise</span></div>
             <div class="ri" data-v="PaaS / гибрид" onmouseup="updateScore()"><span>PaaS / гибрид</span></div>
           </div>
+          <div class="hint">PaaS / гибрид — платформа в облаке Documentolog, а чувствительные данные и LLM работают у вас</div>
         </div>
         <div class="f"><label><span class="tip-wrap">Есть собственные GPU-серверы для локальной LLM?<span class="tip-icon" data-tip-title="GPU для локальной LLM" data-tip-text="AI-агенты работают на языковой модели класса 100B+ параметров. В SaaS — наши GPU. On-premise — нужны ваши. Без GPU локальные AI-агенты не работают.">?</span></span></label>
           <div class="rg" id="rg-gpu">
@@ -461,12 +461,13 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
             <div class="ri" data-v="Без разницы"><span>Без разницы</span></div>
           </div>
         </div>
-        <div class="f"><label><span class="tip-wrap">Статус бюджета<span class="tip-icon" data-tip-title="Статус бюджета" data-tip-text="Помогает понять зрелость сделки и правильно расставить приоритеты. «Согласован» → готовим детальное КП. «Speculative» → сначала executive summary.">?</span></span><span class="req">*</span></label>
+        <div class="f"><label><span class="tip-wrap">Статус бюджета<span class="tip-icon" data-tip-title="Статус бюджета" data-tip-text="Показывает, насколько сделка готова к покупке. «Согласован» — бюджет есть, готовим детальное КП. «В процессе» — согласование внутри компании. «Предварительно» — ещё изучаете решение, бюджета пока нет: пришлём краткое резюме, без детальной сметы.">?</span></span><span class="req">*</span></label>
           <div class="rg" id="rg-budget">
             <div class="ri" data-v="Согласован"><span>Согласован</span></div>
             <div class="ri" data-v="В процессе согласования"><span>В процессе</span></div>
-            <div class="ri" data-v="Speculative"><span>Speculative</span></div>
+            <div class="ri" data-v="Предварительно (бюджета пока нет)"><span>Предварительно</span></div>
           </div>
+          <div class="hint">«Предварительно» — изучаете решение, бюджета ещё нет</div>
         </div>
         <div class="r2">
           <div class="f"><label><span class="tip-wrap">Когда заключить договор?<span class="tip-icon" data-tip-title="Дедлайн сделки" data-tip-text="Определяет срочность подготовки КП и внедрения. Если дедлайн жёсткий — предложим ускоренный старт Foundation за 2 недели.">?</span></span><span class="req">*</span></label>
@@ -571,7 +572,7 @@ function getSegment(){
 
   const needsIntegration = integrations.length > 0;
   const needsAdvancedBPM = modules.some(m=>['Кадровый + HR','Финансовый (счета, акты, бюджетирование)',
-    'Управление заседаниями / протоколы','ITSM / Service Desk','CRM'].includes(m));
+    'Управление заседаниями / протоколы','ITSM / Service Desk'].includes(m));
   const needsComms   = comms.length > 0;
   const isHolding    = legalEntities > 1;
   const needsOnPrem  = deploy.includes('On-premise') || deploy.includes('PaaS');
@@ -734,9 +735,52 @@ function show(n){for(let i=1;i<=maxStep;i++){const el=document.getElementById('s
 
 function flash(el){el.style.outline='2px solid #EF4444';el.style.borderRadius='6px';setTimeout(()=>{el.style.outline='';},2500);}
 
+function isEmailOk(s){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
+}
+function isPhoneOk(s){
+  return /^\+7\d{10}$/.test(s);
+}
+function normalizePhone(raw){
+  let digits=(raw||'').replace(/\D/g,'');
+  if(digits.startsWith('8')&&digits.length===11) digits='7'+digits.slice(1);
+  if(!digits.startsWith('7')) digits='7'+digits;
+  digits=digits.slice(0,11);
+  return digits.length ? '+'+digits : '+7';
+}
+
+(function bindContactMasks(){
+  const phone=document.getElementById('cphone');
+  if(phone){
+    phone.addEventListener('focus',()=>{ if(!phone.value.trim()) phone.value='+7'; });
+    phone.addEventListener('input',()=>{
+      phone.value=normalizePhone(phone.value);
+      if(document.activeElement===phone) phone.setSelectionRange(phone.value.length, phone.value.length);
+    });
+    phone.addEventListener('blur',()=>{
+      const n=normalizePhone(phone.value);
+      phone.value = n==='+7' ? '' : n;
+      const hint=document.getElementById('cphone-hint');
+      if(hint){
+        if(phone.value && !isPhoneOk(phone.value)){ hint.style.color='#EF4444'; hint.textContent='Нужен формат +77011231212 (+7 и 10 цифр)'; }
+        else { hint.style.color=''; hint.textContent='Формат: +77011231212 (+7 и 10 цифр)'; }
+      }
+    });
+  }
+  const email=document.getElementById('cemail');
+  if(email){
+    email.addEventListener('blur',()=>{
+      const hint=document.getElementById('cemail-hint');
+      if(!hint) return;
+      if(email.value.trim() && !isEmailOk(email.value.trim())){ hint.style.color='#EF4444'; hint.textContent='Укажите корректный email с символом @'; }
+      else { hint.style.color=''; hint.textContent='Формат: name@company.kz'; }
+    });
+  }
+})();
+
 function validate(){
   const rules={
-    1:[{id:'company'},{id:'bin',min:12},{id:'ownership'},{id:'industry'},{id:'cname'},{id:'crole'},{id:'cemail'},{id:'cphone'},{id:'ebName'}],
+    1:[{id:'company'},{id:'bin',min:12},{id:'ownership'},{id:'industry'},{id:'cname'},{id:'crole'},{id:'cemail',email:true},{id:'cphone',phone:true},{id:'ebName'}],
     2:[{id:'users',min_val:1},{rg:'rg-sed'},{id:'goal'},{id:'pain'},{id:'vision12'}],
     3:[{cb:'cb-mod'}],
     4:[{rg:'rg-deploy'}],
@@ -746,12 +790,15 @@ function validate(){
   document.querySelectorAll('.err-hl').forEach(e=>e.classList.remove('err-hl'));
   (rules[step]||[]).forEach(c=>{
     if(c.id){const el=document.getElementById(c.id);if(el){
-  const val=el.value.trim();
-  let bad=!val;
-  if(c.min&&val.length<c.min)bad=true;
-  if(c.min_val&&(parseInt(val)||0)<c.min_val)bad=true;
-  if(bad){el.classList.add('err-hl');ok=false;}
-}}
+      let val=el.value.trim();
+      if(c.phone){ el.value=normalizePhone(val); val=el.value; if(val==='+7') val=''; }
+      let bad=!val;
+      if(c.min&&val.length<c.min)bad=true;
+      if(c.min_val&&(parseInt(val)||0)<c.min_val)bad=true;
+      if(c.email&&val&&!isEmailOk(val))bad=true;
+      if(c.phone&&val&&!isPhoneOk(val))bad=true;
+      if(bad){el.classList.add('err-hl');ok=false;}
+    }}
     if(c.rg&&!R[c.rg]){const el=document.getElementById(c.rg);if(el)flash(el);ok=false;}
     if(c.cb&&chk(c.cb).length===0){const el=document.getElementById(c.cb);if(el)flash(el);ok=false;}
   });
