@@ -57,10 +57,20 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;
 .tbl-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden}
 .tbl-head{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .tbl-head h3{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-.tbl-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:680px}
+.tbl-scroll{overflow-x:hidden}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th:nth-child(1),td:nth-child(1){width:10%}
+th:nth-child(2),td:nth-child(2){width:18%}
+th:nth-child(3),td:nth-child(3){width:13%}
+th:nth-child(4),td:nth-child(4){width:6%}
+th:nth-child(5),td:nth-child(5){width:12%}
+th:nth-child(6),td:nth-child(6){width:11%}
+th:nth-child(7),td:nth-child(7){width:12%}
+th:nth-child(8),td:nth-child(8){width:18%}
 th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--brd);background:var(--bg);white-space:nowrap}
-td{padding:11px 14px;border-bottom:1px solid var(--brd);font-size:13px;vertical-align:middle}
+td{padding:9px 8px;border-bottom:1px solid var(--brd);font-size:13px;vertical-align:middle;overflow-wrap:anywhere;min-width:0}
+td:nth-child(1){font-size:11px;white-space:normal!important;line-height:1.35}
+td:nth-child(6) .badge{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#F8FAFF}
 .badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
@@ -70,7 +80,7 @@ tr:hover td{background:#F8FAFF}
 .b-deal{background:#E3F2FD;color:#1565C0}
 .b-no{background:#FFEBEE;color:#C62828}
 .b-def{background:#F5F5F5;color:#666}
-.status-sel{font-size:12px;font-weight:600;padding:4px 10px 4px 10px;border-radius:20px;border:1.5px solid rgba(0,0,0,.1);cursor:pointer;font-family:var(--f);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;transition:all .15s}
+.status-sel{width:100%;max-width:112px;font-size:10px;font-weight:600;padding:4px 20px 4px 6px;border-radius:20px;border:1.5px solid rgba(0,0,0,.1);cursor:pointer;font-family:var(--f);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;transition:all .15s}
 .status-sel:hover{filter:brightness(.95)}
 .status-sel.s-new{background:#E8F5E9;color:#2E7D32}
 .status-sel.s-wip{background:#FFF8E1;color:#E65100}
@@ -110,32 +120,22 @@ tr:hover td{background:#F8FAFF}
 .code-box pre{font-family:'Courier New',monospace;font-size:11px;color:#CBD5E1;white-space:pre-wrap;line-height:1.6;margin:0}
 .code-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:8px}
 .modal-foot{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:760px){
+  th,td{padding-left:6px;padding-right:6px}
+  th:nth-child(1),td:nth-child(1),th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none}
+  th:nth-child(2),td:nth-child(2){width:38%}
+  th:nth-child(6),td:nth-child(6){width:20%}
+  th:nth-child(7),td:nth-child(7){width:20%}
+  th:nth-child(8),td:nth-child(8){width:22%}
+  td:nth-child(8) .btn{padding:5px 6px;font-size:10px}
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:9999;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:14px;padding:36px 32px;width:100%;max-width:360px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,.3)">
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="background:var(--blue);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">DG</div>
-        <div style="font-size:15px;font-weight:700;color:var(--navy)">Documentolog</div>
-      </div>
-      <div style="font-size:13px;color:var(--t2)">Дашборд менеджера</div>
-    </div>
-    <div style="margin-bottom:12px">
-      <label style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Логин</label>
-      <input id="login-user" type="text" placeholder="admin" style="width:100%;padding:10px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div style="margin-bottom:20px">
-      <label style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Пароль</label>
-      <input id="login-pwd" type="password" placeholder="••••••••" style="width:100%;padding:10px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div id="login-err" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:8px 12px;font-size:12px;color:#991B1B;margin-bottom:12px">Неверный логин или пароль</div>
-    <button onclick="doLogin()" style="width:100%;padding:11px;background:var(--yellow);color:var(--navy);border:none;border-radius:6px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer">Войти</button>
-  </div>
-</div>
+<!-- Access is gated server-side by HTTP Basic Auth in api/dashboard.js —
+     the browser's native auth prompt handles login, so no client-side
+     login screen is needed (or trustworthy) here. -->
 
 <!-- NAVBAR -->
 <div class="topnav">
@@ -171,7 +171,6 @@ tr:hover td{background:#F8FAFF}
   </div>
   <div style="display:flex;align-items:center;gap:12px">
     <a href="/" style="font-size:12px;color:rgba(255,255,255,.5);text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">← Форма клиента</a>
-    <button onclick="doLogout()" style="font-size:11px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:var(--f)">Выйти</button>
   </div>
 </div>
 
@@ -210,7 +209,10 @@ tr:hover td{background:#F8FAFF}
   <div class="tbl-wrap">
     <div class="tbl-head">
       <h3>Заполненные анкеты</h3>
-      <button class="btn sec" onclick="loadData()">↻ Обновить</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn sec" id="archive-toggle" onclick="toggleArchive()">Архив</button>
+        <button class="btn sec" onclick="loadData()">↻ Обновить</button>
+      </div>
     </div>
     <div class="tbl-scroll">
       <div id="tbl-c"><div class="empty"><div class="ico">📋</div>Загрузка данных из Airtable...</div></div>
@@ -240,12 +242,12 @@ tr:hover td{background:#F8FAFF}
 </div>
 
 <script>
-let rows = [], curMgr = 'all', _prompt = '', _genLink = '';
+let rows = [], curMgr = 'all', showArchived = false, _prompt = '', _genLink = '';
 
 // ── Manager registry (stored in localStorage) ────────────────────────────
 const DEFAULT_MANAGERS = [
-  { id: 'n.omarov', name: 'Омаров Нурлан', dept: 'Упр. №9', email: 'astananur@gmail.com' },
-  { id: 'a.kuz',    name: 'Кузьменко Азиза', dept: 'Упр. №9', email: '' },
+  { id: 'n.omarov', name: 'Омаров Нурлан', dept: 'Упр. №9', email: 'astananur@gmail.com', backupEmail: '' },
+  { id: 'a.kuz',    name: 'Кузьменко Азиза', dept: 'Упр. №9', email: '', backupEmail: '' },
 ];
 
 function loadManagers() {
@@ -260,6 +262,24 @@ function saveManagers(mgrs) {
 
 let managers = loadManagers();
 
+async function loadServerManagers() {
+  try {
+    const response = await fetch('/api/managers');
+    const data = await response.json();
+    if (response.ok && Array.isArray(data.managers) && data.managers.length) {
+      managers = managers.map((local) => {
+        const server = data.managers.find((item) => item.id === local.id);
+        return server ? { ...local, ...server } : local;
+      });
+      data.managers.forEach((server) => {
+        if (!managers.some((local) => local.id === server.id)) managers.push(server);
+      });
+      saveManagers(managers);
+      renderManagers();
+    }
+  } catch (e) { console.warn('Server manager mapping load skipped:', e); }
+}
+
 function renderManagers() {
   const list = document.getElementById('mgr-list');
   if (!list) return;
@@ -267,7 +287,7 @@ function renderManagers() {
     <div class="mgr-row">
       <div class="mgr-info">
         <div class="mgr-name">${m.name} <span class="mgr-id">${m.id}</span></div>
-        <div class="mgr-email">${m.email || '<span style="color:#EF4444">email не указан</span>'} · ${m.dept || ''}</div>
+        <div class="mgr-email">${m.email || '<span style="color:#EF4444">email не указан</span>'}${m.backupEmail ? ` · резерв: ${m.backupEmail}` : ''} · ${m.dept || ''}</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="copyMgrLink('${m.id}')">Скопировать ссылку</button>
@@ -326,6 +346,10 @@ function openAddMgr(idx = -1) {
       <input id="mgr-f-email" type="email" value="${m.email}" placeholder="manager@company.kz">
     </div>
     <div class="form-row">
+      <label>Резервный email</label>
+      <input id="mgr-f-backup" type="email" value="${m.backupEmail || ''}" placeholder="backup@company.kz">
+    </div>
+    <div class="form-row">
       <label>Отдел / подразделение</label>
       <input id="mgr-f-dept" type="text" value="${m.dept}" placeholder="Упр. №9">
     </div>
@@ -344,18 +368,20 @@ function editMgr(idx) { openAddMgr(idx); }
 function saveMgr() {
   const name  = document.getElementById('mgr-f-name')?.value.trim();
   const email = document.getElementById('mgr-f-email')?.value.trim();
+  const backupEmail = document.getElementById('mgr-f-backup')?.value.trim();
   const dept  = document.getElementById('mgr-f-dept')?.value.trim();
   const idEl  = document.getElementById('mgr-f-id');
   const id    = _editIdx >= 0 ? managers[_editIdx].id : (idEl?.value.trim().toLowerCase().replace(/\s+/g,'') || '');
 
   if (!name || !email || !id) { alert('Заполните обязательные поля'); return; }
   if (!email.includes('@')) { alert('Некорректный email'); return; }
+  if (backupEmail && !backupEmail.includes('@')) { alert('Некорректный резервный email'); return; }
 
   if (_editIdx >= 0) {
-    managers[_editIdx] = { ...managers[_editIdx], name, email, dept };
+    managers[_editIdx] = { ...managers[_editIdx], name, email, backupEmail, dept };
   } else {
     if (managers.find(m => m.id === id)) { alert('Менеджер с таким ID уже существует'); return; }
-    managers.push({ id, name, dept, email });
+    managers.push({ id, name, dept, email, backupEmail });
   }
   saveManagers(managers);
 
@@ -422,12 +448,17 @@ function copyLink() {
 // Load data
 // Render managers on init
 renderManagers();
+loadServerManagers();
 
 async function loadData() {
   document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">⏳</div>Загрузка из Airtable...</div>';
   document.getElementById('err-box').style.display = 'none';
   try {
-    const url = '/api/rows' + (curMgr !== 'all' ? '?mgr=' + curMgr : '');
+    const params = new URLSearchParams();
+    if (curMgr !== 'all') params.set('mgr', curMgr);
+    if (showArchived) params.set('archived', '1');
+    const query = params.toString();
+    const url = '/api/rows' + (query ? '?' + query : '');
     const res = await fetch(url);
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'API error ' + res.status);
@@ -466,7 +497,7 @@ function render() {
     document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">📭</div>Анкет пока нет</div>';
     return;
   }
-  const STATUSES = ['Новое','КП в работе','КП отправлено','Договор','Отказ'];
+  const STATUSES = ['Новое','КП в работе','КП отправлено','Договор','Отказ','Архив'];
   let h = `<table><thead><tr>
     <th>Дата</th><th>Компания</th><th>Менеджер</th>
     <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Статус</th><th></th>
@@ -487,11 +518,39 @@ function render() {
           onchange="updateStatus('${r.id}', this.value, this, ${i})">${opts}
         </select>
       </td>
-      <td><button class="btn blue" style="padding:6px 12px;font-size:12px" onclick="openModal(${i})">→ КП</button></td>
+      <td style="white-space:nowrap">
+        <button class="btn blue" style="padding:6px 12px;font-size:12px" onclick="openModal(${i})">→ КП</button>
+        ${showArchived ? '' : `<button class="btn sec" style="padding:6px 10px;font-size:12px;margin-left:4px" onclick="archiveRow('${r.id}', ${i})">В архив</button>`}
+      </td>
     </tr>`;
   });
   h += '</tbody></table>';
   document.getElementById('tbl-c').innerHTML = h;
+}
+
+async function archiveRow(recordId, idx) {
+  if (!confirm('Переместить анкету в архив?')) return;
+  try {
+    const res = await fetch('/api/update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId, status: 'Архив' })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'Ошибка архивации');
+    rows.splice(idx, 1);
+    render();
+    updateStats();
+  } catch (e) {
+    alert('Не удалось переместить анкету в архив: ' + e.message);
+  }
+}
+
+function toggleArchive() {
+  showArchived = !showArchived;
+  document.getElementById('archive-toggle').textContent = showArchived ? '← Заполненные анкеты' : 'Архив';
+  document.querySelector('.tbl-head h3').textContent = showArchived ? 'Архив' : 'Заполненные анкеты';
+  loadData();
 }
 
 async function updateStatus(recordId, newStatus, selectEl, idx) {
@@ -559,40 +618,6 @@ function copyPrompt() {
 }
 
 loadData();
-
-  // ── Auth ─────────────────────────────────────────────────────────────────
-(function(){
-  const CREDS = { user: 'admin', pwd: 'astana1234' };
-  const KEY   = 'dg_dash_v1';
-
-  function isAuthed() {
-    try { return localStorage.getItem(KEY) === btoa(CREDS.user + ':' + CREDS.pwd); } catch{ return false; }
-  }
-
-  window.doLogin = function() {
-    const u = (document.getElementById('login-user').value || '').trim();
-    const p = (document.getElementById('login-pwd').value  || '');
-    if (u === CREDS.user && p === CREDS.pwd) {
-      try { localStorage.setItem(KEY, btoa(u + ':' + p)); } catch{}
-      document.getElementById('login-screen').style.display = 'none';
-    } else {
-      document.getElementById('login-err').style.display = 'block';
-      document.getElementById('login-pwd').value = '';
-      document.getElementById('login-pwd').focus();
-    }
-  };
-
-  window.doLogout = function() {
-    try { localStorage.removeItem(KEY); } catch{}
-    document.getElementById('login-screen').style.display = 'flex';
-    setTimeout(() => document.getElementById('login-user').focus(), 100);
-  };
-
-  if (!isAuthed()) {
-    document.getElementById('login-screen').style.display = 'flex';
-    setTimeout(() => document.getElementById('login-user').focus(), 100);
-  }
-})();
 </script>
 </body>
 </html>
