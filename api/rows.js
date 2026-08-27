@@ -1,26 +1,31 @@
 // api/rows.js — читает анкеты из Airtable для дашборда
 
+import { getAirtableToken, requireDashboardAuth } from './_lib.js';
+
 const BASE_ID = 'appHakMP7mBJhUu7p';
 const TABLE_ID = 'tblTU1on0yAcK5RTt';
 
 export default async function handler(req, res) {
   try {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+    if (!requireDashboardAuth(req, res)) return;
 
-    const token = process.env.AIRTABLE_TOKEN || process.env.Airtable;
+    const token = getAirtableToken();
     if (!token) return res.status(500).json({ error: 'AIRTABLE_TOKEN not set' });
 
     const mgr = (req.query && req.query.mgr) || '';
+    const archived = (req.query && req.query.archived) === '1';
 
-    const params = new URLSearchParams();
+    const params = new globalThis.URLSearchParams();
     params.set('sort[0][field]', 'Дата');
     params.set('sort[0][direction]', 'desc');
     params.set('pageSize', '50');
-    if (mgr) params.set('filterByFormula', `{manager_id}='${mgr}'`);
+    const filters = [`{Компания}!='__DG_MANAGER_CONFIG__'`, `${archived ? '' : 'NOT('}FIND('__DG_ARCHIVED__',{Примечания})${archived ? '' : ')'}`];
+    if (mgr) filters.push(`{manager_id}='${mgr}'`);
+    params.set('filterByFormula', `AND(${filters.join(',')})`);
 
     const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}?${params.toString()}`;
 
@@ -57,7 +62,7 @@ export default async function handler(req, res) {
         budget: f['Бюджет'] || '—',
         deploy: f['Развёртывание'] || '—',
         deadline: f['Срок заключения'] || '—',
-        status: f['Статус'] || 'Новое',
+        status: f['Примечания']?.includes('__DG_ARCHIVED__') ? 'Архив' : (f['Статус'] || 'Новое'),
         prompt: f['Промпт d8n Sales'] || '',
         ebEmail: f['EB Email'] || '',
         ebPhone: f['EB Телефон'] || '',

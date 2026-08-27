@@ -904,8 +904,26 @@ async function submit(){
   const btn=document.getElementById('bnext');
   btn.disabled=true;btn.textContent='Отправляем...';
   const d=buildData();
-  try{await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:d,prompt:buildPrompt(d)})});}
-  catch(e){console.warn(e);}
+
+  let errMsg=null;
+  try{
+    const res=await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:d,prompt:buildPrompt(d)})});
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok||json.error) errMsg=json.error||('Сервер вернул ошибку '+res.status);
+    // Both delivery paths (email to manager, Airtable record) can fail
+    // independently without an HTTP-level error — if neither actually
+    // succeeded, the anketa was silently lost, so treat it as a failure.
+    else if(!String(json.email||'').startsWith('sent:') && !String(json.airtable||'').startsWith('saved:')){
+      errMsg='Анкета не была сохранена (email: '+json.email+', airtable: '+json.airtable+')';
+    }
+  }catch(e){errMsg=e.message;}
+
+  if(errMsg){
+    btn.disabled=false;
+    btn.innerHTML='Повторить отправку <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    alert('Не удалось отправить анкету: '+errMsg+'\n\nПопробуйте ещё раз. Если ошибка повторится — свяжитесь с менеджером напрямую.');
+    return;
+  }
 
   // Show result
   const {seg,reasons}=getSegment();

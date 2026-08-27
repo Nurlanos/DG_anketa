@@ -1,15 +1,33 @@
+import { getAirtableToken } from './_lib.js';
+
 const BASE_ID  = 'appHakMP7mBJhUu7p';
 const TABLE_ID = 'tblTU1on0yAcK5RTt';
-const AT_TOKEN = process.env.AIRTABLE_TOKEN;
-const RESEND_KEY = process.env.RESEND_API_KEY || 're_8UGpHFbF_7jsHzk9qayhwrtVQpYWSHn3a';
+const AT_TOKEN = getAirtableToken();
+const RESEND_KEY = process.env.RESEND_API_KEY || '';
 
-const MANAGER_EMAILS = {
-  'n.omarov': 'astananur@gmail.com',
-  'a.kuz':    'astananur@gmail.com',
-  'manager3': 'astananur@gmail.com',
-};
-const FALLBACK_EMAIL = 'astananur@gmail.com';
-function getManagerEmail(id) { return MANAGER_EMAILS[id] || FALLBACK_EMAIL; }
+// Used only when Airtable has no manager-config record for the given id yet.
+const FALLBACK_EMAIL = process.env.FALLBACK_MANAGER_EMAIL || '';
+
+async function getManagerEmail(id) {
+  const fallback = FALLBACK_EMAIL;
+  if (!AT_TOKEN) return [fallback].filter(Boolean);
+  try {
+    const params = new globalThis.URLSearchParams({ filterByFormula: `{Компания}='__DG_MANAGER_CONFIG__'`, pageSize: '100' });
+    const response = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}?${params}`, {
+      headers: { Authorization: `Bearer ${AT_TOKEN}` },
+    });
+    if (!response.ok) return [fallback].filter(Boolean);
+    const records = (await response.json()).records || [];
+    const config = records.find((record) => record.fields?.manager_id === id && record.fields?.Email);
+    if (!config?.fields.Email) return [fallback].filter(Boolean);
+    return [config.fields.Email, config.fields.Примечания].filter((email, index, emails) =>
+      email && (index === 0 || email !== emails[0])
+    );
+  } catch (err) {
+    console.error('Manager email lookup error:', err.message);
+    return [fallback].filter(Boolean);
+  }
+}
 
 const SEG_LABEL = { se: 'd8n Standard Edition (SE)', aie: 'd8n AI Edition (AIE)' };
 
@@ -114,7 +132,12 @@ export default async function handler(req, res) {
     const filename  = `anketa_${(data.company||'client').replace(/[^\wа-яёА-ЯЁ]/gi,'_').slice(0,30)}_${new Date().toISOString().slice(0,10)}.md`;
 
     // Email
-    try {
+    const recipients = await getManagerEmail(data.managerId);
+    if (!RESEND_KEY) {
+      results.email = 'skipped:no key';
+    } else if (!recipients.length) {
+      results.email = 'skipped:no recipient email';
+    } else { try {
       const html = `<div style="font-family:-apple-system,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#0D1F4E;padding:20px 24px;border-radius:10px 10px 0 0">
           <div style="color:#fff;font-size:15px;font-weight:700">Новая анкета клиента</div>
@@ -154,7 +177,7 @@ export default async function handler(req, res) {
         headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from:        'DG Anketa <onboarding@resend.dev>',
-          to:          [getManagerEmail(data.managerId)],
+          to:          recipients,
           subject:     `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment]||data.segment}`,
           html,
           attachments: [{ filename, content: mdBase64 }],
@@ -166,7 +189,7 @@ export default async function handler(req, res) {
     } catch(e) {
       results.email = 'exception:' + e.message;
       console.error('Email error:', e.message);
-    }
+    } }
 
     // Airtable
     if (AT_TOKEN) {
