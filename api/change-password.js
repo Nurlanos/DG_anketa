@@ -26,10 +26,11 @@ export default async function handler(req, res) {
         item.email.toLowerCase() === session.email.toLowerCase()
     )
     if (!user) return res.status(404).json({ error: 'User not found' })
+    const passwordHash = await hashPassword(password)
     const fields = {
       Примечания: JSON.stringify({
         role: user.role || 'manager',
-        passwordHash: await hashPassword(password),
+        passwordHash,
         status: 'active',
         mustChangePassword: false,
       }),
@@ -38,10 +39,15 @@ export default async function handler(req, res) {
     if (recordId) await updateDashboardUser(recordId, fields)
     else {
       const created = await createDashboardUser({
-        Email: user.email,
-        Менеджер: user.name || user.email,
-        manager_id: user.managerId || '',
-        ...fields,
+        Примечания: JSON.stringify({
+          email: user.email,
+          name: user.name || user.email,
+          managerId: user.managerId || '',
+          role: user.role || 'manager',
+          passwordHash,
+          status: 'active',
+          mustChangePassword: false,
+        }),
       })
       recordId = created.id
     }

@@ -60,10 +60,10 @@ function normalizeAirtableUser(record) {
   })()
   return {
     recordId: record.id,
-    email: fields.Email || '',
-    name: fields.Менеджер || '',
+    email: metadata.email || fields.Email || '',
+    name: metadata.name || fields.Менеджер || '',
     role: metadata.role || 'manager',
-    managerId: fields.manager_id || '',
+    managerId: metadata.managerId || fields.manager_id || '',
     passwordHash: metadata.passwordHash || '',
     status: metadata.status || 'active',
     mustChangePassword: metadata.mustChangePassword === true,

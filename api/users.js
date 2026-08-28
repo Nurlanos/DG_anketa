@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       const password = String(req.body?.password || '')
       if (!validEmail(email) || !name || !isValidPassword(password)) {
         return res.status(400).json({
-            error: 'Нужны корректные почта, имя и пароль от 8 латинских символов',
+          error: 'Нужны корректные почта, имя и пароль от 8 латинских символов',
         })
       }
       if (role === 'manager' && !managerId) {
@@ -59,10 +59,10 @@ export default async function handler(req, res) {
           .json({ error: 'Пользователь с такой почтой уже есть' })
       }
       const created = await createDashboardUser({
-        Email: email,
-        Менеджер: name,
-        manager_id: managerId,
         Примечания: JSON.stringify({
+          email,
+          name,
+          managerId,
           role,
           passwordHash: await hashPassword(password),
           status: 'active',
@@ -132,7 +132,9 @@ export default async function handler(req, res) {
       if (!isValidPassword(password))
         return res
           .status(400)
-          .json({ error: 'Пароль: минимум 8 латинских символов, цифр или знаков' })
+          .json({
+            error: 'Пароль: минимум 8 латинских символов, цифр или знаков',
+          })
       await updateDashboardUser(recordId, {
         Примечания: JSON.stringify({
           role: target.role,
