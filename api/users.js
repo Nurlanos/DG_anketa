@@ -1,0 +1,97 @@
+import {
+  createDashboardUser,
+  deleteDashboardUser,
+  getDashboardUsers,
+  hashPassword,
+  requireAdmin,
+  updateDashboardUser,
+} from './_lib.js'
+
+function publicUser(user) {
+  return {
+    id: user.recordId || '',
+    email: user.email,
+    name: user.name || '',
+    role: user.role,
+    managerId: user.managerId || '',
+    status: user.status,
+    mustChangePassword: Boolean(user.mustChangePassword),
+    managed: Boolean(user.recordId),
+  }
+}
+
+function validEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+export default async function handler(req, res) {
+  const admin = requireAdmin(req, res)
+  if (!admin) return
+  if (!['GET', 'POST', 'PATCH', 'DELETE'].includes(req.method)) {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  try {
+    const users = await getDashboardUsers()
+    if (req.method === 'GET') return res.status(200).json({ users: users.map(publicUser) })
+
+    if (req.method === 'POST') {
+      const email = String(req.body?.email || '').trim().toLowerCase()
+      const name = String(req.body?.name || '').trim()
+      const role = req.body?.role === 'admin' ? 'admin' : 'manager'
+      const managerId = String(req.body?.managerId || '').trim()
+      const password = String(req.body?.password || '')
+      if (!validEmail(email) || !name || password.length < 10) {
+        return res.status(400).json({ error: 'Нужны корректные почта, имя и пароль от 10 символов' })
+      }
+      if (role === 'manager' && !managerId) {
+        return res.status(400).json({ error: 'Для менеджера нужен managerId' })
+      }
+      if (users.some((user) => user.email.toLowerCase() === email)) {
+        return res.status(409).json({ error: 'Пользователь с такой почтой уже есть' })
+      }
+      const created = await createDashboardUser({
+        Email: email,
+        Менеджер: name,
+        manager_id: managerId,
+        'Auth Role': role,
+        'Auth Password Hash': await hashPassword(password),
+        'Auth Status': 'active',
+        'Auth Must Change': true,
+      })
+      return res.status(201).json({ user: publicUser({ ...created.fields, recordId: created.id, email, name, role, managerId, status: 'active', mustChangePassword: true }) })
+    }
+
+    const recordId = String(req.body?.id || '')
+    const target = users.find((user) => user.recordId === recordId)
+    if (!target) return res.status(404).json({ error: 'Пользователь не найден или управляется через env' })
+
+    if (req.method === 'DELETE') {
+      if (target.email.toLowerCase() === admin.email.toLowerCase()) return res.status(400).json({ error: 'Нельзя удалить свой аккаунт' })
+      if (target.role === 'admin' && users.filter((user) => user.role === 'admin' && user.status === 'active').length <= 1) {
+        return res.status(400).json({ error: 'Нельзя удалить последнего активного администратора' })
+      }
+      await deleteDashboardUser(recordId)
+      return res.status(200).json({ ok: true })
+    }
+
+    const action = req.body?.action
+    if (action === 'block' || action === 'unblock') {
+      if (target.email.toLowerCase() === admin.email.toLowerCase() && action === 'block') {
+        return res.status(400).json({ error: 'Нельзя заблокировать свой аккаунт' })
+      }
+      await updateDashboardUser(recordId, { 'Auth Status': action === 'block' ? 'blocked' : 'active' })
+      return res.status(200).json({ ok: true })
+    }
+    if (action === 'reset-password') {
+      const password = String(req.body?.password || '')
+      if (password.length < 10) return res.status(400).json({ error: 'Пароль должен содержать минимум 10 символов' })
+      await updateDashboardUser(recordId, { 'Auth Password Hash': await hashPassword(password), 'Auth Must Change': true })
+      return res.status(200).json({ ok: true })
+    }
+    return res.status(400).json({ error: 'Unknown action' })
+  } catch (err) {
+    console.error('users error:', err)
+    return res.status(500).json({ error: err.message })
+  }
+}

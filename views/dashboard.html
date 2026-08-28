@@ -1010,6 +1010,21 @@
         <div class="mgr-list" id="mgr-list"></div>
       </div>
 
+      <div class="lgen" id="users-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <h3 style="margin:0">Пользователи дашборда</h3>
+        </div>
+        <div class="lr">
+          <input class="lurl" id="user-email" type="email" placeholder="Почта">
+          <input class="lurl" id="user-name" type="text" placeholder="Имя">
+          <select class="lsel" id="user-role"><option value="manager">Менеджер</option><option value="admin">Администратор</option></select>
+          <input class="lurl" id="user-manager" type="text" placeholder="ID менеджера">
+          <input class="lurl" id="user-password" type="password" placeholder="Временный пароль (10+)" autocomplete="new-password">
+          <button class="btn" onclick="createUser()">Добавить</button>
+        </div>
+        <div class="mgr-list" id="users-list"></div>
+      </div>
+
       <!-- ERROR BOX -->
       <div class="err-box" id="err-box"></div>
 
@@ -1146,12 +1161,62 @@
         currentUser = await response.json()
         if (currentUser.role !== 'admin') {
           document.getElementById('admin-panel').style.display = 'none'
+          document.getElementById('users-panel').style.display = 'none'
           document.getElementById('tabs').style.display = 'none'
           curMgr = currentUser.managerId
           return
         }
         renderManagers()
         loadServerManagers()
+        loadUsers()
+      }
+
+      async function loadUsers() {
+        const response = await fetch('/api/users')
+        if (!response.ok) return
+        const data = await response.json()
+        document.getElementById('users-list').innerHTML = (data.users || [])
+          .map((user) => {
+            const status = user.status === 'blocked' ? 'Заблокирован' : 'Активен'
+            const action = user.status === 'blocked' ? 'unblock' : 'block'
+            const actionLabel = user.status === 'blocked' ? 'Разблокировать' : 'Заблокировать'
+            return `<div class="mgr-row"><div class="mgr-info"><div class="mgr-name">${user.name || user.email} <span class="mgr-id">${user.role}</span></div><div class="mgr-email">${user.email} · ${user.managerId || 'все данные'} · ${status}</div></div>${user.managed ? `<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="userAction('${user.id}','${action}')">${actionLabel}</button><button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="resetUserPassword('${user.id}')">Сбросить пароль</button><button class="btn sec" style="padding:6px 10px;font-size:11px;color:#ef4444" onclick="deleteUser('${user.id}')">Удалить</button></div>` : '<span style="font-size:11px;color:var(--t3)">bootstrap</span>'}</div>`
+          })
+          .join('')
+      }
+
+      async function createUser() {
+        const body = { email: document.getElementById('user-email').value, name: document.getElementById('user-name').value, role: document.getElementById('user-role').value, managerId: document.getElementById('user-manager').value, password: document.getElementById('user-password').value }
+        const response = await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+        const data = await response.json()
+        if (!response.ok) return alert(data.error || 'Не удалось создать пользователя')
+        ;['user-email', 'user-name', 'user-manager', 'user-password'].forEach((id) => { document.getElementById(id).value = '' })
+        loadUsers()
+      }
+
+      async function userAction(id, action) {
+        const response = await fetch('/api/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action }) })
+        const data = await response.json()
+        if (!response.ok) alert(data.error || 'Не удалось изменить пользователя')
+        loadUsers()
+      }
+
+      async function resetUserPassword(id) {
+        const password = prompt('Введите новый временный пароль (минимум 10 символов):')
+        if (!password) return
+        const response = await fetch('/api/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action: 'reset-password', password }) })
+        const data = await response.json()
+        if (!response.ok) alert(data.error || 'Не удалось сбросить пароль')
+        else alert('Пароль сброшен. Пользователь сменит его при следующем входе.')
+        loadUsers()
+      }
+
+      async function deleteUser(id) {
+        if (!confirm('Удалить пользователя?')) return
+        const response = await fetch('/api/users', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+        const data = await response.json()
+        if (!response.ok) alert(data.error || 'Не удалось удалить пользователя')
+        loadUsers()
       }
 
       function renderManagers() {
