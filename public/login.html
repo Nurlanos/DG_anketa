@@ -133,7 +133,9 @@
             })
             const data = await response.json()
             if (!response.ok) throw new Error(data.error || 'Не удалось войти')
-              location.href = data.mustChangePassword ? '/change-password.html' : '/dashboard'
+            location.href = data.mustChangePassword
+              ? '/change-password.html'
+              : '/dashboard'
           } catch (err) {
             error.textContent = err.message
             button.disabled = false

@@ -8,19 +8,30 @@ import {
 } from './_lib.js'
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (req.method !== 'POST')
+    return res.status(405).json({ error: 'Method not allowed' })
   const session = requireDashboardAuth(req, res)
   if (!session) return
   const password = String(req.body?.password || '')
-  if (password.length < 10) return res.status(400).json({ error: 'Пароль должен содержать минимум 10 символов' })
+  if (password.length < 10)
+    return res
+      .status(400)
+      .json({ error: 'Пароль должен содержать минимум 10 символов' })
 
   try {
-    const user = (await getDashboardUsers()).find((item) => item.recordId === session.recordId || item.email.toLowerCase() === session.email.toLowerCase())
+    const user = (await getDashboardUsers()).find(
+      (item) =>
+        item.recordId === session.recordId ||
+        item.email.toLowerCase() === session.email.toLowerCase()
+    )
     if (!user) return res.status(404).json({ error: 'User not found' })
     const fields = {
-      'Auth Password Hash': await hashPassword(password),
-      'Auth Must Change': false,
-      'Auth Status': 'active',
+      Примечания: JSON.stringify({
+        role: user.role || 'manager',
+        passwordHash: await hashPassword(password),
+        status: 'active',
+        mustChangePassword: false,
+      }),
     }
     let recordId = user.recordId
     if (recordId) await updateDashboardUser(recordId, fields)
@@ -29,7 +40,6 @@ export default async function handler(req, res) {
         Email: user.email,
         Менеджер: user.name || user.email,
         manager_id: user.managerId || '',
-        'Auth Role': user.role || 'manager',
         ...fields,
       })
       recordId = created.id

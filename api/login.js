@@ -7,13 +7,19 @@ export default async function handler(req, res) {
   const email = String(req.body?.email || '').trim()
   const password = String(req.body?.password || '')
   const user = await findDashboardUser(email)
-  if (!user || user.status !== 'active' || !(await verifyPassword(password, user.passwordHash))) {
+  if (
+    !user ||
+    user.status !== 'active' ||
+    !(await verifyPassword(password, user.passwordHash))
+  ) {
     return res.status(401).json({ error: 'Неверная почта или пароль' })
   }
 
   try {
     createSession(res, user)
-      return res.status(200).json({ ok: true, mustChangePassword: Boolean(user.mustChangePassword) })
+    return res
+      .status(200)
+      .json({ ok: true, mustChangePassword: Boolean(user.mustChangePassword) })
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }

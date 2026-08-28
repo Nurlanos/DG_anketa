@@ -51,24 +51,34 @@ function envUsers() {
 
 function normalizeAirtableUser(record) {
   const fields = record.fields || {}
+  const metadata = (() => {
+    try {
+      return JSON.parse(String(fields.Примечания || '{}'))
+    } catch {
+      return {}
+    }
+  })()
   return {
     recordId: record.id,
     email: fields.Email || '',
     name: fields.Менеджер || '',
-    role: fields['Auth Role'] || 'manager',
+    role: metadata.role || 'manager',
     managerId: fields.manager_id || '',
-    passwordHash: fields['Auth Password Hash'] || '',
-    status: fields['Auth Status'] || 'active',
-    mustChangePassword: fields['Auth Must Change'] === true,
+    passwordHash: metadata.passwordHash || '',
+    status: metadata.status || 'active',
+    mustChangePassword: metadata.mustChangePassword === true,
   }
 }
 
 export async function getDashboardUsers() {
   const records = await getAirtableUserRecords()
   const stored = records.map(normalizeAirtableUser)
-  const byEmail = new Map(stored.map((user) => [user.email.toLowerCase(), user]))
+  const byEmail = new Map(
+    stored.map((user) => [user.email.toLowerCase(), user])
+  )
   envUsers().forEach((user) => {
-    if (!byEmail.has(String(user.email || '').toLowerCase())) byEmail.set(user.email.toLowerCase(), user)
+    if (!byEmail.has(String(user.email || '').toLowerCase()))
+      byEmail.set(user.email.toLowerCase(), user)
   })
   return [...byEmail.values()]
 }
@@ -91,7 +101,9 @@ export async function createDashboardUser(fields) {
   const response = await fetch(airtableUrl(), {
     method: 'POST',
     headers: airtableHeaders(token),
-    body: JSON.stringify({ fields: { Компания: USER_CONFIG_COMPANY, ...fields } }),
+    body: JSON.stringify({
+      fields: { Компания: USER_CONFIG_COMPANY, ...fields },
+    }),
   })
   if (!response.ok) throw new Error((await response.text()).slice(0, 500))
   return response.json()
@@ -175,7 +187,9 @@ export async function hashPassword(password) {
 }
 
 export async function findDashboardUser(email) {
-  const normalizedEmail = String(email || '').trim().toLowerCase()
+  const normalizedEmail = String(email || '')
+    .trim()
+    .toLowerCase()
   return (await getDashboardUsers()).find(
     (user) => user.email?.toLowerCase() === normalizedEmail
   )
