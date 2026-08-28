@@ -63,9 +63,24 @@
         outline: 2px solid rgba(32, 86, 184, 0.2);
         border-color: var(--blue);
       }
-      .password-wrap { position: relative; }
-      .password-wrap input { padding-right: 48px; }
-      .password-toggle { position: absolute; right: 8px; top: 50%; width: 32px; margin: 0; padding: 4px; transform: translateY(-50%); background: transparent; color: var(--blue); font-size: 16px; }
+      .password-wrap {
+        position: relative;
+      }
+      .password-wrap input {
+        padding-right: 48px;
+      }
+      .password-toggle {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        width: 32px;
+        margin: 0;
+        padding: 4px;
+        transform: translateY(-50%);
+        background: transparent;
+        color: var(--blue);
+        font-size: 16px;
+      }
       button {
         width: 100%;
         margin-top: 22px;
@@ -105,8 +120,21 @@
         />
         <label for="password">Пароль</label>
         <div class="password-wrap">
-          <input id="password" name="password" type="password" autocomplete="current-password" required pattern="[!-~]+" oninput="this.value = this.value.replace(/[^\x21-\x7E]/g, '')" />
-          <button class="password-toggle" type="button" onclick="togglePassword('password', this)" aria-label="Показать пароль">◉</button>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          <button
+            class="password-toggle"
+            type="button"
+            onclick="togglePassword('password', this)"
+            aria-label="Показать пароль"
+          >
+            ◉
+          </button>
         </div>
         <button type="submit">Войти</button>
         <div id="error" role="alert"></div>
@@ -145,7 +173,10 @@
         const input = document.getElementById(id)
         input.type = input.type === 'password' ? 'text' : 'password'
         button.textContent = input.type === 'password' ? '◉' : '○'
-        button.setAttribute('aria-label', input.type === 'password' ? 'Показать пароль' : 'Скрыть пароль')
+        button.setAttribute(
+          'aria-label',
+          input.type === 'password' ? 'Показать пароль' : 'Скрыть пароль'
+        )
       }
     </script>
   </body>
