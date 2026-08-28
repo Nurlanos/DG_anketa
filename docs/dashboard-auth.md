@@ -9,6 +9,7 @@
 - `DASH_SESSION_SECRET` — длинная случайная строка не менее 32 символов.
 - `APP_URL` — основной адрес сайта, например `https://dg-anketa.vercel.app`.
 - `RESEND_API_KEY` — ключ Resend для отправки приглашений.
+- `RESEND_FROM_EMAIL` — подтверждённый адрес отправителя в Resend, например `DG Anketa <noreply@your-domain.kz>`.
 - `DASH_USERS_JSON` — JSON-массив bootstrap-пользователей с `scrypt`-хэшами паролей. После запуска новых пользователей создаёт администратор из дашборда, они сохраняются в Airtable.
 
 Формат пользователя:
