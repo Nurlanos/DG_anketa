@@ -656,7 +656,10 @@ function updateStats() {
   const deployments = new Map();
   const statuses = new Map();
   list.forEach((row) => {
-    const deploy = String(row.deploy || 'Не указано').trim() || 'Не указано';
+    const rawDeploy = String(row.deploy || 'Не указано').trim() || 'Не указано';
+    const deploy = /(?:наши|свои) серверы/i.test(rawDeploy)
+      ? 'Серверы клиента'
+      : rawDeploy;
     const status = String(row.status || 'Новое').trim() || 'Новое';
     deployments.set(deploy, (deployments.get(deploy) || 0) + 1);
     statuses.set(status, (statuses.get(status) || 0) + 1);
