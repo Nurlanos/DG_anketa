@@ -9,6 +9,7 @@ import {
   requireAdmin,
   updateDashboardUser,
 } from './_lib.js'
+import { sendMail } from './_mail.js'
 
 function publicUser(user) {
   return {
@@ -85,40 +86,20 @@ export default async function handler(req, res) {
       })
       if (invite) {
         const inviteUrl = `${getAppUrl()}/invite.html?token=${encodeURIComponent(invite.token)}`
-        const resendKey = process.env.RESEND_API_KEY || ''
-        const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
-        if (!resendKey)
-          return res.status(500).json({ error: 'RESEND_API_KEY not configured' })
-        const emailResponse = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: fromEmail,
-            to: [email],
+        try {
+          await sendMail({
+            to: email,
             subject: 'Приглашение в дашборд Documentolog',
             html: `<p>Здравствуйте, ${name}!</p><p>Вас пригласили в дашборд Documentolog.</p><p><a href="${inviteUrl}">Создать пароль и войти</a></p><p>Ссылка действует 24 часа и используется один раз.</p>`,
-          }),
-        })
-        if (!emailResponse.ok) {
-          await deleteDashboardUser(created.id)
-          const details = await emailResponse.text()
-          let message = 'Не удалось отправить приглашение на email'
-          try {
-            message = JSON.parse(details).message || message
-          } catch {
-            message = `${message}: ${details.slice(0, 200)}`
-          }
-          return res.status(502).json({ error: message })
-        }
-        return res
-          .status(201)
-          .json({
-            user: publicUser({ ...metadata, recordId: created.id }),
-            inviteSent: true,
           })
+        } catch (emailError) {
+          await deleteDashboardUser(created.id)
+          return res.status(502).json({ error: emailError.message })
+        }
+        return res.status(201).json({
+          user: publicUser({ ...metadata, recordId: created.id }),
+          inviteSent: true,
+        })
       }
       return res.status(201).json({
         user: publicUser({

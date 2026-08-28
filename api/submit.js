@@ -1,10 +1,10 @@
 import { getAirtableToken } from './_lib.js'
+import { mailConfigured, sendMail } from './_mail.js'
 
 const BASE_ID = 'appHakMP7mBJhUu7p'
 const TABLE_ID = 'tblTU1on0yAcK5RTt'
 const AT_TOKEN = getAirtableToken()
 const RESEND_KEY = process.env.RESEND_API_KEY || ''
-const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 // Used only when Airtable has no manager-config record for the given id yet.
 const FALLBACK_EMAIL = process.env.FALLBACK_MANAGER_EMAIL || ''
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
 
     // Email
     const recipients = await getManagerEmail(data.managerId)
-    if (!RESEND_KEY) {
+    if (!mailConfigured() && !RESEND_KEY) {
       results.email = 'skipped:no key'
     } else if (!recipients.length) {
       results.email = 'skipped:no recipient email'
@@ -192,24 +192,13 @@ export default async function handler(req, res) {
         </div>
       </div>`
 
-        const emailRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${RESEND_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: RESEND_FROM,
-            to: recipients,
-            subject: `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment] || data.segment}`,
-            html,
-            attachments: [{ filename, content: mdBase64 }],
-          }),
+        const emailInfo = await sendMail({
+          to: recipients,
+          subject: `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment] || data.segment}`,
+          html,
+          attachments: [{ filename, content: mdBase64 }],
         })
-        const emailJson = await emailRes.json()
-        results.email = emailJson.id
-          ? 'sent:' + emailJson.id
-          : 'error:' + JSON.stringify(emailJson)
+        results.email = 'sent:' + (emailInfo.messageId || emailInfo.id || 'ok')
         console.log('Email:', results.email)
       } catch (e) {
         results.email = 'exception:' + e.message
