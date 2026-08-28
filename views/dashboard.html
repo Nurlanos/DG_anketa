@@ -1028,44 +1028,7 @@
             gap: 8px;
           "
         >
-          <h3 style="margin: 0">Аккаунты пользователей</h3>
-        </div>
-        <div class="lr">
-          <input
-            class="lurl"
-            id="user-email"
-            type="email"
-            placeholder="Почта"
-          />
-          <input class="lurl" id="user-name" type="text" placeholder="Имя" />
-          <select class="lsel" id="user-role">
-            <option value="manager">Менеджер</option>
-            <option value="admin">Администратор</option>
-          </select>
-          <input
-            class="lurl"
-            id="user-manager"
-            type="text"
-            placeholder="ID менеджера"
-          />
-          <input
-            class="lurl"
-            id="user-password"
-            type="password"
-            placeholder="Временный пароль (8+, латиница)"
-            autocomplete="new-password"
-            minlength="8"
-            pattern="[!-~]+"
-            oninput="this.value = this.value.replace(/[^\x21-\x7E]/g, '')"
-          />
-          <button
-            class="btn sec"
-            type="button"
-            onclick="togglePassword('user-password', this)"
-          >
-            ◉
-          </button>
-          <button class="btn" onclick="createUser()">Добавить</button>
+          <h3 style="margin: 0">Управление аккаунтами</h3>
         </div>
         <div class="mgr-list" id="users-list"></div>
       </div>
@@ -1229,30 +1192,6 @@
             return `<div class="mgr-row"><div class="mgr-info"><div class="mgr-name">${user.name || user.email} <span class="mgr-id">${user.role}</span></div><div class="mgr-email">${user.email} · ${user.managerId || 'все данные'} · ${status}</div></div>${user.managed ? `<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="userAction('${user.id}','${action}')">${actionLabel}</button><button class="btn sec" style="padding:6px 10px;font-size:11px" onclick="resetUserPassword('${user.id}')">Сбросить пароль</button><button class="btn sec" style="padding:6px 10px;font-size:11px;color:#ef4444" onclick="deleteUser('${user.id}')">Удалить</button></div>` : '<span style="font-size:11px;color:var(--t3)">bootstrap</span>'}</div>`
           })
           .join('')
-      }
-
-      async function createUser() {
-        const body = {
-          email: document.getElementById('user-email').value,
-          name: document.getElementById('user-name').value,
-          role: document.getElementById('user-role').value,
-          managerId: document.getElementById('user-manager').value,
-          password: document.getElementById('user-password').value,
-        }
-        const response = await fetch('/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        })
-        const data = await response.json()
-        if (!response.ok)
-          return alert(data.error || 'Не удалось создать пользователя')
-        ;['user-email', 'user-name', 'user-manager', 'user-password'].forEach(
-          (id) => {
-            document.getElementById(id).value = ''
-          }
-        )
-        loadUsers()
       }
 
       function togglePassword(id, button) {
