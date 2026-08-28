@@ -1,308 +1,1152 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Дашборд менеджера — Documentolog</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0D1F4E;--blue:#2056B8;--blue-h:#1748A3;--blue-l:#EBF2FF;
-  --yellow:#F5C518;
-  --text:#1A1A2E;--t2:#4B5563;--t3:#9CA3AF;
-  --brd:#E5E7EB;--bg:#F3F6FB;--card:#fff;
-  --r:8px;--f:'Inter',sans-serif
-}
-body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Дашборд менеджера — Documentolog</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --navy: #0d1f4e;
+        --blue: #2056b8;
+        --blue-h: #1748a3;
+        --blue-l: #ebf2ff;
+        --yellow: #f5c518;
+        --text: #1a1a2e;
+        --t2: #4b5563;
+        --t3: #9ca3af;
+        --brd: #e5e7eb;
+        --bg: #f3f6fb;
+        --card: #fff;
+        --r: 8px;
+        --f: 'Inter', sans-serif;
+      }
+      body {
+        font-family: var(--f);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
 
-/* NAVBAR */
-.topnav{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px;position:sticky;top:0;z-index:100}
-.nav-logo{display:flex;align-items:center;gap:14px}
-.nav-divider{width:1px;height:28px;background:rgba(255,255,255,.15)}
+      /* NAVBAR */
+      .topnav {
+        background: var(--navy);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .nav-divider {
+        width: 1px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.15);
+      }
 
-/* MAIN */
-.main{max-width:960px;margin:0 auto;padding:24px 16px 64px}
+      /* MAIN */
+      .main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
 
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px}
-.stat .n{font-size:28px;font-weight:700;line-height:1;color:var(--navy)}
-.stat .l{font-size:11px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
-.stat.hi .n{color:var(--blue)}
-.analytics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.analytics-box{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px}
-.analytics-box h3{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.analytics-list{display:flex;flex-wrap:wrap;gap:6px 16px}
-.analytics-item{display:flex;align-items:center;justify-content:space-between;gap:18px;min-width:130px;font-size:12px;color:var(--t2)}
-.analytics-item strong{font-size:13px;color:var(--navy)}
-@media(max-width:600px){.analytics{grid-template-columns:1fr}.analytics-item{flex:1;min-width:120px}}
+      /* STATS */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 600px) {
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .stat {
+        background: var(--card);
+        border: 1px solid var(--brd);
+        border-radius: var(--r);
+        padding: 16px;
+      }
+      .stat .n {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--navy);
+      }
+      .stat .l {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .stat.hi .n {
+        color: var(--blue);
+      }
+      .analytics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .analytics-box {
+        background: var(--card);
+        border: 1px solid var(--brd);
+        border-radius: var(--r);
+        padding: 14px 16px;
+      }
+      .analytics-box h3 {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+      }
+      .analytics-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+      }
+      .analytics-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-width: 130px;
+        font-size: 12px;
+        color: var(--t2);
+      }
+      .analytics-item strong {
+        font-size: 13px;
+        color: var(--navy);
+      }
+      @media (max-width: 600px) {
+        .analytics {
+          grid-template-columns: 1fr;
+        }
+        .analytics-item {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
 
-/* LINK GEN */
-.lgen{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
-.lgen h3{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px}
-.lr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.lsel{flex:1;min-width:160px;padding:9px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;background:var(--bg);color:var(--text);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
-.lsel:focus{outline:none;border-color:var(--blue)}
-.lurl{flex:2;min-width:180px;font-family:'Courier New',monospace;font-size:11px;color:var(--t2);background:var(--bg);border:1.5px solid var(--brd);border-radius:6px;padding:9px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btn{padding:9px 16px;background:var(--yellow);color:var(--navy);border:none;border-radius:6px;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
-.btn:hover{background:#E0B400}
-.btn.sec{background:var(--card);color:var(--t2);border:1.5px solid var(--brd);font-weight:500}
-.btn.sec:hover{border-color:var(--blue);color:var(--blue)}
-.btn.blue{background:var(--blue);color:#fff;font-weight:600}
-.btn.blue:hover{background:var(--blue-h)}
+      /* LINK GEN */
+      .lgen {
+        background: var(--card);
+        border: 1px solid var(--brd);
+        border-radius: var(--r);
+        padding: 16px 20px;
+        margin-bottom: 16px;
+      }
+      .lgen h3 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--navy);
+        margin-bottom: 10px;
+      }
+      .lr {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .lsel {
+        flex: 1;
+        min-width: 160px;
+        padding: 9px 12px;
+        border: 1.5px solid var(--brd);
+        border-radius: 6px;
+        font-family: var(--f);
+        font-size: 13px;
+        background: var(--bg);
+        color: var(--text);
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+        padding-right: 32px;
+      }
+      .lsel:focus {
+        outline: none;
+        border-color: var(--blue);
+      }
+      .lurl {
+        flex: 2;
+        min-width: 180px;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: var(--t2);
+        background: var(--bg);
+        border: 1.5px solid var(--brd);
+        border-radius: 6px;
+        padding: 9px 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .btn {
+        padding: 9px 16px;
+        background: var(--yellow);
+        color: var(--navy);
+        border: none;
+        border-radius: 6px;
+        font-family: var(--f);
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.15s;
+      }
+      .btn:hover {
+        background: #e0b400;
+      }
+      .btn.sec {
+        background: var(--card);
+        color: var(--t2);
+        border: 1.5px solid var(--brd);
+        font-weight: 500;
+      }
+      .btn.sec:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .btn.blue {
+        background: var(--blue);
+        color: #fff;
+        font-weight: 600;
+      }
+      .btn.blue:hover {
+        background: var(--blue-h);
+      }
 
-/* FILTER TABS */
-.tabs{display:flex;gap:0;background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
-.tab{flex:1;padding:10px 8px;text-align:center;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border-right:1px solid var(--brd);transition:all .15s;border:none;background:none;font-family:var(--f)}
-.tab:not(:last-child){border-right:1px solid var(--brd)}
-.tab.on{background:var(--blue);color:#fff;font-weight:600}
-.tab:hover:not(.on){background:var(--blue-l);color:var(--blue)}
+      /* FILTER TABS */
+      .tabs {
+        display: flex;
+        gap: 0;
+        background: var(--card);
+        border: 1px solid var(--brd);
+        border-radius: var(--r);
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+      .tab {
+        flex: 1;
+        padding: 10px 8px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--t3);
+        cursor: pointer;
+        border-right: 1px solid var(--brd);
+        transition: all 0.15s;
+        border: none;
+        background: none;
+        font-family: var(--f);
+      }
+      .tab:not(:last-child) {
+        border-right: 1px solid var(--brd);
+      }
+      .tab.on {
+        background: var(--blue);
+        color: #fff;
+        font-weight: 600;
+      }
+      .tab:hover:not(.on) {
+        background: var(--blue-l);
+        color: var(--blue);
+      }
 
-/* TABLE */
-.tbl-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden}
-.tbl-head{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.tbl-head h3{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-.tbl-scroll{overflow-x:hidden}
-table{width:100%;border-collapse:collapse;table-layout:fixed}
-th:nth-child(1),td:nth-child(1){width:10%}
-th:nth-child(2),td:nth-child(2){width:18%}
-th:nth-child(3),td:nth-child(3){width:13%}
-th:nth-child(4),td:nth-child(4){width:6%}
-th:nth-child(5),td:nth-child(5){width:12%}
-th:nth-child(6),td:nth-child(6){width:11%}
-th:nth-child(7),td:nth-child(7){width:12%}
-th:nth-child(8),td:nth-child(8){width:18%}
-th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--brd);background:var(--bg);white-space:nowrap}
-td{padding:9px 8px;border-bottom:1px solid var(--brd);font-size:13px;vertical-align:middle;overflow-wrap:anywhere;min-width:0}
-td:nth-child(1){font-size:11px;white-space:normal!important;line-height:1.35}
-td:nth-child(6) .badge{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#F8FAFF}
-.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
-.b-new{background:#E8F5E9;color:#2E7D32}
-.b-wip{background:#FFF8E1;color:#E65100}
-.b-sent{background:var(--blue-l);color:var(--blue)}
-.b-deal{background:#E3F2FD;color:#1565C0}
-.b-no{background:#FFEBEE;color:#C62828}
-.b-def{background:#F5F5F5;color:#666}
-.status-sel{width:100%;max-width:112px;font-size:10px;font-weight:600;padding:4px 20px 4px 6px;border-radius:20px;border:1.5px solid rgba(0,0,0,.1);cursor:pointer;font-family:var(--f);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;transition:all .15s}
-.status-sel:hover{filter:brightness(.95)}
-.status-sel.s-new{background:#E8F5E9;color:#2E7D32}
-.status-sel.s-wip{background:#FFF8E1;color:#E65100}
-.status-sel.s-sent{background:#EBF2FF;color:#2056B8}
-.status-sel.s-deal{background:#E3F2FD;color:#1565C0}
-.status-sel.s-no{background:#FFEBEE;color:#C62828}
-.empty{padding:48px;text-align:center;color:var(--t3);font-size:13px}
-.empty .ico{font-size:32px;margin-bottom:12px}
-.err-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13px;color:#991B1B;display:none}
-.mgr-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.mgr-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:6px;padding:8px 12px;flex-wrap:wrap}
-.mgr-row .mgr-info{flex:1;min-width:160px}
-.mgr-row .mgr-name{font-size:13px;font-weight:600;color:var(--navy)}
-.mgr-row .mgr-email{font-size:11px;color:var(--t3);margin-top:1px}
-.mgr-row .mgr-id{font-family:'Courier New',monospace;font-size:10px;background:var(--blue-l);color:var(--blue);padding:2px 7px;border-radius:10px}
-.modal-sm{background:var(--card);border-radius:12px;max-width:420px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.form-row{margin-bottom:12px}
-.form-row label{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px}
-.form-row input{width:100%;padding:9px 12px;border:1.5px solid var(--brd);border-radius:6px;font-family:var(--f);font-size:13px;color:var(--text);background:var(--bg);outline:none;-webkit-appearance:none}
-.form-row input:focus{border-color:var(--blue);background:var(--card)}
+      /* TABLE */
+      .tbl-wrap {
+        background: var(--card);
+        border: 1px solid var(--brd);
+        border-radius: var(--r);
+        overflow: hidden;
+      }
+      .tbl-head {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--brd);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tbl-head h3 {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .tbl-scroll {
+        overflow-x: hidden;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      th:nth-child(1),
+      td:nth-child(1) {
+        width: 10%;
+      }
+      th:nth-child(2),
+      td:nth-child(2) {
+        width: 18%;
+      }
+      th:nth-child(3),
+      td:nth-child(3) {
+        width: 13%;
+      }
+      th:nth-child(4),
+      td:nth-child(4) {
+        width: 6%;
+      }
+      th:nth-child(5),
+      td:nth-child(5) {
+        width: 12%;
+      }
+      th:nth-child(6),
+      td:nth-child(6) {
+        width: 11%;
+      }
+      th:nth-child(7),
+      td:nth-child(7) {
+        width: 12%;
+      }
+      th:nth-child(8),
+      td:nth-child(8) {
+        width: 18%;
+      }
+      th {
+        padding: 9px 14px;
+        text-align: left;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--brd);
+        background: var(--bg);
+        white-space: nowrap;
+      }
+      td {
+        padding: 9px 8px;
+        border-bottom: 1px solid var(--brd);
+        font-size: 13px;
+        vertical-align: middle;
+        overflow-wrap: anywhere;
+        min-width: 0;
+      }
+      td:nth-child(1) {
+        font-size: 11px;
+        white-space: normal !important;
+        line-height: 1.35;
+      }
+      td:nth-child(6) .badge {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: #f8faff;
+      }
+      .badge {
+        font-size: 10px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .b-new {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .b-wip {
+        background: #fff8e1;
+        color: #e65100;
+      }
+      .b-sent {
+        background: var(--blue-l);
+        color: var(--blue);
+      }
+      .b-deal {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .b-no {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .b-def {
+        background: #f5f5f5;
+        color: #666;
+      }
+      .status-sel {
+        width: 100%;
+        max-width: 112px;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 4px 20px 4px 6px;
+        border-radius: 20px;
+        border: 1.5px solid rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        font-family: var(--f);
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 6px center;
+        transition: all 0.15s;
+      }
+      .status-sel:hover {
+        filter: brightness(0.95);
+      }
+      .status-sel.s-new {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .status-sel.s-wip {
+        background: #fff8e1;
+        color: #e65100;
+      }
+      .status-sel.s-sent {
+        background: #ebf2ff;
+        color: #2056b8;
+      }
+      .status-sel.s-deal {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .status-sel.s-no {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .empty {
+        padding: 48px;
+        text-align: center;
+        color: var(--t3);
+        font-size: 13px;
+      }
+      .empty .ico {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      .err-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: var(--r);
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        font-size: 13px;
+        color: #991b1b;
+        display: none;
+      }
+      .mgr-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .mgr-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--bg);
+        border-radius: 6px;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+      }
+      .mgr-row .mgr-info {
+        flex: 1;
+        min-width: 160px;
+      }
+      .mgr-row .mgr-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--navy);
+      }
+      .mgr-row .mgr-email {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 1px;
+      }
+      .mgr-row .mgr-id {
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        background: var(--blue-l);
+        color: var(--blue);
+        padding: 2px 7px;
+        border-radius: 10px;
+      }
+      .modal-sm {
+        background: var(--card);
+        border-radius: 12px;
+        max-width: 420px;
+        width: 100%;
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      }
+      .form-row {
+        margin-bottom: 12px;
+      }
+      .form-row label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--t2);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 5px;
+      }
+      .form-row input {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1.5px solid var(--brd);
+        border-radius: 6px;
+        font-family: var(--f);
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg);
+        outline: none;
+        -webkit-appearance: none;
+      }
+      .form-row input:focus {
+        border-color: var(--blue);
+        background: var(--card);
+      }
 
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
-.modal-bg.open{display:flex}
-.modal{background:var(--card);border-radius:12px;max-width:660px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.modal-head{background:var(--navy);padding:16px 20px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between}
-.modal-head h2{font-size:15px;font-weight:600;color:#fff}
-.modal-close{width:28px;height:28px;background:rgba(255,255,255,.1);border:none;border-radius:50%;cursor:pointer;font-size:16px;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.modal-close:hover{background:rgba(255,255,255,.2)}
-.modal-body{padding:20px}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-@media(max-width:480px){.detail-grid{grid-template-columns:1fr}}
-.det{background:var(--bg);border-radius:6px;padding:10px 12px}
-.det .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:3px}
-.det .val{font-size:13px;color:var(--navy);font-weight:500}
-.code-box{background:#0D1F4E;border-radius:8px;padding:16px;margin-bottom:14px;max-height:320px;overflow-y:auto}
-.code-box pre{font-family:'Courier New',monospace;font-size:11px;color:#CBD5E1;white-space:pre-wrap;line-height:1.6;margin:0}
-.code-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:8px}
-.modal-foot{display:flex;gap:8px;flex-wrap:wrap}
-@media(max-width:760px){
-  th,td{padding-left:6px;padding-right:6px}
-  th:nth-child(1),td:nth-child(1),th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none}
-  th:nth-child(2),td:nth-child(2){width:38%}
-  th:nth-child(6),td:nth-child(6){width:20%}
-  th:nth-child(7),td:nth-child(7){width:20%}
-  th:nth-child(8),td:nth-child(8){width:22%}
-  td:nth-child(8) .btn{padding:5px 6px;font-size:10px}
-}
-</style>
-</head>
-<body>
-
-<!-- Access is gated server-side by HTTP Basic Auth in api/dashboard.js —
+      /* MODAL */
+      .modal-bg {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .modal-bg.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--card);
+        border-radius: 12px;
+        max-width: 660px;
+        width: 100%;
+        max-height: 88vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      }
+      .modal-head {
+        background: var(--navy);
+        padding: 16px 20px;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-head h2 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .modal-close {
+        width: 28px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        flex-shrink: 0;
+      }
+      .modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .modal-body {
+        padding: 20px;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      @media (max-width: 480px) {
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .det {
+        background: var(--bg);
+        border-radius: 6px;
+        padding: 10px 12px;
+      }
+      .det .lbl {
+        font-size: 10px;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .det .val {
+        font-size: 13px;
+        color: var(--navy);
+        font-weight: 500;
+      }
+      .code-box {
+        background: #0d1f4e;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 14px;
+        max-height: 320px;
+        overflow-y: auto;
+      }
+      .code-box pre {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: #cbd5e1;
+        white-space: pre-wrap;
+        line-height: 1.6;
+        margin: 0;
+      }
+      .code-lbl {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .modal-foot {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      @media (max-width: 760px) {
+        th,
+        td {
+          padding-left: 6px;
+          padding-right: 6px;
+        }
+        th:nth-child(1),
+        td:nth-child(1),
+        th:nth-child(3),
+        td:nth-child(3),
+        th:nth-child(4),
+        td:nth-child(4),
+        th:nth-child(5),
+        td:nth-child(5) {
+          display: none;
+        }
+        th:nth-child(2),
+        td:nth-child(2) {
+          width: 38%;
+        }
+        th:nth-child(6),
+        td:nth-child(6) {
+          width: 20%;
+        }
+        th:nth-child(7),
+        td:nth-child(7) {
+          width: 20%;
+        }
+        th:nth-child(8),
+        td:nth-child(8) {
+          width: 22%;
+        }
+        td:nth-child(8) .btn {
+          padding: 5px 6px;
+          font-size: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Access is gated server-side by HTTP Basic Auth in api/dashboard.js —
      the browser's native auth prompt handles login, so no client-side
      login screen is needed (or trustworthy) here. -->
 
-<!-- NAVBAR -->
-<div class="topnav">
-  <div class="nav-logo">
-    <div style="position:relative;width:36px;height:45px;flex-shrink:0">
-      <div style="display:grid;grid-template-columns:repeat(3,9px);grid-template-rows:repeat(4,9px);gap:3px;position:relative;z-index:2">
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">D</span>
-        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">C</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">U</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">M</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">E</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">N</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">T</span>
-        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">L</span>
-        <span style="font-size:7px;font-weight:800;color:#F5C518;font-family:'Inter',sans-serif;line-height:9px;text-align:center">O</span>
-        <span style="font-size:7px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;line-height:9px;text-align:center">G</span>
+    <!-- NAVBAR -->
+    <div class="topnav">
+      <div class="nav-logo">
+        <div
+          style="position: relative; width: 36px; height: 45px; flex-shrink: 0"
+        >
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(3, 9px);
+              grid-template-rows: repeat(4, 9px);
+              gap: 3px;
+              position: relative;
+              z-index: 2;
+            "
+          >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >D</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #f5c518;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >O</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >C</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >U</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >M</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >E</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >N</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >T</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #f5c518;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >O</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >L</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #f5c518;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >O</span
+            >
+            <span
+              style="
+                font-size: 7px;
+                font-weight: 800;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                line-height: 9px;
+                text-align: center;
+              "
+              >G</span
+            >
+          </div>
+          <svg
+            style="
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 36px;
+              height: 45px;
+              z-index: 1;
+            "
+            viewBox="0 0 36 45"
+          >
+            <line
+              x1="16.5"
+              y1="4.5"
+              x2="28.5"
+              y2="28.5"
+              stroke="#F5C518"
+              stroke-width="1"
+              stroke-dasharray="2,2.5"
+              opacity="0.75"
+            />
+            <line
+              x1="28.5"
+              y1="28.5"
+              x2="16.5"
+              y2="40.5"
+              stroke="#F5C518"
+              stroke-width="1"
+              stroke-dasharray="2,2.5"
+              opacity="0.75"
+            />
+          </svg>
+        </div>
+        <div class="nav-divider"></div>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#F5C518"
+            stroke-width="2"
+          >
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+            />
+          </svg>
+          <div>
+            <div
+              style="
+                color: #fff;
+                font-size: 15px;
+                font-weight: 700;
+                font-family: 'Inter', sans-serif;
+                line-height: 1.1;
+              "
+            >
+              D8N AI
+            </div>
+            <div
+              style="
+                color: rgba(255, 255, 255, 0.38);
+                font-size: 9px;
+                letter-spacing: 0.6px;
+                text-transform: uppercase;
+                font-family: 'Inter', sans-serif;
+                margin-top: 1px;
+              "
+            >
+              Дашборд менеджера
+            </div>
+          </div>
+        </div>
       </div>
-      <svg style="position:absolute;top:0;left:0;width:36px;height:45px;z-index:1" viewBox="0 0 36 45">
-        <line x1="16.5" y1="4.5" x2="28.5" y2="28.5" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,2.5" opacity="0.75"/>
-        <line x1="28.5" y1="28.5" x2="16.5" y2="40.5" stroke="#F5C518" stroke-width="1" stroke-dasharray="2,2.5" opacity="0.75"/>
-      </svg>
-    </div>
-    <div class="nav-divider"></div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <div>
-        <div style="color:#fff;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;line-height:1.1">D8N AI</div>
-        <div style="color:rgba(255,255,255,.38);font-size:9px;letter-spacing:.6px;text-transform:uppercase;font-family:'Inter',sans-serif;margin-top:1px">Дашборд менеджера</div>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <a
+          href="/"
+          style="
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+          "
+          onmouseover="this.style.color = '#fff'"
+          onmouseout="this.style.color = 'rgba(255,255,255,.5)'"
+          >← Форма клиента</a
+        >
       </div>
     </div>
-  </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <a href="/" style="font-size:12px;color:rgba(255,255,255,.5);text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">← Форма клиента</a>
-  </div>
-</div>
 
-<div class="main">
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat hi"><div class="n" id="st-companies">—</div><div class="l">Компаний</div></div>
-    <div class="stat"><div class="n" id="st-users">—</div><div class="l">Пользователей</div></div>
-    <div class="stat"><div class="n" id="st-revenue">—</div><div class="l">Прогноз, ₸</div></div>
-    <div class="stat"><div class="n" id="st-t">—</div><div class="l">Всего анкет</div></div>
-  </div>
+    <div class="main">
+      <!-- STATS -->
+      <div class="stats">
+        <div class="stat hi">
+          <div class="n" id="st-companies">—</div>
+          <div class="l">Компаний</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="st-users">—</div>
+          <div class="l">Пользователей</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="st-revenue">—</div>
+          <div class="l">Прогноз, ₸</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="st-t">—</div>
+          <div class="l">Всего анкет</div>
+        </div>
+      </div>
 
-  <div class="analytics">
-    <div class="analytics-box">
-      <h3>Размещения</h3>
-      <div class="analytics-list" id="analytics-deploy"><span class="analytics-item">Загрузка...</span></div>
-    </div>
-    <div class="analytics-box">
-      <h3>Статус КП</h3>
-      <div class="analytics-list" id="analytics-status"><span class="analytics-item">Загрузка...</span></div>
-    </div>
-  </div>
+      <div class="analytics">
+        <div class="analytics-box">
+          <h3>Размещения</h3>
+          <div class="analytics-list" id="analytics-deploy">
+            <span class="analytics-item">Загрузка...</span>
+          </div>
+        </div>
+        <div class="analytics-box">
+          <h3>Статус КП</h3>
+          <div class="analytics-list" id="analytics-status">
+            <span class="analytics-item">Загрузка...</span>
+          </div>
+        </div>
+      </div>
 
-  <!-- MANAGER MANAGEMENT + LINK GENERATOR -->
-  <div class="lgen">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-      <h3 style="margin:0">Менеджеры и персональные ссылки</h3>
-      <button class="btn" onclick="openAddMgr()">+ Добавить менеджера</button>
-    </div>
-    <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding:10px 12px;background:var(--bg);border-radius:6px;border-left:3px solid var(--blue)">
-      Отправьте клиенту <strong>персональную ссылку</strong> — он заполняет анкету, и вам автоматически приходит письмо с готовым промптом для агента <strong>d8n Sales</strong>. Вставьте промпт в d8n Sales — агент подготовит персональное КП.
-    </div>
-    <div class="mgr-list" id="mgr-list"></div>
-  </div>
+      <!-- MANAGER MANAGEMENT + LINK GENERATOR -->
+      <div class="lgen">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+          "
+        >
+          <h3 style="margin: 0">Менеджеры и персональные ссылки</h3>
+          <button class="btn" onclick="openAddMgr()">
+            + Добавить менеджера
+          </button>
+        </div>
+        <div
+          style="
+            font-size: 12px;
+            color: var(--t2);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            background: var(--bg);
+            border-radius: 6px;
+            border-left: 3px solid var(--blue);
+          "
+        >
+          Отправьте клиенту <strong>персональную ссылку</strong> — он заполняет
+          анкету, и вам автоматически приходит письмо с готовым промптом для
+          агента <strong>d8n Sales</strong>. Вставьте промпт в d8n Sales — агент
+          подготовит персональное КП.
+        </div>
+        <div class="mgr-list" id="mgr-list"></div>
+      </div>
 
-  <!-- ERROR BOX -->
-  <div class="err-box" id="err-box"></div>
+      <!-- ERROR BOX -->
+      <div class="err-box" id="err-box"></div>
 
-  <!-- FILTER TABS -->
-  <div class="tabs" id="tabs">
-    <button class="tab on" data-m="all">Все</button>
-    <button class="tab" data-m="n.omarov">Омаров Нурлан</button>
-    <button class="tab" data-m="a.kuz">Кузьменко Азиза</button>
-  </div>
+      <!-- FILTER TABS -->
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-m="all">Все</button>
+        <button class="tab" data-m="n.omarov">Омаров Нурлан</button>
+        <button class="tab" data-m="a.kuz">Кузьменко Азиза</button>
+      </div>
 
-  <!-- TABLE -->
-  <div class="tbl-wrap">
-    <div class="tbl-head">
-      <h3>Заполненные анкеты</h3>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn sec" id="archive-toggle" onclick="toggleArchive()">Архив</button>
-        <button class="btn sec" onclick="exportExcel()">⤓ Экспорт в CSV</button>
-        <button class="btn sec" onclick="loadData()">↻ Обновить</button>
+      <!-- TABLE -->
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <h3>Заполненные анкеты</h3>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <button
+              class="btn sec"
+              id="archive-toggle"
+              onclick="toggleArchive()"
+            >
+              Архив
+            </button>
+            <button class="btn sec" onclick="exportExcel()">
+              ⤓ Экспорт в CSV
+            </button>
+            <button class="btn sec" onclick="loadData()">↻ Обновить</button>
+          </div>
+        </div>
+        <div class="tbl-scroll">
+          <div id="tbl-c">
+            <div class="empty">
+              <div class="ico">📋</div>
+              Загрузка данных из Airtable...
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="tbl-scroll">
-      <div id="tbl-c"><div class="empty"><div class="ico">📋</div>Загрузка данных из Airtable...</div></div>
-    </div>
-  </div>
-</div>
 
-<!-- MODAL -->
-<div class="modal-bg" id="modal">
-  <div class="modal">
-    <div class="modal-head">
-      <h2 id="m-title">Данные клиента</h2>
-      <button class="modal-close" id="m-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="detail-grid" id="m-detail"></div>
-      <div class="code-box">
-        <div class="code-lbl">Промпт для d8n Sales</div>
-        <pre id="m-code"></pre>
+    <!-- MODAL -->
+    <div class="modal-bg" id="modal">
+      <div class="modal">
+        <div class="modal-head">
+          <h2 id="m-title">Данные клиента</h2>
+          <button class="modal-close" id="m-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-grid" id="m-detail"></div>
+          <div class="code-box">
+            <div class="code-lbl">Промпт для d8n Sales</div>
+            <pre id="m-code"></pre>
+          </div>
+          <div class="modal-foot">
+            <button class="btn blue" onclick="copyPrompt()">
+              Скопировать промпт
+            </button>
+            <button class="btn sec" id="m-close2">Закрыть</button>
+          </div>
+        </div>
       </div>
-      <div class="modal-foot">
-        <button class="btn blue" onclick="copyPrompt()">Скопировать промпт</button>
-        <button class="btn sec" id="m-close2">Закрыть</button>
-      </div>
     </div>
-  </div>
-</div>
 
-<script>
-let rows = [], curMgr = 'all', showArchived = false, _prompt = '', _genLink = '';
+    <script>
+      let rows = [],
+        curMgr = 'all',
+        showArchived = false,
+        _prompt = '',
+        _genLink = ''
 
-// ── Manager registry (stored in localStorage) ────────────────────────────
-const DEFAULT_MANAGERS = [
-  { id: 'n.omarov', name: 'Омаров Нурлан', dept: 'Упр. №9', email: 'astananur@gmail.com', backupEmail: '' },
-  { id: 'a.kuz',    name: 'Кузьменко Азиза', dept: 'Упр. №9', email: '', backupEmail: '' },
-];
+      // ── Manager registry (stored in localStorage) ────────────────────────────
+      const DEFAULT_MANAGERS = [
+        {
+          id: 'n.omarov',
+          name: 'Омаров Нурлан',
+          dept: 'Упр. №9',
+          email: 'astananur@gmail.com',
+          backupEmail: '',
+        },
+        {
+          id: 'a.kuz',
+          name: 'Кузьменко Азиза',
+          dept: 'Упр. №9',
+          email: '',
+          backupEmail: '',
+        },
+      ]
 
-function loadManagers() {
-  try {
-    const saved = localStorage.getItem('dg_managers');
-    return saved ? JSON.parse(saved) : DEFAULT_MANAGERS;
-  } catch { return DEFAULT_MANAGERS; }
-}
-function saveManagers(mgrs) {
-  try { localStorage.setItem('dg_managers', JSON.stringify(mgrs)); } catch {}
-}
+      function loadManagers() {
+        try {
+          const saved = localStorage.getItem('dg_managers')
+          return saved ? JSON.parse(saved) : DEFAULT_MANAGERS
+        } catch {
+          return DEFAULT_MANAGERS
+        }
+      }
+      function saveManagers(mgrs) {
+        try {
+          localStorage.setItem('dg_managers', JSON.stringify(mgrs))
+        } catch {}
+      }
 
-let managers = loadManagers();
+      let managers = loadManagers()
 
-async function loadServerManagers() {
-  try {
-    const response = await fetch('/api/managers');
-    const data = await response.json();
-    if (response.ok && Array.isArray(data.managers) && data.managers.length) {
-      managers = managers.map((local) => {
-        const server = data.managers.find((item) => item.id === local.id);
-        return server ? { ...local, ...server } : local;
-      });
-      data.managers.forEach((server) => {
-        if (!managers.some((local) => local.id === server.id)) managers.push(server);
-      });
-      saveManagers(managers);
-      renderManagers();
-    }
-  } catch (e) { console.warn('Server manager mapping load skipped:', e); }
-}
+      async function loadServerManagers() {
+        try {
+          const response = await fetch('/api/managers')
+          const data = await response.json()
+          if (
+            response.ok &&
+            Array.isArray(data.managers) &&
+            data.managers.length
+          ) {
+            managers = managers.map((local) => {
+              const server = data.managers.find((item) => item.id === local.id)
+              return server ? { ...local, ...server } : local
+            })
+            data.managers.forEach((server) => {
+              if (!managers.some((local) => local.id === server.id))
+                managers.push(server)
+            })
+            saveManagers(managers)
+            renderManagers()
+          }
+        } catch (e) {
+          console.warn('Server manager mapping load skipped:', e)
+        }
+      }
 
-function renderManagers() {
-  const list = document.getElementById('mgr-list');
-  if (!list) return;
-  list.innerHTML = managers.map((m, i) => `
+      function renderManagers() {
+        const list = document.getElementById('mgr-list')
+        if (!list) return
+        list.innerHTML = managers
+          .map(
+            (m, i) => `
     <div class="mgr-row">
       <div class="mgr-info">
         <div class="mgr-name">${m.name} <span class="mgr-id">${m.id}</span></div>
@@ -314,48 +1158,60 @@ function renderManagers() {
         ${managers.length > 1 ? `<button class="btn sec" style="padding:6px 10px;font-size:11px;color:#EF4444;border-color:#FECACA" onclick="deleteMgr(${i})">✕</button>` : ''}
       </div>
     </div>
-  `).join('');
+  `
+          )
+          .join('')
 
-  // Update filter tabs
-  const tabs = document.getElementById('tabs');
-  if (tabs) {
-    const managerTabs = managers.map(m =>
-      `<button class="tab${curMgr===m.id?' on':''}" data-m="${m.id}">${m.name.split(' ')[0]}</button>`
-    ).join('');
-    tabs.innerHTML = `<button class="tab${curMgr==='all'?' on':''}" data-m="all">Все</button>${managerTabs}`;
-    tabs.querySelectorAll('.tab').forEach(t => {
-      t.addEventListener('click', () => {
-        tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-        t.classList.add('on');
-        curMgr = t.dataset.m;
-        render();
-      });
-    });
-  }
-}
+        // Update filter tabs
+        const tabs = document.getElementById('tabs')
+        if (tabs) {
+          const managerTabs = managers
+            .map(
+              (m) =>
+                `<button class="tab${curMgr === m.id ? ' on' : ''}" data-m="${m.id}">${m.name.split(' ')[0]}</button>`
+            )
+            .join('')
+          tabs.innerHTML = `<button class="tab${curMgr === 'all' ? ' on' : ''}" data-m="all">Все</button>${managerTabs}`
+          tabs.querySelectorAll('.tab').forEach((t) => {
+            t.addEventListener('click', () => {
+              tabs
+                .querySelectorAll('.tab')
+                .forEach((x) => x.classList.remove('on'))
+              t.classList.add('on')
+              curMgr = t.dataset.m
+              render()
+            })
+          })
+        }
+      }
 
-function copyMgrLink(mgrId) {
-  const url = location.origin + '/?mgr=' + mgrId;
-  navigator.clipboard.writeText(url).catch(() => {});
-  event.target.textContent = '✓ Скопировано';
-  setTimeout(() => event.target.textContent = 'Скопировать ссылку', 1500);
-}
+      function copyMgrLink(mgrId) {
+        const url = location.origin + '/?mgr=' + mgrId
+        navigator.clipboard.writeText(url).catch(() => {})
+        event.target.textContent = '✓ Скопировано'
+        setTimeout(
+          () => (event.target.textContent = 'Скопировать ссылку'),
+          1500
+        )
+      }
 
-// ── Add/Edit manager modal ────────────────────────────────────────────────
-let _editIdx = -1;
+      // ── Add/Edit manager modal ────────────────────────────────────────────────
+      let _editIdx = -1
 
-function openAddMgr(idx = -1) {
-  _editIdx = idx;
-  const m = idx >= 0 ? managers[idx] : { id: '', name: '', dept: '', email: '' };
-  document.getElementById('modal').classList.add('open');
-  document.getElementById('m-title').textContent = idx >= 0 ? 'Изменить менеджера' : 'Добавить менеджера';
-  document.getElementById('m-code').style.display = 'none';
-  document.querySelector('.code-box').style.display = 'none';
-  document.querySelector('.modal-foot').innerHTML = `
+      function openAddMgr(idx = -1) {
+        _editIdx = idx
+        const m =
+          idx >= 0 ? managers[idx] : { id: '', name: '', dept: '', email: '' }
+        document.getElementById('modal').classList.add('open')
+        document.getElementById('m-title').textContent =
+          idx >= 0 ? 'Изменить менеджера' : 'Добавить менеджера'
+        document.getElementById('m-code').style.display = 'none'
+        document.querySelector('.code-box').style.display = 'none'
+        document.querySelector('.modal-foot').innerHTML = `
     <button class="btn blue" onclick="saveMgr()">Сохранить</button>
     <button class="btn sec" onclick="closeModal()">Отмена</button>
-  `;
-  document.getElementById('m-detail').innerHTML = `
+  `
+        document.getElementById('m-detail').innerHTML = `
     <div class="form-row" style="grid-column:1/-1">
       <label>ФИО менеджера<span style="color:#EF4444">*</span></label>
       <input id="mgr-f-name" type="text" value="${m.name}" placeholder="Иванов Иван">
@@ -377,162 +1233,210 @@ function openAddMgr(idx = -1) {
       <input id="mgr-f-id" type="text" value="${m.id}" placeholder="i.ivanov">
     </div>
     <div style="grid-column:1/-1;font-size:11px;color:var(--t3);padding:4px 0">
-      Ссылка для клиента: <span style="font-family:monospace;color:var(--blue)">${location.origin}/?mgr=${m.id||'[id]'}</span>
+      Ссылка для клиента: <span style="font-family:monospace;color:var(--blue)">${location.origin}/?mgr=${m.id || '[id]'}</span>
     </div>
-  `;
-}
+  `
+      }
 
-function editMgr(idx) { openAddMgr(idx); }
+      function editMgr(idx) {
+        openAddMgr(idx)
+      }
 
-function saveMgr() {
-  const name  = document.getElementById('mgr-f-name')?.value.trim();
-  const email = document.getElementById('mgr-f-email')?.value.trim();
-  const backupEmail = document.getElementById('mgr-f-backup')?.value.trim();
-  const dept  = document.getElementById('mgr-f-dept')?.value.trim();
-  const idEl  = document.getElementById('mgr-f-id');
-  const id    = _editIdx >= 0 ? managers[_editIdx].id : (idEl?.value.trim().toLowerCase().replace(/\s+/g,'') || '');
+      function saveMgr() {
+        const name = document.getElementById('mgr-f-name')?.value.trim()
+        const email = document.getElementById('mgr-f-email')?.value.trim()
+        const backupEmail = document
+          .getElementById('mgr-f-backup')
+          ?.value.trim()
+        const dept = document.getElementById('mgr-f-dept')?.value.trim()
+        const idEl = document.getElementById('mgr-f-id')
+        const id =
+          _editIdx >= 0
+            ? managers[_editIdx].id
+            : idEl?.value.trim().toLowerCase().replace(/\s+/g, '') || ''
 
-  if (!name || !email || !id) { alert('Заполните обязательные поля'); return; }
-  if (!email.includes('@')) { alert('Некорректный email'); return; }
-  if (backupEmail && !backupEmail.includes('@')) { alert('Некорректный резервный email'); return; }
+        if (!name || !email || !id) {
+          alert('Заполните обязательные поля')
+          return
+        }
+        if (!email.includes('@')) {
+          alert('Некорректный email')
+          return
+        }
+        if (backupEmail && !backupEmail.includes('@')) {
+          alert('Некорректный резервный email')
+          return
+        }
 
-  if (_editIdx >= 0) {
-    managers[_editIdx] = { ...managers[_editIdx], name, email, backupEmail, dept };
-  } else {
-    if (managers.find(m => m.id === id)) { alert('Менеджер с таким ID уже существует'); return; }
-    managers.push({ id, name, dept, email, backupEmail });
-  }
-  saveManagers(managers);
+        if (_editIdx >= 0) {
+          managers[_editIdx] = {
+            ...managers[_editIdx],
+            name,
+            email,
+            backupEmail,
+            dept,
+          }
+        } else {
+          if (managers.find((m) => m.id === id)) {
+            alert('Менеджер с таким ID уже существует')
+            return
+          }
+          managers.push({ id, name, dept, email, backupEmail })
+        }
+        saveManagers(managers)
 
-  // Also update server-side mapping via API
-  updateServerMapping();
+        // Also update server-side mapping via API
+        updateServerMapping()
 
-  renderManagers();
-  closeModal();
-}
+        renderManagers()
+        closeModal()
+      }
 
-function deleteMgr(idx) {
-  if (!confirm(`Удалить менеджера ${managers[idx].name}?`)) return;
-  managers.splice(idx, 1);
-  saveManagers(managers);
-  renderManagers();
-}
+      function deleteMgr(idx) {
+        if (!confirm(`Удалить менеджера ${managers[idx].name}?`)) return
+        managers.splice(idx, 1)
+        saveManagers(managers)
+        renderManagers()
+      }
 
-async function updateServerMapping() {
-  // Send updated manager list to server to update email routing
-  try {
-    await fetch('/api/managers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ managers })
-    });
-  } catch(e) { console.warn('Server mapping update skipped:', e); }
-}
+      async function updateServerMapping() {
+        // Send updated manager list to server to update email routing
+        try {
+          await fetch('/api/managers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ managers }),
+          })
+        } catch (e) {
+          console.warn('Server mapping update skipped:', e)
+        }
+      }
 
-// Close modal — через id, без конфликта с window.close
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-}
-document.getElementById('m-close').addEventListener('click', closeModal);
-document.getElementById('m-close2').addEventListener('click', closeModal);
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+      // Close modal — через id, без конфликта с window.close
+      function closeModal() {
+        document.getElementById('modal').classList.remove('open')
+      }
+      document.getElementById('m-close').addEventListener('click', closeModal)
+      document.getElementById('m-close2').addEventListener('click', closeModal)
+      document.getElementById('modal').addEventListener('click', function (e) {
+        if (e.target === this) closeModal()
+      })
 
-// Tabs
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-    t.classList.add('on');
-    curMgr = t.dataset.m;
-    render();
-    updateStats();
-  });
-});
+      // Tabs
+      document.querySelectorAll('.tab').forEach((t) => {
+        t.addEventListener('click', () => {
+          document
+            .querySelectorAll('.tab')
+            .forEach((x) => x.classList.remove('on'))
+          t.classList.add('on')
+          curMgr = t.dataset.m
+          render()
+          updateStats()
+        })
+      })
 
-// Link generator
-function genLink() {
-  const v = document.getElementById('lsel').value;
-  if (!v) { document.getElementById('lurl').textContent = 'Выберите менеджера...'; _genLink = ''; return; }
-  _genLink = location.origin + '/?mgr=' + v;
-  document.getElementById('lurl').textContent = _genLink;
-}
-function copyLink() {
-  if (!_genLink) return;
-  navigator.clipboard.writeText(_genLink).catch(() => {});
-  const b = event.target;
-  b.textContent = '✓ Скопировано';
-  setTimeout(() => b.textContent = 'Скопировать ссылку', 1500);
-}
+      // Link generator
+      function genLink() {
+        const v = document.getElementById('lsel').value
+        if (!v) {
+          document.getElementById('lurl').textContent = 'Выберите менеджера...'
+          _genLink = ''
+          return
+        }
+        _genLink = location.origin + '/?mgr=' + v
+        document.getElementById('lurl').textContent = _genLink
+      }
+      function copyLink() {
+        if (!_genLink) return
+        navigator.clipboard.writeText(_genLink).catch(() => {})
+        const b = event.target
+        b.textContent = '✓ Скопировано'
+        setTimeout(() => (b.textContent = 'Скопировать ссылку'), 1500)
+      }
 
-// Load data
-// Render managers on init
-renderManagers();
-loadServerManagers();
+      // Load data
+      // Render managers on init
+      renderManagers()
+      loadServerManagers()
 
-async function loadData() {
-  document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">⏳</div>Загрузка из Airtable...</div>';
-  document.getElementById('err-box').style.display = 'none';
-  try {
-    const params = new URLSearchParams();
-    if (curMgr !== 'all') params.set('mgr', curMgr);
-    if (showArchived) params.set('archived', '1');
-    const query = params.toString();
-    const url = '/api/rows' + (query ? '?' + query : '');
-    const res = await fetch(url);
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || 'API error ' + res.status);
-    rows = json.rows || [];
-    render();
-    updateStats();
-  } catch(e) {
-    const box = document.getElementById('err-box');
-    box.style.display = 'block';
-    box.textContent = 'Ошибка загрузки: ' + e.message + '. Проверьте что AIRTABLE_TOKEN добавлен в Vercel → Settings → Environment Variables.';
-    document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">⚠️</div>Нет данных</div>';
-  }
-}
+      async function loadData() {
+        document.getElementById('tbl-c').innerHTML =
+          '<div class="empty"><div class="ico">⏳</div>Загрузка из Airtable...</div>'
+        document.getElementById('err-box').style.display = 'none'
+        try {
+          const params = new URLSearchParams()
+          if (curMgr !== 'all') params.set('mgr', curMgr)
+          if (showArchived) params.set('archived', '1')
+          const query = params.toString()
+          const url = '/api/rows' + (query ? '?' + query : '')
+          const res = await fetch(url)
+          const json = await res.json()
+          if (!res.ok) throw new Error(json.error || 'API error ' + res.status)
+          rows = json.rows || []
+          render()
+          updateStats()
+        } catch (e) {
+          const box = document.getElementById('err-box')
+          box.style.display = 'block'
+          box.textContent =
+            'Ошибка загрузки: ' +
+            e.message +
+            '. Проверьте что AIRTABLE_TOKEN добавлен в Vercel → Settings → Environment Variables.'
+          document.getElementById('tbl-c').innerHTML =
+            '<div class="empty"><div class="ico">⚠️</div>Нет данных</div>'
+        }
+      }
 
-function badgeCls(s) {
-  if (s === 'Новое') return 'b-new';
-  if (s === 'КП в работе') return 'b-wip';
-  if (s === 'КП отправлено') return 'b-sent';
-  if (s === 'Договор') return 'b-deal';
-  if (s === 'Отказ') return 'b-no';
-  return 'b-def';
-}
+      function badgeCls(s) {
+        if (s === 'Новое') return 'b-new'
+        if (s === 'КП в работе') return 'b-wip'
+        if (s === 'КП отправлено') return 'b-sent'
+        if (s === 'Договор') return 'b-deal'
+        if (s === 'Отказ') return 'b-no'
+        return 'b-def'
+      }
 
-function statusClass(s) {
-  if (s === 'Новое') return 's-new';
-  if (s === 'КП в работе') return 's-wip';
-  if (s === 'КП отправлено') return 's-sent';
-  if (s === 'Договор') return 's-deal';
-  if (s === 'Отказ') return 's-no';
-  return 's-new';
-}
+      function statusClass(s) {
+        if (s === 'Новое') return 's-new'
+        if (s === 'КП в работе') return 's-wip'
+        if (s === 'КП отправлено') return 's-sent'
+        if (s === 'Договор') return 's-deal'
+        if (s === 'Отказ') return 's-no'
+        return 's-new'
+      }
 
-function render() {
-  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
-  if (!list.length) {
-    document.getElementById('tbl-c').innerHTML = '<div class="empty"><div class="ico">📭</div>Анкет пока нет</div>';
-    return;
-  }
-  const STATUSES = ['Новое','КП в работе','КП отправлено','Договор','Отказ','Архив'];
-  let h = `<table><thead><tr>
+      function render() {
+        const list =
+          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        if (!list.length) {
+          document.getElementById('tbl-c').innerHTML =
+            '<div class="empty"><div class="ico">📭</div>Анкет пока нет</div>'
+          return
+        }
+        const STATUSES = [
+          'Новое',
+          'КП в работе',
+          'КП отправлено',
+          'Договор',
+          'Отказ',
+          'Архив',
+        ]
+        let h = `<table><thead><tr>
     <th>Дата</th><th>Компания</th><th>Менеджер</th>
     <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Статус</th><th></th>
-  </tr></thead><tbody>`;
-  list.forEach((r, i) => {
-    const opts = STATUSES.map(s =>
-      `<option value="${s}" ${s === r.status ? 'selected' : ''}>${s}</option>`
-    ).join('');
-    h += `<tr>
+  </tr></thead><tbody>`
+        list.forEach((r, i) => {
+          const opts = STATUSES.map(
+            (s) =>
+              `<option value="${s}" ${s === r.status ? 'selected' : ''}>${s}</option>`
+          ).join('')
+          h += `<tr>
       <td style="color:var(--t3);font-size:11px;white-space:nowrap">${r.date}</td>
       <td><div style="font-weight:600;color:var(--navy)">${r.company}</div><div style="font-size:11px;color:var(--t3)">${r.email}</div></td>
       <td style="font-size:12px;color:var(--t2)">${r.manager}</td>
       <td style="font-weight:600">${r.users}</td>
       <td style="font-size:12px">${r.deploy}</td>
-      <td><span class="badge ${r.budget === 'Согласован' ? 'b-new' : (r.budget === 'Speculative' || (r.budget||'').startsWith('Предварительно')) ? 'b-def' : 'b-wip'}">${r.budget}</span></td>
+      <td><span class="badge ${r.budget === 'Согласован' ? 'b-new' : r.budget === 'Speculative' || (r.budget || '').startsWith('Предварительно') ? 'b-def' : 'b-wip'}">${r.budget}</span></td>
       <td>
         <select class="status-sel ${statusClass(r.status)}"
           onchange="updateStatus('${r.id}', this.value, this, ${i})">${opts}
@@ -542,169 +1446,202 @@ function render() {
         <button class="btn blue" style="padding:6px 12px;font-size:12px" onclick="openModal(${i})">→ КП</button>
         ${showArchived ? '' : `<button class="btn sec" style="padding:6px 10px;font-size:12px;margin-left:4px" onclick="archiveRow('${r.id}', ${i})">В архив</button>`}
       </td>
-    </tr>`;
-  });
-  h += '</tbody></table>';
-  document.getElementById('tbl-c').innerHTML = h;
-}
+    </tr>`
+        })
+        h += '</tbody></table>'
+        document.getElementById('tbl-c').innerHTML = h
+      }
 
-function exportExcel() {
-  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
-  if (!list.length) { alert('Нет анкет для экспорта'); return; }
+      function exportExcel() {
+        const list =
+          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        if (!list.length) {
+          alert('Нет анкет для экспорта')
+          return
+        }
 
-  const cols = [
-    ['Дата', r => r.date],
-    ['Компания', r => r.company],
-    ['БИН', r => r.bin],
-    ['Отрасль', r => r.industry],
-    ['Email', r => r.email],
-    ['Менеджер', r => r.manager],
-    ['N_full', r => r.users],
-    ['Бюджет', r => r.budget],
-    ['Развёртывание', r => r.deploy],
-    ['Срок заключения', r => r.deadline],
-    ['Статус', r => r.status],
-    ['EB Email', r => r.ebEmail],
-    ['EB Телефон', r => r.ebPhone],
-    ['Маркетинг кейс', r => r.marketingCase],
-  ];
+        const cols = [
+          ['Дата', (r) => r.date],
+          ['Компания', (r) => r.company],
+          ['БИН', (r) => r.bin],
+          ['Отрасль', (r) => r.industry],
+          ['Email', (r) => r.email],
+          ['Менеджер', (r) => r.manager],
+          ['N_full', (r) => r.users],
+          ['Бюджет', (r) => r.budget],
+          ['Развёртывание', (r) => r.deploy],
+          ['Срок заключения', (r) => r.deadline],
+          ['Статус', (r) => r.status],
+          ['EB Email', (r) => r.ebEmail],
+          ['EB Телефон', (r) => r.ebPhone],
+          ['Маркетинг кейс', (r) => r.marketingCase],
+        ]
 
-  const esc = (v) => {
-    const s = (v === undefined || v === null) ? '' : String(v);
-    return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  };
+        const esc = (v) => {
+          const s = v === undefined || v === null ? '' : String(v)
+          return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s
+        }
 
-  const lines = [cols.map(c => esc(c[0])).join(';')];
-  list.forEach(r => lines.push(cols.map(c => esc(c[1](r))).join(';')));
+        const lines = [cols.map((c) => esc(c[0])).join(';')]
+        list.forEach((r) => lines.push(cols.map((c) => esc(c[1](r))).join(';')))
 
-  // BOM + CRLF — чтобы кириллица и разделитель корректно открывались в Excel
-  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-  const d = new Date();
-  const stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  const name = (showArchived ? 'anketi_arhiv_' : 'anketi_') + stamp + '.csv';
+        // BOM + CRLF — чтобы кириллица и разделитель корректно открывались в Excel
+        const blob = new Blob(['﻿' + lines.join('\r\n')], {
+          type: 'text/csv;charset=utf-8;',
+        })
+        const d = new Date()
+        const stamp =
+          d.getFullYear() +
+          '-' +
+          String(d.getMonth() + 1).padStart(2, '0') +
+          '-' +
+          String(d.getDate()).padStart(2, '0')
+        const name =
+          (showArchived ? 'anketi_arhiv_' : 'anketi_') + stamp + '.csv'
 
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = name
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+      }
 
-async function archiveRow(recordId, idx) {
-  if (!confirm('Переместить анкету в архив?')) return;
-  try {
-    const res = await fetch('/api/update', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recordId, status: 'Архив' })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.ok) throw new Error(data.error || 'Ошибка архивации');
-    rows.splice(idx, 1);
-    render();
-    updateStats();
-  } catch (e) {
-    alert('Не удалось переместить анкету в архив: ' + e.message);
-  }
-}
+      async function archiveRow(recordId, idx) {
+        if (!confirm('Переместить анкету в архив?')) return
+        try {
+          const res = await fetch('/api/update', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recordId, status: 'Архив' }),
+          })
+          const data = await res.json()
+          if (!res.ok || !data.ok)
+            throw new Error(data.error || 'Ошибка архивации')
+          rows.splice(idx, 1)
+          render()
+          updateStats()
+        } catch (e) {
+          alert('Не удалось переместить анкету в архив: ' + e.message)
+        }
+      }
 
-function toggleArchive() {
-  showArchived = !showArchived;
-  document.getElementById('archive-toggle').textContent = showArchived ? '← Заполненные анкеты' : 'Архив';
-  document.querySelector('.tbl-head h3').textContent = showArchived ? 'Архив' : 'Заполненные анкеты';
-  loadData();
-}
+      function toggleArchive() {
+        showArchived = !showArchived
+        document.getElementById('archive-toggle').textContent = showArchived
+          ? '← Заполненные анкеты'
+          : 'Архив'
+        document.querySelector('.tbl-head h3').textContent = showArchived
+          ? 'Архив'
+          : 'Заполненные анкеты'
+        loadData()
+      }
 
-async function updateStatus(recordId, newStatus, selectEl, idx) {
-  const oldCls = selectEl.className;
-  selectEl.disabled = true;
-  selectEl.style.opacity = '0.5';
-  try {
-    const res = await fetch('/api/update', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recordId, status: newStatus })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      // Update local data
-      const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
-      const globalIdx = rows.indexOf(list[idx]);
-      if (globalIdx !== -1) rows[globalIdx].status = newStatus;
-      // Update select style
-      selectEl.className = 'status-sel ' + statusClass(newStatus);
-      updateStats();
-    } else {
-      alert('Ошибка: ' + (data.error || 'неизвестно'));
-      selectEl.className = oldCls;
-    }
-  } catch(e) {
-    alert('Ошибка сети');
-    selectEl.className = oldCls;
-  } finally {
-    selectEl.disabled = false;
-    selectEl.style.opacity = '1';
-  }
-}
+      async function updateStatus(recordId, newStatus, selectEl, idx) {
+        const oldCls = selectEl.className
+        selectEl.disabled = true
+        selectEl.style.opacity = '0.5'
+        try {
+          const res = await fetch('/api/update', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recordId, status: newStatus }),
+          })
+          const data = await res.json()
+          if (data.ok) {
+            // Update local data
+            const list =
+              curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+            const globalIdx = rows.indexOf(list[idx])
+            if (globalIdx !== -1) rows[globalIdx].status = newStatus
+            // Update select style
+            selectEl.className = 'status-sel ' + statusClass(newStatus)
+            updateStats()
+          } else {
+            alert('Ошибка: ' + (data.error || 'неизвестно'))
+            selectEl.className = oldCls
+          }
+        } catch (e) {
+          alert('Ошибка сети')
+          selectEl.className = oldCls
+        } finally {
+          selectEl.disabled = false
+          selectEl.style.opacity = '1'
+        }
+      }
 
-function updateStats() {
-  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
-  const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(value);
-  const users = list.reduce((sum, row) => sum + (Number(row.users) || 0), 0);
-  const deployments = new Map();
-  const statuses = new Map();
-  list.forEach((row) => {
-    const rawDeploy = String(row.deploy || 'Не указано').trim() || 'Не указано';
-    const deploy = /(?:наши|свои) серверы/i.test(rawDeploy)
-      ? 'Серверы клиента'
-      : rawDeploy;
-    const status = String(row.status || 'Новое').trim() || 'Новое';
-    deployments.set(deploy, (deployments.get(deploy) || 0) + 1);
-    statuses.set(status, (statuses.get(status) || 0) + 1);
-  });
-  const renderBreakdown = (targetId, values) => {
-    const target = document.getElementById(targetId);
-    target.innerHTML = values.size
-      ? [...values].map(([label, count]) => `<span class="analytics-item"><span>${label}</span><strong>${count}</strong></span>`).join('')
-      : '<span class="analytics-item">Нет данных</span>';
-  };
+      function updateStats() {
+        const list =
+          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        const formatNumber = (value) =>
+          new Intl.NumberFormat('ru-RU').format(value)
+        const users = list.reduce(
+          (sum, row) => sum + (Number(row.users) || 0),
+          0
+        )
+        const deployments = new Map()
+        const statuses = new Map()
+        list.forEach((row) => {
+          const rawDeploy = String(row.deploy || 'Не указано').trim() || 'Не указано'
+          const deploy = /(?:наши|свои) серверы/i.test(rawDeploy)
+            ? 'Серверы клиента'
+            : rawDeploy
+          const status = String(row.status || 'Новое').trim() || 'Новое'
+          deployments.set(deploy, (deployments.get(deploy) || 0) + 1)
+          statuses.set(status, (statuses.get(status) || 0) + 1)
+        })
+        const renderBreakdown = (targetId, values) => {
+          const target = document.getElementById(targetId)
+          target.innerHTML = values.size
+            ? [...values]
+                .map(
+                  ([label, count]) =>
+                    `<span class="analytics-item"><span>${label}</span><strong>${count}</strong></span>`
+                )
+                .join('')
+            : '<span class="analytics-item">Нет данных</span>'
+        }
 
-  document.getElementById('st-companies').textContent = formatNumber(new Set(list.map(row => row.company).filter(Boolean)).size);
-  document.getElementById('st-users').textContent = formatNumber(users);
-  document.getElementById('st-revenue').textContent = formatNumber(users * 6490);
-  document.getElementById('st-t').textContent = formatNumber(list.length);
-  renderBreakdown('analytics-deploy', deployments);
-  renderBreakdown('analytics-status', statuses);
-}
+        document.getElementById('st-companies').textContent = formatNumber(
+          new Set(list.map((row) => row.company).filter(Boolean)).size
+        )
+        document.getElementById('st-users').textContent = formatNumber(users)
+        document.getElementById('st-revenue').textContent = formatNumber(
+          users * 6490 * 12
+        )
+        document.getElementById('st-t').textContent = formatNumber(list.length)
+        renderBreakdown('analytics-deploy', deployments)
+        renderBreakdown('analytics-status', statuses)
+      }
 
-function openModal(i) {
-  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
-  const r = list[i];
-  if (!r) return;
-  _prompt = r.prompt || '';
-  document.getElementById('m-title').textContent = r.company;
-  document.getElementById('m-code').textContent = _prompt;
-  document.getElementById('m-detail').innerHTML = `
+      function openModal(i) {
+        const list =
+          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        const r = list[i]
+        if (!r) return
+        _prompt = r.prompt || ''
+        document.getElementById('m-title').textContent = r.company
+        document.getElementById('m-code').textContent = _prompt
+        document.getElementById('m-detail').innerHTML = `
     <div class="det"><div class="lbl">Менеджер</div><div class="val">${r.manager}</div></div>
     <div class="det"><div class="lbl">Отрасль</div><div class="val">${r.industry || '—'}</div></div>
     <div class="det"><div class="lbl">Пользователей</div><div class="val">${r.users} чел.</div></div>
     <div class="det"><div class="lbl">Развёртывание</div><div class="val">${r.deploy}</div></div>
     <div class="det"><div class="lbl">Бюджет</div><div class="val">${r.budget}</div></div>
     <div class="det"><div class="lbl">Срок договора</div><div class="val">${r.deadline}</div></div>
-  `;
-  document.getElementById('modal').classList.add('open');
-}
+  `
+        document.getElementById('modal').classList.add('open')
+      }
 
-function copyPrompt() {
-  navigator.clipboard.writeText(_prompt).catch(() => {});
-  const b = event.target;
-  b.textContent = '✓ Скопировано';
-  setTimeout(() => b.textContent = 'Скопировать промпт', 1500);
-}
+      function copyPrompt() {
+        navigator.clipboard.writeText(_prompt).catch(() => {})
+        const b = event.target
+        b.textContent = '✓ Скопировано'
+        setTimeout(() => (b.textContent = 'Скопировать промпт'), 1500)
+      }
 
-loadData();
-</script>
-</body>
+      loadData()
+    </script>
+  </body>
 </html>
