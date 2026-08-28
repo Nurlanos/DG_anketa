@@ -1406,10 +1406,10 @@
         // Save the manager mapping before creating the linked dashboard account.
         if (_editIdx < 0) {
           const mappingSaved = await updateServerMapping()
-          if (!mappingSaved) {
+          if (!mappingSaved.ok) {
             managers.pop()
             saveManagers(managers)
-            alert('Не удалось сохранить менеджера')
+            alert(mappingSaved.error || 'Не удалось сохранить менеджера')
             return
           }
           const response = await fetch('/api/users', {
@@ -1455,10 +1455,11 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ managers }),
           })
-          return response.ok
+          const data = await response.json().catch(() => ({}))
+          return { ok: response.ok, error: data.error || data.details }
         } catch (e) {
           console.warn('Server mapping update skipped:', e)
-          return false
+          return { ok: false, error: e.message }
         }
       }
 
