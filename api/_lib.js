@@ -38,7 +38,11 @@ function envUsers() {
   try {
     const parsed = JSON.parse(process.env.DASH_USERS_JSON || '[]')
     return Array.isArray(parsed)
-      ? parsed.map((user) => ({ ...user, status: user.status || 'active' }))
+      ? parsed.map((user) => ({
+          ...user,
+          status: user.status || 'active',
+          mustChangePassword: user.mustChangePassword !== false,
+        }))
       : []
   } catch {
     return []
