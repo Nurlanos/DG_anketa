@@ -1,7 +1,9 @@
 import {
   createDashboardUser,
+  createInviteToken,
   deleteDashboardUser,
   getDashboardUsers,
+  getAppUrl,
   hashPassword,
   isValidPassword,
   requireAdmin,
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
       const role = req.body?.role === 'admin' ? 'admin' : 'manager'
       const managerId = String(req.body?.managerId || '').trim()
       const password = String(req.body?.password || '')
-      if (!validEmail(email) || !name || !isValidPassword(password)) {
+      if (!validEmail(email) || !name || (password && !isValidPassword(password))) {
         return res.status(400).json({
           error: 'Нужны корректные почта, имя и пароль от 8 латинских символов',
         })
@@ -58,17 +60,30 @@ export default async function handler(req, res) {
           .status(409)
           .json({ error: 'Пользователь с такой почтой уже есть' })
       }
-      const created = await createDashboardUser({
-        Примечания: JSON.stringify({
-          email,
-          name,
-          managerId,
-          role,
-          passwordHash: await hashPassword(password),
-          status: 'active',
-          mustChangePassword: true,
-        }),
-      })
+      const invite = password ? null : createInviteToken()
+      const metadata = {
+        email,
+        name,
+        managerId,
+        role,
+        passwordHash: password ? await hashPassword(password) : '',
+        status: password ? 'active' : 'pending',
+        mustChangePassword: Boolean(password),
+        ...(invite ? { inviteHash: invite.hash, inviteExpires: Date.now() + 24 * 60 * 60 * 1000 } : {}),
+      }
+      const created = await createDashboardUser({ Примечания: JSON.stringify(metadata) })
+      if (invite) {
+        const inviteUrl = `${getAppUrl()}/invite.html?token=${encodeURIComponent(invite.token)}`
+        const resendKey = process.env.RESEND_API_KEY || ''
+        if (!resendKey) return res.status(500).json({ error: 'RESEND_API_KEY not configured' })
+        const emailResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ from: 'DG Anketa <onboarding@resend.dev>', to: [email], subject: 'Приглашение в дашборд Documentolog', html: `<p>Здравствуйте, ${name}!</p><p>Вас пригласили в дашборд Documentolog.</p><p><a href="${inviteUrl}">Создать пароль и войти</a></p><p>Ссылка действует 24 часа и используется один раз.</p>` }),
+        })
+        if (!emailResponse.ok) return res.status(502).json({ error: 'Не удалось отправить приглашение на email' })
+        return res.status(201).json({ user: publicUser({ ...metadata, recordId: created.id }), inviteSent: true })
+      }
       return res.status(201).json({
         user: publicUser({
           ...created.fields,
@@ -130,11 +145,9 @@ export default async function handler(req, res) {
     if (action === 'reset-password') {
       const password = String(req.body?.password || '')
       if (!isValidPassword(password))
-        return res
-          .status(400)
-          .json({
-            error: 'Пароль: минимум 8 латинских символов, цифр или знаков',
-          })
+        return res.status(400).json({
+          error: 'Пароль: минимум 8 латинских символов, цифр или знаков',
+        })
       await updateDashboardUser(recordId, {
         Примечания: JSON.stringify({
           role: target.role,

@@ -1328,17 +1328,6 @@
       <label>Отдел / подразделение</label>
       <input id="mgr-f-dept" type="text" value="${m.dept}" placeholder="Упр. №9">
     </div>
-    ${
-      idx < 0
-        ? `<div class="form-row">
-      <label>Временный пароль для входа<span style="color:#EF4444">*</span></label>
-      <div style="display:flex;gap:6px">
-        <input id="mgr-f-password" type="password" placeholder="Минимум 8 латинских символов" minlength="8" pattern="[!-~]+" oninput="this.value=this.value.replace(/[^\x21-\x7E]/g,'')" style="flex:1">
-        <button class="btn sec" type="button" onclick="togglePassword('mgr-f-password', this)">◉</button>
-      </div>
-    </div>`
-        : ''
-    }
     <div class="form-row" style="${idx >= 0 ? 'display:none' : ''}">
       <label>ID (латиница, без пробелов)<span style="color:#EF4444">*</span></label>
       <input id="mgr-f-id" type="text" value="${m.id}" placeholder="i.ivanov">
@@ -1360,7 +1349,6 @@
           .getElementById('mgr-f-backup')
           ?.value.trim()
         const dept = document.getElementById('mgr-f-dept')?.value.trim()
-        const password = document.getElementById('mgr-f-password')?.value || ''
         const idEl = document.getElementById('mgr-f-id')
         const id =
           _editIdx >= 0
@@ -1377,12 +1365,6 @@
         }
         if (backupEmail && !backupEmail.includes('@')) {
           alert('Некорректный резервный email')
-          return
-        }
-        if (_editIdx < 0 && !/^[\x21-\x7e]{8,}$/.test(password)) {
-          alert(
-            'Введите временный пароль: минимум 8 латинских символов, цифр или знаков'
-          )
           return
         }
 
@@ -1420,7 +1402,6 @@
               name,
               role: 'manager',
               managerId: id,
-              password,
             }),
           })
           const data = await response.json()
@@ -1432,6 +1413,7 @@
             )
             return
           }
+          alert(`Приглашение отправлено на ${email}`)
         }
         if (_editIdx >= 0) await updateServerMapping()
 

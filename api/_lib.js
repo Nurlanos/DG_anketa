@@ -67,6 +67,8 @@ function normalizeAirtableUser(record) {
     passwordHash: metadata.passwordHash || '',
     status: metadata.status || 'active',
     mustChangePassword: metadata.mustChangePassword === true,
+    inviteHash: metadata.inviteHash || '',
+    inviteExpires: Number(metadata.inviteExpires || 0),
   }
 }
 
@@ -119,7 +121,7 @@ export async function deleteDashboardUser(recordId) {
   if (!response.ok) throw new Error((await response.text()).slice(0, 500))
 }
 
-import { createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
+import { createHash, createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
 
 const scryptAsync = promisify(scrypt)
@@ -189,6 +191,19 @@ export async function hashPassword(password) {
     p: 1,
   })
   return `scrypt$16384$${salt}$${Buffer.from(derived).toString('base64url')}`
+}
+
+export function createInviteToken() {
+  const token = randomBytes(32).toString('base64url')
+  return { token, hash: createHash('sha256').update(token).digest('base64url') }
+}
+
+export function hashInviteToken(token) {
+  return createHash('sha256').update(String(token || '')).digest('base64url')
+}
+
+export function getAppUrl() {
+  return process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
 }
 
 export async function findDashboardUser(email) {
