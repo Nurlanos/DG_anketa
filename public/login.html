@@ -63,6 +63,9 @@
         outline: 2px solid rgba(32, 86, 184, 0.2);
         border-color: var(--blue);
       }
+      .password-wrap { position: relative; }
+      .password-wrap input { padding-right: 48px; }
+      .password-toggle { position: absolute; right: 8px; top: 50%; width: 32px; margin: 0; padding: 4px; transform: translateY(-50%); background: transparent; color: var(--blue); font-size: 16px; }
       button {
         width: 100%;
         margin-top: 22px;
@@ -101,13 +104,10 @@
           autofocus
         />
         <label for="password">Пароль</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          required
-        />
+        <div class="password-wrap">
+          <input id="password" name="password" type="password" autocomplete="current-password" required pattern="[!-~]+" oninput="this.value = this.value.replace(/[^\x21-\x7E]/g, '')" />
+          <button class="password-toggle" type="button" onclick="togglePassword('password', this)" aria-label="Показать пароль">◉</button>
+        </div>
         <button type="submit">Войти</button>
         <div id="error" role="alert"></div>
       </form>
@@ -118,7 +118,7 @@
         .addEventListener('submit', async (event) => {
           event.preventDefault()
           const form = event.currentTarget
-          const button = form.querySelector('button')
+          const button = form.querySelector('button[type="submit"]')
           const error = document.getElementById('error')
           button.disabled = true
           error.textContent = ''
@@ -141,6 +141,12 @@
             button.disabled = false
           }
         })
+      function togglePassword(id, button) {
+        const input = document.getElementById(id)
+        input.type = input.type === 'password' ? 'text' : 'password'
+        button.textContent = input.type === 'password' ? '◉' : '○'
+        button.setAttribute('aria-label', input.type === 'password' ? 'Показать пароль' : 'Скрыть пароль')
+      }
     </script>
   </body>
 </html>

@@ -125,6 +125,11 @@ import { promisify } from 'node:util'
 const scryptAsync = promisify(scrypt)
 const SESSION_COOKIE = 'dg_session'
 const SESSION_TTL = 60 * 60 * 24 * 7
+const PASSWORD_RE = /^[\x21-\x7e]+$/
+
+export function isValidPassword(password) {
+  return password.length >= 8 && PASSWORD_RE.test(password)
+}
 
 function sign(value) {
   return createHmac('sha256', process.env.DASH_SESSION_SECRET || '')

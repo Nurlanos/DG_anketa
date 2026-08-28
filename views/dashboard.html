@@ -1045,9 +1045,13 @@
             class="lurl"
             id="user-password"
             type="password"
-            placeholder="Временный пароль (10+)"
+            placeholder="Временный пароль (8+, латиница)"
             autocomplete="new-password"
+            minlength="8"
+            pattern="[!-~]+"
+            oninput="this.value = this.value.replace(/[^\x21-\x7E]/g, '')"
           />
+          <button class="btn sec" type="button" onclick="togglePassword('user-password', this)">◉</button>
           <button class="btn" onclick="createUser()">Добавить</button>
         </div>
         <div class="mgr-list" id="users-list"></div>
@@ -1237,6 +1241,12 @@
           }
         )
         loadUsers()
+      }
+
+      function togglePassword(id, button) {
+        const input = document.getElementById(id)
+        input.type = input.type === 'password' ? 'text' : 'password'
+        button.textContent = input.type === 'password' ? '◉' : '○'
       }
 
       async function userAction(id, action) {

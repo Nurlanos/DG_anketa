@@ -3,6 +3,7 @@ import {
   deleteDashboardUser,
   getDashboardUsers,
   hashPassword,
+  isValidPassword,
   requireAdmin,
   updateDashboardUser,
 } from './_lib.js'
@@ -44,9 +45,9 @@ export default async function handler(req, res) {
       const role = req.body?.role === 'admin' ? 'admin' : 'manager'
       const managerId = String(req.body?.managerId || '').trim()
       const password = String(req.body?.password || '')
-      if (!validEmail(email) || !name || password.length < 10) {
+      if (!validEmail(email) || !name || !isValidPassword(password)) {
         return res.status(400).json({
-          error: 'Нужны корректные почта, имя и пароль от 10 символов',
+            error: 'Нужны корректные почта, имя и пароль от 8 латинских символов',
         })
       }
       if (role === 'manager' && !managerId) {
@@ -128,10 +129,10 @@ export default async function handler(req, res) {
     }
     if (action === 'reset-password') {
       const password = String(req.body?.password || '')
-      if (password.length < 10)
+      if (!isValidPassword(password))
         return res
           .status(400)
-          .json({ error: 'Пароль должен содержать минимум 10 символов' })
+          .json({ error: 'Пароль: минимум 8 латинских символов, цифр или знаков' })
       await updateDashboardUser(recordId, {
         Примечания: JSON.stringify({
           role: target.role,

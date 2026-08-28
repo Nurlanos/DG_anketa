@@ -3,6 +3,7 @@ import {
   createSession,
   getDashboardUsers,
   hashPassword,
+  isValidPassword,
   requireDashboardAuth,
   updateDashboardUser,
 } from './_lib.js'
@@ -13,10 +14,10 @@ export default async function handler(req, res) {
   const session = requireDashboardAuth(req, res)
   if (!session) return
   const password = String(req.body?.password || '')
-  if (password.length < 10)
+  if (!isValidPassword(password))
     return res
       .status(400)
-      .json({ error: 'Пароль должен содержать минимум 10 символов' })
+      .json({ error: 'Пароль: минимум 8 латинских символов, цифр или знаков' })
 
   try {
     const user = (await getDashboardUsers()).find(
