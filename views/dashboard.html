@@ -1015,9 +1015,7 @@
           подготовит персональное КП.
         </div>
         <div class="mgr-list" id="mgr-list"></div>
-      </div>
-
-      <div class="lgen" id="users-panel">
+        <div style="border-top:1px solid var(--brd);margin:16px 0 14px"></div>
         <div
           style="
             display: flex;
@@ -1206,7 +1204,6 @@
         currentUser = await response.json()
         if (currentUser.role !== 'admin') {
           document.getElementById('admin-panel').style.display = 'none'
-          document.getElementById('users-panel').style.display = 'none'
           document.getElementById('tabs').style.display = 'none'
           curMgr = currentUser.managerId
           return
