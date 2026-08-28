@@ -1,42 +1,56 @@
-import { getAirtableToken } from './_lib.js';
+import { getAirtableToken } from './_lib.js'
 
-const BASE_ID  = 'appHakMP7mBJhUu7p';
-const TABLE_ID = 'tblTU1on0yAcK5RTt';
-const AT_TOKEN = getAirtableToken();
-const RESEND_KEY = process.env.RESEND_API_KEY || '';
+const BASE_ID = 'appHakMP7mBJhUu7p'
+const TABLE_ID = 'tblTU1on0yAcK5RTt'
+const AT_TOKEN = getAirtableToken()
+const RESEND_KEY = process.env.RESEND_API_KEY || ''
+const RESEND_FROM = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
 
 // Used only when Airtable has no manager-config record for the given id yet.
-const FALLBACK_EMAIL = process.env.FALLBACK_MANAGER_EMAIL || '';
+const FALLBACK_EMAIL = process.env.FALLBACK_MANAGER_EMAIL || ''
 
 async function getManagerEmail(id) {
-  const fallback = FALLBACK_EMAIL;
-  if (!AT_TOKEN) return [fallback].filter(Boolean);
+  const fallback = FALLBACK_EMAIL
+  if (!AT_TOKEN) return [fallback].filter(Boolean)
   try {
-    const params = new globalThis.URLSearchParams({ filterByFormula: `{Компания}='__DG_MANAGER_CONFIG__'`, pageSize: '100' });
-    const response = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}?${params}`, {
-      headers: { Authorization: `Bearer ${AT_TOKEN}` },
-    });
-    if (!response.ok) return [fallback].filter(Boolean);
-    const records = (await response.json()).records || [];
-    const config = records.find((record) => record.fields?.manager_id === id);
-    let metadata = {};
-    try { metadata = JSON.parse(String(config?.fields?.Примечания || '{}')); } catch { metadata = {}; }
-    const managerEmail = metadata.email || config?.fields?.Email || '';
-    const backupEmail = metadata.backupEmail || '';
-    if (!managerEmail) return [fallback].filter(Boolean);
-    return [managerEmail, backupEmail].filter((email, index, emails) =>
-      email && (index === 0 || email !== emails[0])
-    );
+    const params = new globalThis.URLSearchParams({
+      filterByFormula: `{Компания}='__DG_MANAGER_CONFIG__'`,
+      pageSize: '100',
+    })
+    const response = await fetch(
+      `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}?${params}`,
+      {
+        headers: { Authorization: `Bearer ${AT_TOKEN}` },
+      }
+    )
+    if (!response.ok) return [fallback].filter(Boolean)
+    const records = (await response.json()).records || []
+    const config = records.find((record) => record.fields?.manager_id === id)
+    let metadata = {}
+    try {
+      metadata = JSON.parse(String(config?.fields?.Примечания || '{}'))
+    } catch {
+      metadata = {}
+    }
+    const managerEmail = metadata.email || config?.fields?.Email || ''
+    const backupEmail = metadata.backupEmail || ''
+    if (!managerEmail) return [fallback].filter(Boolean)
+    return [managerEmail, backupEmail].filter(
+      (email, index, emails) => email && (index === 0 || email !== emails[0])
+    )
   } catch (err) {
-    console.error('Manager email lookup error:', err.message);
-    return [fallback].filter(Boolean);
+    console.error('Manager email lookup error:', err.message)
+    return [fallback].filter(Boolean)
   }
 }
 
-const SEG_LABEL = { se: 'd8n Standard Edition (SE)', aie: 'd8n AI Edition (AIE)' };
+const SEG_LABEL = {
+  se: 'd8n Standard Edition (SE)',
+  aie: 'd8n AI Edition (AIE)',
+}
 
 function buildMarkdown(data, prompt) {
-  const dt = new Date().toLocaleDateString('ru-RU');
+  const dt = new Date().toLocaleDateString('ru-RU')
   return `# Анкета клиента — ${data.company}
 
 **Дата:** ${dt}
@@ -116,33 +130,35 @@ ${data.vision12}
 ## Промпт для d8n Sales
 
 ${prompt}
-`;
+`
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  if (req.method === 'OPTIONS') return res.status(200).end()
+  if (req.method !== 'POST')
+    return res.status(405).json({ error: 'Method not allowed' })
 
   try {
-    const { data, prompt } = req.body;
-    if (!data?.company) return res.status(400).json({ error: 'Missing data' });
+    const { data, prompt } = req.body
+    if (!data?.company) return res.status(400).json({ error: 'Missing data' })
 
-    const results = { email: null, airtable: null };
-    const mdContent = buildMarkdown(data, prompt);
-    const mdBase64  = Buffer.from(mdContent, 'utf8').toString('base64');
-    const filename  = `anketa_${(data.company||'client').replace(/[^\wа-яёА-ЯЁ]/gi,'_').slice(0,30)}_${new Date().toISOString().slice(0,10)}.md`;
+    const results = { email: null, airtable: null }
+    const mdContent = buildMarkdown(data, prompt)
+    const mdBase64 = Buffer.from(mdContent, 'utf8').toString('base64')
+    const filename = `anketa_${(data.company || 'client').replace(/[^\wа-яёА-ЯЁ]/gi, '_').slice(0, 30)}_${new Date().toISOString().slice(0, 10)}.md`
 
     // Email
-    const recipients = await getManagerEmail(data.managerId);
+    const recipients = await getManagerEmail(data.managerId)
     if (!RESEND_KEY) {
-      results.email = 'skipped:no key';
+      results.email = 'skipped:no key'
     } else if (!recipients.length) {
-      results.email = 'skipped:no recipient email';
-    } else { try {
-      const html = `<div style="font-family:-apple-system,sans-serif;max-width:600px;margin:0 auto">
+      results.email = 'skipped:no recipient email'
+    } else {
+      try {
+        const html = `<div style="font-family:-apple-system,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#0D1F4E;padding:20px 24px;border-radius:10px 10px 0 0">
           <div style="color:#fff;font-size:15px;font-weight:700">Новая анкета клиента</div>
           <div style="color:rgba(255,255,255,.45);font-size:11px">Documentolog · d8n.ai</div>
@@ -156,7 +172,7 @@ export default async function handler(req, res) {
             <tr><td style="padding:8px 20px;color:#94A3B8;width:38%;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid #F8FAFC">Контакт</td><td style="padding:8px 20px;color:#1E293B;border-bottom:1px solid #F8FAFC">${data.contactName}, ${data.contactRole}</td></tr>
             <tr style="background:#FAFBFC"><td style="padding:8px 20px;color:#94A3B8;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid #F8FAFC">Email / Тел.</td><td style="padding:8px 20px;border-bottom:1px solid #F8FAFC"><a href="mailto:${data.contactEmail}" style="color:#2056B8">${data.contactEmail}</a> · ${data.contactPhone}</td></tr>
             <tr><td style="padding:8px 20px;color:#94A3B8;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid #F8FAFC">N_full / Deploy</td><td style="padding:8px 20px;font-weight:600;border-bottom:1px solid #F8FAFC">${data.usersCount} польз. · ${data.deploy}</td></tr>
-            <tr style="background:#FAFBFC"><td style="padding:8px 20px;color:#94A3B8;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid #F8FAFC">Сегмент</td><td style="padding:8px 20px;font-weight:600;color:#2056B8;border-bottom:1px solid #F8FAFC">${SEG_LABEL[data.segment]||data.segment}</td></tr>
+            <tr style="background:#FAFBFC"><td style="padding:8px 20px;color:#94A3B8;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid #F8FAFC">Сегмент</td><td style="padding:8px 20px;font-weight:600;color:#2056B8;border-bottom:1px solid #F8FAFC">${SEG_LABEL[data.segment] || data.segment}</td></tr>
             <tr><td style="padding:8px 20px;color:#94A3B8;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:1px solid #F8FAFC">Бюджет</td><td style="padding:8px 20px;border-bottom:1px solid #F8FAFC">${data.budget} · ${data.contractTerm} · до ${data.deadline}</td></tr>
           </table>
           <div style="margin:16px 20px;background:#EBF2FF;border-left:3px solid #2056B8;padding:10px 14px;border-radius:0 6px 6px 0">
@@ -174,66 +190,98 @@ export default async function handler(req, res) {
             Менеджер: ${data.managerName} · Documentolog Group
           </div>
         </div>
-      </div>`;
+      </div>`
 
-      const emailRes = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from:        'DG Anketa <onboarding@resend.dev>',
-          to:          recipients,
-          subject:     `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment]||data.segment}`,
-          html,
-          attachments: [{ filename, content: mdBase64 }],
-        }),
-      });
-      const emailJson = await emailRes.json();
-      results.email = emailJson.id ? 'sent:' + emailJson.id : 'error:' + JSON.stringify(emailJson);
-      console.log('Email:', results.email);
-    } catch(e) {
-      results.email = 'exception:' + e.message;
-      console.error('Email error:', e.message);
-    } }
+        const emailRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${RESEND_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: RESEND_FROM,
+            to: recipients,
+            subject: `Новая анкета: ${data.company} — ${data.usersCount} польз. / ${SEG_LABEL[data.segment] || data.segment}`,
+            html,
+            attachments: [{ filename, content: mdBase64 }],
+          }),
+        })
+        const emailJson = await emailRes.json()
+        results.email = emailJson.id
+          ? 'sent:' + emailJson.id
+          : 'error:' + JSON.stringify(emailJson)
+        console.log('Email:', results.email)
+      } catch (e) {
+        results.email = 'exception:' + e.message
+        console.error('Email error:', e.message)
+      }
+    }
 
     // Airtable
     if (AT_TOKEN) {
       try {
         const fields = {
-          'Компания': data.company, 'БИН': data.bin,
-          'Менеджер': data.managerName, 'manager_id': data.managerId,
-          'Статус': 'Новое', 'Дата': new Date().toISOString(),
-          'Отрасль': data.industry, 'Вид собственности': data.ownership,
-          'Контакт ФИО': data.contactName, 'Должность': data.contactRole,
-          'Email': data.contactEmail, 'Телефон': data.contactPhone,
-          'N_full': parseInt(data.usersCount)||0, 'N_mobile': parseInt(data.mobileCount)||0,
-          'Всего сотрудников': parseInt(data.totalEmployees)||0,
-          'Рост пользователей': data.growth, 'Филиалы': data.branches,
-          'Текущая СЭД': data.currentSed, 'Название СЭД': data.sedName,
-          'Цель внедрения': data.goal, 'Боль': data.pain, 'Срочность': data.urgency,
-          'Модули': data.modules, 'AI-агенты': data.aiAgents,
-          'Интеграции': data.integrations, 'Развёртывание': data.deploy,
-          'Срок договора': data.contractTerm, 'Авансовая оплата': data.prepay,
-          'Бюджет': data.budget, 'Срок заключения': data.deadline,
-          'Economic Buyer': data.economicBuyer, 'Champion': data.champion,
-          'Критерии выбора': data.criteria, 'Примечания': data.notes,
+          Компания: data.company,
+          БИН: data.bin,
+          Менеджер: data.managerName,
+          manager_id: data.managerId,
+          Статус: 'Новое',
+          Дата: new Date().toISOString(),
+          Отрасль: data.industry,
+          'Вид собственности': data.ownership,
+          'Контакт ФИО': data.contactName,
+          Должность: data.contactRole,
+          Email: data.contactEmail,
+          Телефон: data.contactPhone,
+          N_full: parseInt(data.usersCount) || 0,
+          N_mobile: parseInt(data.mobileCount) || 0,
+          'Всего сотрудников': parseInt(data.totalEmployees) || 0,
+          'Рост пользователей': data.growth,
+          Филиалы: data.branches,
+          'Текущая СЭД': data.currentSed,
+          'Название СЭД': data.sedName,
+          'Цель внедрения': data.goal,
+          Боль: data.pain,
+          Срочность: data.urgency,
+          Модули: data.modules,
+          'AI-агенты': data.aiAgents,
+          Интеграции: data.integrations,
+          Развёртывание: data.deploy,
+          'Срок договора': data.contractTerm,
+          'Авансовая оплата': data.prepay,
+          Бюджет: data.budget,
+          'Срок заключения': data.deadline,
+          'Economic Buyer': data.economicBuyer,
+          Champion: data.champion,
+          'Критерии выбора': data.criteria,
+          Примечания: data.notes,
           'Промпт d8n Sales': prompt,
-        };
-        const atRes = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${AT_TOKEN}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fields, typecast: true }),
-        });
-        const atJson = await atRes.json();
-        results.airtable = atJson.id ? 'saved:' + atJson.id : 'error:' + JSON.stringify(atJson).slice(0,100);
-      } catch(e) { results.airtable = 'exception:' + e.message; }
+        }
+        const atRes = await fetch(
+          `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${AT_TOKEN}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fields, typecast: true }),
+          }
+        )
+        const atJson = await atRes.json()
+        results.airtable = atJson.id
+          ? 'saved:' + atJson.id
+          : 'error:' + JSON.stringify(atJson).slice(0, 100)
+      } catch (e) {
+        results.airtable = 'exception:' + e.message
+      }
     } else {
-      results.airtable = 'skipped:no token';
+      results.airtable = 'skipped:no token'
     }
 
-    return res.status(200).json({ ok: true, ...results });
-
+    return res.status(200).json({ ok: true, ...results })
   } catch (err) {
-    console.error('handler error:', err);
-    return res.status(500).json({ error: err.message });
+    console.error('handler error:', err)
+    return res.status(500).json({ error: err.message })
   }
 }
