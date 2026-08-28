@@ -926,6 +926,7 @@
         </div>
       </div>
       <div style="display: flex; align-items: center; gap: 12px">
+        <button class="btn sec" onclick="logout()">Выйти</button>
         <a
           href="/"
           style="
@@ -973,7 +974,7 @@
       </div>
 
       <!-- MANAGER MANAGEMENT + LINK GENERATOR -->
-      <div class="lgen">
+      <div class="lgen" id="admin-panel">
         <div
           style="
             display: flex;
@@ -1111,8 +1112,10 @@
       }
 
       let managers = loadManagers()
+      let currentUser = null
 
       async function loadServerManagers() {
+        if (currentUser?.role !== 'admin') return
         try {
           const response = await fetch('/api/managers')
           const data = await response.json()
@@ -1135,6 +1138,20 @@
         } catch (e) {
           console.warn('Server manager mapping load skipped:', e)
         }
+      }
+
+      async function loadCurrentUser() {
+        const response = await fetch('/api/me')
+        if (!response.ok) return
+        currentUser = await response.json()
+        if (currentUser.role !== 'admin') {
+          document.getElementById('admin-panel').style.display = 'none'
+          document.getElementById('tabs').style.display = 'none'
+          curMgr = currentUser.managerId
+          return
+        }
+        renderManagers()
+        loadServerManagers()
       }
 
       function renderManagers() {
@@ -1351,9 +1368,12 @@
       }
 
       // Load data
-      // Render managers on init
-      renderManagers()
-      loadServerManagers()
+      loadCurrentUser()
+
+      async function logout() {
+        await fetch('/api/logout', { method: 'POST' })
+        location.href = '/login.html'
+      }
 
       async function loadData() {
         document.getElementById('tbl-c').innerHTML =
@@ -1579,7 +1599,8 @@
         const deployments = new Map()
         const statuses = new Map()
         list.forEach((row) => {
-          const rawDeploy = String(row.deploy || 'Не указано').trim() || 'Не указано'
+          const rawDeploy =
+            String(row.deploy || 'Не указано').trim() || 'Не указано'
           const deploy = /(?:наши|свои) серверы/i.test(rawDeploy)
             ? 'Серверы клиента'
             : rawDeploy

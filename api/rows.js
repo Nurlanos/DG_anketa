@@ -11,12 +11,15 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-    if (!requireDashboardAuth(req, res)) return;
+    const user = requireDashboardAuth(req, res);
+    if (!user) return;
 
     const token = getAirtableToken();
     if (!token) return res.status(500).json({ error: 'AIRTABLE_TOKEN not set' });
 
-    const mgr = (req.query && req.query.mgr) || '';
+    const requestedMgr = (req.query && req.query.mgr) || '';
+    const mgr = user.role === 'admin' ? requestedMgr : user.managerId;
+    if (user.role !== 'admin' && !mgr) return res.status(403).json({ error: 'Manager account is not linked' });
     const archived = (req.query && req.query.archived) === '1';
 
     const params = new globalThis.URLSearchParams();

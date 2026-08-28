@@ -4,10 +4,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { requireDashboardAuth } from './_lib.js';
+import { getDashboardUser } from './_lib.js';
 
 export default async function handler(req, res) {
-  if (!requireDashboardAuth(req, res)) return;
+  if (!getDashboardUser(req)) return res.redirect(302, '/login.html');
 
   const filePath = path.join(process.cwd(), 'views', 'dashboard.html');
 

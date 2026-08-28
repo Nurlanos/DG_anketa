@@ -1,4 +1,4 @@
-import { getAirtableToken, requireDashboardAuth } from './_lib.js';
+import { getAirtableToken, requireAdmin } from './_lib.js';
 
 const BASE_ID = 'appHakMP7mBJhUu7p';
 const TABLE_ID = 'tblTU1on0yAcK5RTt';
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  if (!requireDashboardAuth(req, res)) return;
+  if (!requireAdmin(req, res)) return;
 
   const token = getAirtableToken();
   if (!token) return res.status(500).json({ error: 'AIRTABLE_TOKEN not set' });

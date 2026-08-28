@@ -9,7 +9,8 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'PATCH') return res.status(405).json({ error: 'Method not allowed' });
-  if (!requireDashboardAuth(req, res)) return;
+  const user = requireDashboardAuth(req, res);
+  if (!user) return;
 
   const AT_TOKEN = getAirtableToken();
   if (!AT_TOKEN) return res.status(500).json({ error: 'AIRTABLE_TOKEN not set' });
@@ -26,6 +27,9 @@ export default async function handler(req, res) {
     });
     if (!recordRes.ok) { const e = await recordRes.text(); return res.status(500).json({ error: e }); }
     const record = await recordRes.json();
+    if (user.role !== 'admin' && record.fields?.manager_id !== user.managerId) {
+      return res.status(403).json({ error: 'You cannot update this record' });
+    }
     const currentNotes = String(record.fields?.Примечания || '');
     const fields = {};
 

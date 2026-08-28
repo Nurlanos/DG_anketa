@@ -15,7 +15,8 @@
   "scripts": {
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "hash-password": "node scripts/hash-password.js"
   },
   "type": "module"
 }
