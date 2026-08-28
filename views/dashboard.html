@@ -1440,11 +1440,22 @@
         closeModal()
       }
 
-      function deleteMgr(idx) {
+      async function deleteMgr(idx) {
         if (!confirm(`Удалить менеджера ${managers[idx].name}?`)) return
+        const response = await fetch('/api/managers', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ managerId: managers[idx].id }),
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+          alert(data.error || 'Не удалось удалить менеджера')
+          return
+        }
         managers.splice(idx, 1)
         saveManagers(managers)
         renderManagers()
+        loadUsers()
       }
 
       async function updateServerMapping() {

@@ -1,4 +1,4 @@
-import { getAirtableToken, requireAdmin } from './_lib.js'
+import { deleteDashboardUser, getAirtableToken, requireAdmin } from './_lib.js'
 
 const BASE_ID = 'appHakMP7mBJhUu7p'
 const TABLE_ID = 'tblTU1on0yAcK5RTt'
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   if (req.method === 'OPTIONS') return res.status(200).end()
-  if (!['GET', 'POST'].includes(req.method))
+  if (!['GET', 'POST', 'DELETE'].includes(req.method))
     return res.status(405).json({ error: 'Method not allowed' })
   if (!requireAdmin(req, res)) return
 
@@ -64,6 +64,34 @@ export default async function handler(req, res) {
       return res.status(200).json({ managers })
     }
 
+    if (req.method === 'DELETE') {
+      const managerId = String(req.body?.managerId || '').trim()
+      const managerRecord = records.find((record) => record.fields?.manager_id === managerId)
+      if (!managerRecord) return res.status(404).json({ error: 'Менеджер не найден' })
+
+      const userRecords = await (async () => {
+        const params = new globalThis.URLSearchParams({
+          filterByFormula: `{Компания}='__DG_USER_CONFIG__'`,
+          pageSize: '100',
+        })
+        const response = await fetch(getAirtableUrl(`?${params}`), { headers: headers(token) })
+        if (!response.ok) throw new Error((await response.text()).slice(0, 500))
+        return (await response.json()).records || []
+      })()
+      const linkedUsers = userRecords.filter((record) => {
+        const metadata = managerMetadata(record.fields?.Примечания)
+        return metadata.managerId === managerId
+      })
+
+      const response = await fetch(getAirtableUrl(`/${managerRecord.id}`), {
+        method: 'DELETE',
+        headers: headers(token),
+      })
+      if (!response.ok) throw new Error((await response.text()).slice(0, 500))
+      await Promise.all(linkedUsers.map((record) => deleteDashboardUser(record.id)))
+      return res.status(200).json({ ok: true })
+    }
+
     const managers = Array.isArray(req.body?.managers) ? req.body.managers : []
     const validManagers = managers.filter(
       (manager) =>
@@ -86,7 +114,10 @@ export default async function handler(req, res) {
           Компания: CONFIG_COMPANY,
           manager_id: manager.id,
           Менеджер: manager.name,
-          Примечания: JSON.stringify({ email: manager.email, backupEmail: manager.backupEmail || '' }),
+          Примечания: JSON.stringify({
+            email: manager.email,
+            backupEmail: manager.backupEmail || '',
+          }),
         },
       }))
     const creates = validManagers
@@ -96,7 +127,10 @@ export default async function handler(req, res) {
           Компания: CONFIG_COMPANY,
           manager_id: manager.id,
           Менеджер: manager.name,
-          Примечания: JSON.stringify({ email: manager.email, backupEmail: manager.backupEmail || '' }),
+          Примечания: JSON.stringify({
+            email: manager.email,
+            backupEmail: manager.backupEmail || '',
+          }),
         },
       }))
 
