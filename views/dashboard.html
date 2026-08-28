@@ -955,10 +955,6 @@
           <div class="n" id="st-revenue">—</div>
           <div class="l">Прогноз, ₸</div>
         </div>
-        <div class="stat">
-          <div class="n" id="st-t">—</div>
-          <div class="l">Всего анкет</div>
-        </div>
       </div>
 
       <div class="analytics">
@@ -1610,7 +1606,6 @@
         document.getElementById('st-revenue').textContent = formatNumber(
           users * 6490 * 12
         )
-        document.getElementById('st-t').textContent = formatNumber(list.length)
         renderBreakdown('analytics-deploy', deployments)
         renderBreakdown('analytics-status', statuses)
       }
