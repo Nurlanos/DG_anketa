@@ -1015,7 +1015,9 @@
           подготовит персональное КП.
         </div>
         <div class="mgr-list" id="mgr-list"></div>
-        <div style="border-top:1px solid var(--brd);margin:16px 0 14px"></div>
+        <div
+          style="border-top: 1px solid var(--brd); margin: 16px 0 14px"
+        ></div>
         <div
           style="
             display: flex;
@@ -1026,7 +1028,7 @@
             gap: 8px;
           "
         >
-          <h3 style="margin: 0">Пользователи дашборда</h3>
+          <h3 style="margin: 0">Аккаунты пользователей</h3>
         </div>
         <div class="lr">
           <input
@@ -1387,6 +1389,13 @@
       <label>Отдел / подразделение</label>
       <input id="mgr-f-dept" type="text" value="${m.dept}" placeholder="Упр. №9">
     </div>
+    ${idx < 0 ? `<div class="form-row">
+      <label>Временный пароль для входа<span style="color:#EF4444">*</span></label>
+      <div style="display:flex;gap:6px">
+        <input id="mgr-f-password" type="password" placeholder="Минимум 8 латинских символов" minlength="8" pattern="[!-~]+" oninput="this.value=this.value.replace(/[^\x21-\x7E]/g,'')" style="flex:1">
+        <button class="btn sec" type="button" onclick="togglePassword('mgr-f-password', this)">◉</button>
+      </div>
+    </div>` : ''}
     <div class="form-row" style="${idx >= 0 ? 'display:none' : ''}">
       <label>ID (латиница, без пробелов)<span style="color:#EF4444">*</span></label>
       <input id="mgr-f-id" type="text" value="${m.id}" placeholder="i.ivanov">
@@ -1401,13 +1410,14 @@
         openAddMgr(idx)
       }
 
-      function saveMgr() {
+      async function saveMgr() {
         const name = document.getElementById('mgr-f-name')?.value.trim()
         const email = document.getElementById('mgr-f-email')?.value.trim()
         const backupEmail = document
           .getElementById('mgr-f-backup')
           ?.value.trim()
         const dept = document.getElementById('mgr-f-dept')?.value.trim()
+        const password = document.getElementById('mgr-f-password')?.value || ''
         const idEl = document.getElementById('mgr-f-id')
         const id =
           _editIdx >= 0
@@ -1424,6 +1434,10 @@
         }
         if (backupEmail && !backupEmail.includes('@')) {
           alert('Некорректный резервный email')
+          return
+        }
+        if (_editIdx < 0 && !/^[\x21-\x7e]{8,}$/.test(password)) {
+          alert('Введите временный пароль: минимум 8 латинских символов, цифр или знаков')
           return
         }
 
@@ -1444,10 +1458,25 @@
         }
         saveManagers(managers)
 
-        // Also update server-side mapping via API
-        updateServerMapping()
+        // Also update server-side mapping and create the dashboard account together.
+        if (_editIdx < 0) {
+          const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name, role: 'manager', managerId: id, password }),
+          })
+          const data = await response.json()
+          if (!response.ok) {
+            managers.pop()
+            saveManagers(managers)
+            alert(data.error || 'Менеджер сохранён, но аккаунт создать не удалось')
+            return
+          }
+        }
+        await updateServerMapping()
 
         renderManagers()
+        loadUsers()
         closeModal()
       }
 
