@@ -18,9 +18,13 @@ async function getManagerEmail(id) {
     });
     if (!response.ok) return [fallback].filter(Boolean);
     const records = (await response.json()).records || [];
-    const config = records.find((record) => record.fields?.manager_id === id && record.fields?.Email);
-    if (!config?.fields.Email) return [fallback].filter(Boolean);
-    return [config.fields.Email, config.fields.Примечания].filter((email, index, emails) =>
+    const config = records.find((record) => record.fields?.manager_id === id);
+    let metadata = {};
+    try { metadata = JSON.parse(String(config?.fields?.Примечания || '{}')); } catch { metadata = {}; }
+    const managerEmail = metadata.email || config?.fields?.Email || '';
+    const backupEmail = metadata.backupEmail || '';
+    if (!managerEmail) return [fallback].filter(Boolean);
+    return [managerEmail, backupEmail].filter((email, index, emails) =>
       email && (index === 0 || email !== emails[0])
     );
   } catch (err) {

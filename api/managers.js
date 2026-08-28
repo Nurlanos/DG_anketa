@@ -4,6 +4,14 @@ const BASE_ID = 'appHakMP7mBJhUu7p'
 const TABLE_ID = 'tblTU1on0yAcK5RTt'
 const CONFIG_COMPANY = '__DG_MANAGER_CONFIG__'
 
+function managerMetadata(notes) {
+  try {
+    return JSON.parse(String(notes || '{}'))
+  } catch {
+    return {}
+  }
+}
+
 function getAirtableUrl(query = '') {
   return `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}${query}`
 }
@@ -44,11 +52,12 @@ export default async function handler(req, res) {
       const managers = records
         .map((record) => {
           const fields = record.fields || {}
+          const metadata = managerMetadata(fields.Примечания)
           return {
             id: fields.manager_id,
             name: fields.Менеджер,
-            email: fields.Email,
-            backupEmail: fields.Примечания || '',
+            email: metadata.email || fields.Email || '',
+            backupEmail: metadata.backupEmail || '',
           }
         })
         .filter((manager) => manager.id && manager.email)
@@ -77,8 +86,7 @@ export default async function handler(req, res) {
           Компания: CONFIG_COMPANY,
           manager_id: manager.id,
           Менеджер: manager.name,
-          Email: manager.email,
-          Примечания: manager.backupEmail || '',
+          Примечания: JSON.stringify({ email: manager.email, backupEmail: manager.backupEmail || '' }),
         },
       }))
     const creates = validManagers
@@ -88,8 +96,7 @@ export default async function handler(req, res) {
           Компания: CONFIG_COMPANY,
           manager_id: manager.id,
           Менеджер: manager.name,
-          Email: manager.email,
-          Примечания: manager.backupEmail || '',
+          Примечания: JSON.stringify({ email: manager.email, backupEmail: manager.backupEmail || '' }),
         },
       }))
 

@@ -1389,13 +1389,17 @@
       <label>Отдел / подразделение</label>
       <input id="mgr-f-dept" type="text" value="${m.dept}" placeholder="Упр. №9">
     </div>
-    ${idx < 0 ? `<div class="form-row">
+    ${
+      idx < 0
+        ? `<div class="form-row">
       <label>Временный пароль для входа<span style="color:#EF4444">*</span></label>
       <div style="display:flex;gap:6px">
         <input id="mgr-f-password" type="password" placeholder="Минимум 8 латинских символов" minlength="8" pattern="[!-~]+" oninput="this.value=this.value.replace(/[^\x21-\x7E]/g,'')" style="flex:1">
         <button class="btn sec" type="button" onclick="togglePassword('mgr-f-password', this)">◉</button>
       </div>
-    </div>` : ''}
+    </div>`
+        : ''
+    }
     <div class="form-row" style="${idx >= 0 ? 'display:none' : ''}">
       <label>ID (латиница, без пробелов)<span style="color:#EF4444">*</span></label>
       <input id="mgr-f-id" type="text" value="${m.id}" placeholder="i.ivanov">
@@ -1437,7 +1441,9 @@
           return
         }
         if (_editIdx < 0 && !/^[\x21-\x7e]{8,}$/.test(password)) {
-          alert('Введите временный пароль: минимум 8 латинских символов, цифр или знаков')
+          alert(
+            'Введите временный пароль: минимум 8 латинских символов, цифр или знаков'
+          )
           return
         }
 
@@ -1458,22 +1464,37 @@
         }
         saveManagers(managers)
 
-        // Also update server-side mapping and create the dashboard account together.
+        // Save the manager mapping before creating the linked dashboard account.
         if (_editIdx < 0) {
+          const mappingSaved = await updateServerMapping()
+          if (!mappingSaved) {
+            managers.pop()
+            saveManagers(managers)
+            alert('Не удалось сохранить менеджера')
+            return
+          }
           const response = await fetch('/api/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, name, role: 'manager', managerId: id, password }),
+            body: JSON.stringify({
+              email,
+              name,
+              role: 'manager',
+              managerId: id,
+              password,
+            }),
           })
           const data = await response.json()
           if (!response.ok) {
             managers.pop()
             saveManagers(managers)
-            alert(data.error || 'Менеджер сохранён, но аккаунт создать не удалось')
+            alert(
+              data.error || 'Менеджер сохранён, но аккаунт создать не удалось'
+            )
             return
           }
         }
-        await updateServerMapping()
+        if (_editIdx >= 0) await updateServerMapping()
 
         renderManagers()
         loadUsers()
@@ -1490,13 +1511,15 @@
       async function updateServerMapping() {
         // Send updated manager list to server to update email routing
         try {
-          await fetch('/api/managers', {
+          const response = await fetch('/api/managers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ managers }),
           })
+          return response.ok
         } catch (e) {
           console.warn('Server mapping update skipped:', e)
+          return false
         }
       }
 
