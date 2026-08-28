@@ -31,6 +31,13 @@ body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;
 .stat .n{font-size:28px;font-weight:700;line-height:1;color:var(--navy)}
 .stat .l{font-size:11px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
 .stat.hi .n{color:var(--blue)}
+.analytics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.analytics-box{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px}
+.analytics-box h3{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.analytics-list{display:flex;flex-wrap:wrap;gap:6px 16px}
+.analytics-item{display:flex;align-items:center;justify-content:space-between;gap:18px;min-width:130px;font-size:12px;color:var(--t2)}
+.analytics-item strong{font-size:13px;color:var(--navy)}
+@media(max-width:600px){.analytics{grid-template-columns:1fr}.analytics-item{flex:1;min-width:120px}}
 
 /* LINK GEN */
 .lgen{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px 20px;margin-bottom:16px}
@@ -177,10 +184,21 @@ tr:hover td{background:#F8FAFF}
 <div class="main">
   <!-- STATS -->
   <div class="stats">
-    <div class="stat hi"><div class="n" id="st-t">—</div><div class="l">Всего анкет</div></div>
-    <div class="stat"><div class="n" id="st-n">—</div><div class="l">Новые</div></div>
-    <div class="stat"><div class="n" id="st-s">—</div><div class="l">КП отправлено</div></div>
-    <div class="stat"><div class="n" id="st-d">—</div><div class="l">Договоров</div></div>
+    <div class="stat hi"><div class="n" id="st-companies">—</div><div class="l">Компаний</div></div>
+    <div class="stat"><div class="n" id="st-users">—</div><div class="l">Пользователей</div></div>
+    <div class="stat"><div class="n" id="st-revenue">—</div><div class="l">Прогноз, ₸</div></div>
+    <div class="stat"><div class="n" id="st-t">—</div><div class="l">Всего анкет</div></div>
+  </div>
+
+  <div class="analytics">
+    <div class="analytics-box">
+      <h3>Размещения</h3>
+      <div class="analytics-list" id="analytics-deploy"><span class="analytics-item">Загрузка...</span></div>
+    </div>
+    <div class="analytics-box">
+      <h3>Статус КП</h3>
+      <div class="analytics-list" id="analytics-status"><span class="analytics-item">Загрузка...</span></div>
+    </div>
   </div>
 
   <!-- MANAGER MANAGEMENT + LINK GENERATOR -->
@@ -428,6 +446,7 @@ document.querySelectorAll('.tab').forEach(t => {
     t.classList.add('on');
     curMgr = t.dataset.m;
     render();
+    updateStats();
   });
 });
 
@@ -631,10 +650,30 @@ async function updateStatus(recordId, newStatus, selectEl, idx) {
 }
 
 function updateStats() {
-  document.getElementById('st-t').textContent = rows.length;
-  document.getElementById('st-n').textContent = rows.filter(r => r.status === 'Новое').length;
-  document.getElementById('st-s').textContent = rows.filter(r => r.status === 'КП отправлено').length;
-  document.getElementById('st-d').textContent = rows.filter(r => r.status === 'Договор').length;
+  const list = curMgr === 'all' ? rows : rows.filter(r => r.mgr === curMgr);
+  const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(value);
+  const users = list.reduce((sum, row) => sum + (Number(row.users) || 0), 0);
+  const deployments = new Map();
+  const statuses = new Map();
+  list.forEach((row) => {
+    const deploy = String(row.deploy || 'Не указано').trim() || 'Не указано';
+    const status = String(row.status || 'Новое').trim() || 'Новое';
+    deployments.set(deploy, (deployments.get(deploy) || 0) + 1);
+    statuses.set(status, (statuses.get(status) || 0) + 1);
+  });
+  const renderBreakdown = (targetId, values) => {
+    const target = document.getElementById(targetId);
+    target.innerHTML = values.size
+      ? [...values].map(([label, count]) => `<span class="analytics-item"><span>${label}</span><strong>${count}</strong></span>`).join('')
+      : '<span class="analytics-item">Нет данных</span>';
+  };
+
+  document.getElementById('st-companies').textContent = formatNumber(new Set(list.map(row => row.company).filter(Boolean)).size);
+  document.getElementById('st-users').textContent = formatNumber(users);
+  document.getElementById('st-revenue').textContent = formatNumber(users * 6490);
+  document.getElementById('st-t').textContent = formatNumber(list.length);
+  renderBreakdown('analytics-deploy', deployments);
+  renderBreakdown('analytics-status', statuses);
 }
 
 function openModal(i) {
