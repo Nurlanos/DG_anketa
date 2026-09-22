@@ -4,9 +4,21 @@
 
 import fs from 'fs'
 import path from 'path'
-import { getDashboardUser } from './_lib.js'
+import { getDashboardUser, requireDashboardAuth } from './_lib.js'
 
 export default async function handler(req, res) {
+  if (req.query?.mode === 'me') {
+    if (req.method !== 'GET')
+      return res.status(405).json({ error: 'Method not allowed' })
+    const currentUser = requireDashboardAuth(req, res)
+    if (!currentUser) return
+    return res.status(200).json({
+      email: currentUser.email,
+      role: currentUser.role,
+      managerId: currentUser.managerId || '',
+    })
+  }
+
   const user = getDashboardUser(req)
   if (!user) return res.redirect(302, '/login.html')
   if (user.mustChangePassword) return res.redirect(302, '/change-password.html')

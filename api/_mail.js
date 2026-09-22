@@ -4,6 +4,16 @@ export function mailConfigured() {
   return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS)
 }
 
+// Attachment `content` is always a base64 string (the convention every
+// caller uses); nodemailer needs `encoding: 'base64'` set explicitly to
+// decode it, unlike Resend's API which expects base64 content as-is.
+export function encodeAttachmentsForSmtp(attachments = []) {
+  return attachments.map((attachment) => ({
+    ...attachment,
+    encoding: 'base64',
+  }))
+}
+
 export async function sendMail({ to, subject, html, attachments = [] }) {
   if (mailConfigured()) {
     const transporter = nodemailer.createTransport({
@@ -17,7 +27,7 @@ export async function sendMail({ to, subject, html, attachments = [] }) {
       to,
       subject,
       html,
-      attachments,
+      attachments: encodeAttachmentsForSmtp(attachments),
     })
   }
 

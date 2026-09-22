@@ -102,6 +102,13 @@
         color: #b91c1c;
         font-size: 12px;
       }
+      .forgot-link {
+        display: block;
+        margin-top: 12px;
+        color: var(--blue);
+        font-size: 12px;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -120,13 +127,13 @@
         />
         <label for="password">Пароль</label>
         <div class="password-wrap">
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-            />
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
           <button
             class="password-toggle"
             type="button"
@@ -137,6 +144,7 @@
           </button>
         </div>
         <button type="submit">Войти</button>
+        <a class="forgot-link" href="/reset-password.html">Забыли пароль?</a>
         <div id="error" role="alert"></div>
       </form>
     </main>

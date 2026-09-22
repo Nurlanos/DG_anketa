@@ -4,9 +4,12 @@
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/submit", "destination": "/api/submit" },
-    { "source": "/api/rows",   "destination": "/api/rows" },
+    { "source": "/api/me", "destination": "/api/dashboard?mode=me" },
+    { "source": "/api/rows", "destination": "/api/rows" },
     { "source": "/api/update", "destination": "/api/update" },
     { "source": "/api/managers", "destination": "/api/managers" },
-    { "source": "/dashboard",  "destination": "/api/dashboard" }
-  ]
+    { "source": "/api/accept-invite", "destination": "/api/reset-password" },
+    { "source": "/dashboard", "destination": "/api/dashboard" }
+  ],
+  "crons": [{ "path": "/api/cron/stale-leads", "schedule": "0 6 * * 1-5" }]
 }

@@ -1,5 +1,6 @@
 import { getAirtableToken } from './_lib.js'
 import { mailConfigured, sendMail } from './_mail.js'
+import { randomUUID } from 'node:crypto'
 
 const BASE_ID = 'appHakMP7mBJhUu7p'
 const TABLE_ID = 'tblTU1on0yAcK5RTt'
@@ -8,10 +9,44 @@ const RESEND_KEY = process.env.RESEND_API_KEY || ''
 
 // Used only when Airtable has no manager-config record for the given id yet.
 const FALLBACK_EMAIL = process.env.FALLBACK_MANAGER_EMAIL || ''
+const RATE_WINDOW_MS = 15 * 60 * 1000
+const RATE_LIMIT = 5
+const recentSubmissions = new Map()
+
+function requestIp(req) {
+  return String(
+    req.headers['x-forwarded-for'] || req.socket?.remoteAddress || ''
+  )
+    .split(',')[0]
+    .trim()
+}
+
+function rateLimited(ip) {
+  const now = Date.now()
+  const attempts = (recentSubmissions.get(ip) || []).filter(
+    (timestamp) => now - timestamp < RATE_WINDOW_MS
+  )
+  attempts.push(now)
+  recentSubmissions.set(ip, attempts)
+  return attempts.length > RATE_LIMIT
+}
+
+export function resolveManagerContact(config, metadata, fallback) {
+  const managerEmail = metadata.email || config?.fields?.Email || ''
+  const backupEmail = metadata.backupEmail || ''
+  const emails = managerEmail
+    ? [managerEmail, backupEmail].filter(
+        (email, index, emails) => email && (index === 0 || email !== emails[0])
+      )
+    : fallback
+      ? [fallback]
+      : []
+  return { emails, name: config?.fields?.Менеджер || '' }
+}
 
 async function getManagerEmail(id) {
   const fallback = FALLBACK_EMAIL
-  if (!AT_TOKEN) return [fallback].filter(Boolean)
+  if (!id || !AT_TOKEN) return { emails: fallback ? [fallback] : [], name: '' }
   try {
     const params = new globalThis.URLSearchParams({
       filterByFormula: `{Компания}='__DG_MANAGER_CONFIG__'`,
@@ -23,7 +58,7 @@ async function getManagerEmail(id) {
         headers: { Authorization: `Bearer ${AT_TOKEN}` },
       }
     )
-    if (!response.ok) return [fallback].filter(Boolean)
+    if (!response.ok) return { emails: fallback ? [fallback] : [], name: '' }
     const records = (await response.json()).records || []
     const config = records.find((record) => record.fields?.manager_id === id)
     let metadata = {}
@@ -32,15 +67,10 @@ async function getManagerEmail(id) {
     } catch {
       metadata = {}
     }
-    const managerEmail = metadata.email || config?.fields?.Email || ''
-    const backupEmail = metadata.backupEmail || ''
-    if (!managerEmail) return [fallback].filter(Boolean)
-    return [managerEmail, backupEmail].filter(
-      (email, index, emails) => email && (index === 0 || email !== emails[0])
-    )
+    return resolveManagerContact(config, metadata, fallback)
   } catch (err) {
     console.error('Manager email lookup error:', err.message)
-    return [fallback].filter(Boolean)
+    return { emails: fallback ? [fallback] : [], name: '' }
   }
 }
 
@@ -134,24 +164,45 @@ ${prompt}
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const requestId = randomUUID()
+  res.setHeader('X-Request-Id', requestId)
+  res.setHeader('Access-Control-Allow-Origin', process.env.APP_URL || '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST')
     return res.status(405).json({ error: 'Method not allowed' })
 
+  if (rateLimited(requestIp(req))) {
+    console.warn('submit rate limited', { requestId, ip: requestIp(req) })
+    return res
+      .status(429)
+      .json({ error: 'Слишком много попыток. Повторите позже.' })
+  }
+
   try {
     const { data, prompt } = req.body
-    if (!data?.company) return res.status(400).json({ error: 'Missing data' })
+    if (!data?.company || !data?.consentAt)
+      return res.status(400).json({
+        error:
+          'Заполните обязательные поля и подтвердите согласие на обработку данных',
+      })
+    if (!AT_TOKEN)
+      return res.status(503).json({
+        error: 'Сервис сохранения заявок временно недоступен',
+        requestId,
+      })
 
-    const results = { email: null, airtable: null }
+    const submissionId = `ANK-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${randomUUID().slice(0, 8).toUpperCase()}`
+    const manager = await getManagerEmail(data.managerId)
+
+    const results = { requestId, submissionId, email: null, airtable: null }
     const mdContent = buildMarkdown(data, prompt)
     const mdBase64 = Buffer.from(mdContent, 'utf8').toString('base64')
     const filename = `anketa_${(data.company || 'client').replace(/[^\wа-яёА-ЯЁ]/gi, '_').slice(0, 30)}_${new Date().toISOString().slice(0, 10)}.md`
 
     // Email
-    const recipients = await getManagerEmail(data.managerId)
+    const recipients = manager.emails
     if (!mailConfigured() && !RESEND_KEY) {
       results.email = 'skipped:no key'
     } else if (!recipients.length) {
@@ -209,13 +260,24 @@ export default async function handler(req, res) {
     // Airtable
     if (AT_TOKEN) {
       try {
+        const createdAt = new Date().toISOString()
+        const analyticsMetadata = {
+          segment: data.segment || '',
+          source:
+            data.source || (data.managerId ? 'Менеджерская ссылка' : 'Сайт'),
+          campaign: data.campaign || '',
+          statusHistory: [{ status: 'Новое', at: createdAt }],
+        }
         const fields = {
           Компания: data.company,
           БИН: data.bin,
           Менеджер: data.managerName,
           manager_id: data.managerId,
+          'ID заявки': submissionId,
           Статус: 'Новое',
-          Дата: new Date().toISOString(),
+          Дата: createdAt,
+          'Последнее изменение': new Date().toISOString(),
+          История: `${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Almaty' })} — анкета получена, статус «Новое»`,
           Отрасль: data.industry,
           'Вид собственности': data.ownership,
           'Контакт ФИО': data.contactName,
@@ -243,10 +305,10 @@ export default async function handler(req, res) {
           'Economic Buyer': data.economicBuyer,
           Champion: data.champion,
           'Критерии выбора': data.criteria,
-          Примечания: data.notes,
+          Примечания: `__DG_ANALYTICS__${JSON.stringify(analyticsMetadata)}\n${data.notes || ''}`,
           'Промпт d8n Sales': prompt,
         }
-        const atRes = await fetch(
+        let atRes = await fetch(
           `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`,
           {
             method: 'POST',
@@ -257,20 +319,69 @@ export default async function handler(req, res) {
             body: JSON.stringify({ fields, typecast: true }),
           }
         )
-        const atJson = await atRes.json()
+        let atJson = await atRes.json()
+        if (
+          !atRes.ok &&
+          atJson.type === 'UNKNOWN_FIELD_NAME' &&
+          (atJson.message?.includes('Последнее изменение') ||
+            atJson.message?.includes('История'))
+        ) {
+          console.warn(
+            'Airtable history fields are missing; saving submission without history'
+          )
+          const fallbackFields = { ...fields }
+          delete fallbackFields['Последнее изменение']
+          delete fallbackFields['История']
+          atRes = await fetch(
+            `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${AT_TOKEN}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ fields: fallbackFields, typecast: true }),
+            }
+          )
+          atJson = await atRes.json()
+        }
         results.airtable = atJson.id
           ? 'saved:' + atJson.id
           : 'error:' + JSON.stringify(atJson).slice(0, 100)
+        if (!atRes.ok || !atJson.id) {
+          console.error('Airtable save error', {
+            requestId,
+            submissionId,
+            response: atJson,
+          })
+          return res.status(502).json({
+            error: 'Не удалось сохранить заявку',
+            requestId,
+            ...results,
+          })
+        }
       } catch (e) {
         results.airtable = 'exception:' + e.message
+        console.error('Airtable save exception', {
+          requestId,
+          submissionId,
+          error: e.message,
+        })
+        return res
+          .status(502)
+          .json({ error: 'Не удалось сохранить заявку', requestId, ...results })
       }
-    } else {
-      results.airtable = 'skipped:no token'
     }
 
     return res.status(200).json({ ok: true, ...results })
   } catch (err) {
-    console.error('handler error:', err)
-    return res.status(500).json({ error: err.message })
+    console.error('submit handler error', {
+      requestId,
+      error: err.message,
+      stack: err.stack,
+    })
+    return res
+      .status(500)
+      .json({ error: 'Внутренняя ошибка сервера', requestId })
   }
 }

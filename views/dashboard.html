@@ -71,7 +71,7 @@
       /* STATS */
       .stats {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: 10px;
         margin-bottom: 20px;
       }
@@ -79,6 +79,97 @@
         .stats {
           grid-template-columns: repeat(2, 1fr);
         }
+      }
+      .filters {
+        background: var(--card);
+        border: 1px solid var(--brd);
+        border-radius: var(--r);
+        padding: 14px 16px;
+        margin-bottom: 20px;
+      }
+      .filters-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .filters-head h3 {
+        font-size: 11px;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-grid label {
+        display: grid;
+        gap: 4px;
+        font-size: 10px;
+        color: var(--t3);
+        font-weight: 600;
+      }
+      .filter-grid input,
+      .filter-grid select {
+        width: 100%;
+        min-width: 0;
+        padding: 8px 9px;
+        border: 1px solid var(--brd);
+        border-radius: 6px;
+        background: var(--bg);
+        color: var(--text);
+        font: 12px var(--f);
+      }
+      @media (max-width: 760px) {
+        .filter-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .funnel {
+        display: grid;
+        gap: 8px;
+      }
+      .funnel-row {
+        display: grid;
+        grid-template-columns: 130px 1fr 44px;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--t2);
+      }
+      .funnel-bar {
+        height: 8px;
+        background: var(--blue-l);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .funnel-bar span {
+        display: block;
+        height: 100%;
+        background: var(--blue);
+        border-radius: inherit;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
+      .report-table th,
+      .report-table td {
+        padding: 6px 4px;
+        border-bottom: 1px solid var(--brd);
+        text-align: left;
+      }
+      .report-table th {
+        background: transparent;
+        border-bottom: 1px solid var(--brd);
+      }
+      .report-table td:last-child,
+      .report-table th:last-child {
+        text-align: right;
       }
       .stat {
         background: var(--card);
@@ -98,6 +189,9 @@
         margin-top: 4px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
+      }
+      .stat.warn .n {
+        color: #c62828;
       }
       .stat.hi .n {
         color: var(--blue);
@@ -415,6 +509,18 @@
       .b-def {
         background: #f5f5f5;
         color: #666;
+      }
+      .p-hi {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .p-med {
+        background: #fff8e1;
+        color: #e65100;
+      }
+      .p-low {
+        background: #e8f5e9;
+        color: #2e7d32;
       }
       .status-sel {
         width: 100%;
@@ -963,7 +1069,49 @@
           <div class="n" id="st-revenue">—</div>
           <div class="l">Прогноз, ₸</div>
         </div>
+        <div class="stat">
+          <div class="n" id="st-new">—</div>
+          <div class="l">Новые заявки</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="st-overdue">—</div>
+          <div class="l">Просроченные</div>
+        </div>
+        <div class="stat warn">
+          <div class="n" id="st-problem">—</div>
+          <div class="l">🔴 Проблемных</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="st-conversion">—</div>
+          <div class="l">Конверсия в договор</div>
+        </div>
       </div>
+
+      <section class="filters">
+        <div class="filters-head">
+          <h3>Фильтры отчёта</h3>
+          <button class="btn sec" onclick="resetFilters()">Сбросить</button>
+        </div>
+        <div class="filter-grid">
+          <label>С даты<input id="filter-from" type="date" /></label>
+          <label>По дату<input id="filter-to" type="date" /></label>
+          <label
+            >Отрасль<select id="filter-industry">
+              <option value="">Все отрасли</option>
+            </select></label
+          >
+          <label
+            >Сегмент<select id="filter-segment">
+              <option value="">Все сегменты</option>
+            </select></label
+          >
+          <label
+            >Развёртывание<select id="filter-deploy">
+              <option value="">Все варианты</option>
+            </select></label
+          >
+        </div>
+      </section>
 
       <div class="analytics">
         <div class="analytics-box">
@@ -977,6 +1125,22 @@
           <div class="analytics-list" id="analytics-status">
             <span class="analytics-item">Загрузка...</span>
           </div>
+        </div>
+        <div class="analytics-box">
+          <h3>Воронка продаж</h3>
+          <div class="funnel" id="analytics-funnel"></div>
+        </div>
+        <div class="analytics-box">
+          <h3>Менеджеры</h3>
+          <div id="analytics-managers"></div>
+        </div>
+        <div class="analytics-box">
+          <h3>Источники и отказы</h3>
+          <div class="analytics-list" id="analytics-sources"></div>
+        </div>
+        <div class="analytics-box">
+          <h3>Среднее время перехода</h3>
+          <div class="analytics-list" id="analytics-timing"></div>
         </div>
       </div>
 
@@ -1050,6 +1214,13 @@
           <div style="display: flex; gap: 6px; flex-wrap: wrap">
             <button
               class="btn sec"
+              id="problem-toggle"
+              onclick="toggleProblem()"
+            >
+              🔴 Проблемные
+            </button>
+            <button
+              class="btn sec"
               id="archive-toggle"
               onclick="toggleArchive()"
             >
@@ -1057,6 +1228,9 @@
             </button>
             <button class="btn sec" onclick="exportExcel()">
               ⤓ Экспорт в CSV
+            </button>
+            <button class="btn sec" onclick="copyPortfolioPrompt(this)">
+              🤖 Общий промпт
             </button>
             <button class="btn sec" onclick="loadData()">↻ Обновить</button>
           </div>
@@ -1099,10 +1273,100 @@
       let rows = [],
         curMgr = 'all',
         showArchived = false,
+        onlyProblem = false,
         _prompt = '',
         _genLink = ''
+      const reportFilters = {
+        from: '',
+        to: '',
+        industry: '',
+        segment: '',
+        deploy: '',
+      }
 
-      // ── Manager registry (stored in localStorage) ────────────────────────────
+      function getVisibleRows() {
+        return rows.filter((row) => {
+          if (curMgr !== 'all' && row.mgr !== curMgr) return false
+          if (onlyProblem && row.priority !== 'Высокий') return false
+          const created = row.createdAt ? new Date(row.createdAt) : null
+          if (
+            reportFilters.from &&
+            (!created || created < new Date(reportFilters.from + 'T00:00:00'))
+          )
+            return false
+          if (
+            reportFilters.to &&
+            (!created || created > new Date(reportFilters.to + 'T23:59:59'))
+          )
+            return false
+          if (reportFilters.industry && row.industry !== reportFilters.industry)
+            return false
+          if (reportFilters.segment && row.segment !== reportFilters.segment)
+            return false
+          if (reportFilters.deploy && row.deploy !== reportFilters.deploy)
+            return false
+          return true
+        })
+      }
+
+      function setFilterOptions(id, values, emptyLabel) {
+        const select = document.getElementById(id)
+        const current = select.value
+        const options = [
+          ...new Set(
+            values.map((value) => String(value || '').trim()).filter(Boolean)
+          ),
+        ].sort()
+        select.innerHTML = `<option value="">${emptyLabel}</option>${options.map((value) => `<option value="${value}">${value}</option>`).join('')}`
+        select.value = options.includes(current) ? current : ''
+      }
+
+      function populateFilters() {
+        setFilterOptions(
+          'filter-industry',
+          rows.map((row) => row.industry),
+          'Все отрасли'
+        )
+        setFilterOptions(
+          'filter-segment',
+          rows.map((row) => row.segment),
+          'Все сегменты'
+        )
+        setFilterOptions(
+          'filter-deploy',
+          rows.map((row) => row.deploy),
+          'Все варианты'
+        )
+      }
+
+      function resetFilters() {
+        Object.keys(reportFilters).forEach((key) => {
+          reportFilters[key] = ''
+        })
+        document
+          .querySelectorAll(
+            '#filter-from, #filter-to, #filter-industry, #filter-segment, #filter-deploy'
+          )
+          .forEach((el) => {
+            el.value = ''
+          })
+        render()
+        updateStats()
+      }
+
+      document
+        .querySelectorAll(
+          '#filter-from, #filter-to, #filter-industry, #filter-segment, #filter-deploy'
+        )
+        .forEach((input) => {
+          input.addEventListener('change', () => {
+            reportFilters[input.id.replace('filter-', '')] = input.value
+            render()
+            updateStats()
+          })
+        })
+
+      // ── Manager registry (loaded from the server) ───────────────────────────
       const DEFAULT_MANAGERS = [
         {
           id: 'n.omarov',
@@ -1121,17 +1385,10 @@
       ]
 
       function loadManagers() {
-        try {
-          const saved = localStorage.getItem('dg_managers')
-          return saved ? JSON.parse(saved) : DEFAULT_MANAGERS
-        } catch {
-          return DEFAULT_MANAGERS
-        }
+        return DEFAULT_MANAGERS
       }
       function saveManagers(mgrs) {
-        try {
-          localStorage.setItem('dg_managers', JSON.stringify(mgrs))
-        } catch {}
+        managers = mgrs
       }
 
       let managers = loadManagers()
@@ -1155,7 +1412,6 @@
               if (!managers.some((local) => local.id === server.id))
                 managers.push(server)
             })
-            saveManagers(managers)
             renderManagers()
           }
         } catch (e) {
@@ -1520,6 +1776,7 @@
           const json = await res.json()
           if (!res.ok) throw new Error(json.error || 'API error ' + res.status)
           rows = json.rows || []
+          populateFilters()
           render()
           updateStats()
         } catch (e) {
@@ -1543,6 +1800,23 @@
         return 'b-def'
       }
 
+      function priorityBadge(row) {
+        if (!row.priority)
+          return '<span class="badge b-def" style="opacity:.6">—</span>'
+        const cls =
+          row.priority === 'Высокий'
+            ? 'p-hi'
+            : row.priority === 'Средний'
+              ? 'p-med'
+              : 'p-low'
+        const daysLabel =
+          row.days === null || row.days === undefined
+            ? ''
+            : ` · ${row.days} дн.`
+        const action = (row.nextAction || '').replace(/"/g, '&quot;')
+        return `<span class="badge ${cls}" title="${action}">${row.priority}${daysLabel}</span>`
+      }
+
       function statusClass(s) {
         if (s === 'Новое') return 's-new'
         if (s === 'КП в работе') return 's-wip'
@@ -1553,8 +1827,7 @@
       }
 
       function render() {
-        const list =
-          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        const list = getVisibleRows()
         if (!list.length) {
           document.getElementById('tbl-c').innerHTML =
             '<div class="empty"><div class="ico">📭</div>Анкет пока нет</div>'
@@ -1570,7 +1843,7 @@
         ]
         let h = `<table><thead><tr>
     <th>Дата</th><th>Компания</th><th>Менеджер</th>
-    <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Статус</th><th></th>
+    <th>N_full</th><th>Deploy</th><th>Бюджет</th><th>Статус</th><th>Приоритет</th><th></th>
   </tr></thead><tbody>`
         list.forEach((r, i) => {
           const opts = STATUSES.map(
@@ -1589,6 +1862,7 @@
           onchange="updateStatus('${r.id}', this.value, this, ${i})">${opts}
         </select>
       </td>
+      <td>${priorityBadge(r)}</td>
       <td style="white-space:nowrap">
         <button class="btn blue" style="padding:6px 12px;font-size:12px" onclick="openModal(${i})">→ КП</button>
         ${showArchived ? '' : `<button class="btn sec" style="padding:6px 10px;font-size:12px;margin-left:4px" onclick="archiveRow('${r.id}', ${i})">В архив</button>`}
@@ -1600,8 +1874,7 @@
       }
 
       function exportExcel() {
-        const list =
-          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        const list = getVisibleRows()
         if (!list.length) {
           alert('Нет анкет для экспорта')
           return
@@ -1614,11 +1887,20 @@
           ['Отрасль', (r) => r.industry],
           ['Email', (r) => r.email],
           ['Менеджер', (r) => r.manager],
+          ['Сегмент', (r) => r.segment],
+          ['Источник', (r) => r.source],
+          ['Кампания', (r) => r.campaign],
           ['N_full', (r) => r.users],
           ['Бюджет', (r) => r.budget],
           ['Развёртывание', (r) => r.deploy],
           ['Срок заключения', (r) => r.deadline],
           ['Статус', (r) => r.status],
+          [
+            'Дней без движения',
+            (r) => (r.days === null || r.days === undefined ? '' : r.days),
+          ],
+          ['Приоритет', (r) => r.priority || ''],
+          ['Следующее действие', (r) => r.nextAction || ''],
           ['EB Email', (r) => r.ebEmail],
           ['EB Телефон', (r) => r.ebPhone],
           ['Маркетинг кейс', (r) => r.marketingCase],
@@ -1655,6 +1937,88 @@
         setTimeout(() => URL.revokeObjectURL(a.href), 1000)
       }
 
+      function buildPortfolioPrompt(list) {
+        const rowsText = list
+          .map(
+            (row, index) =>
+              `${index + 1}. Компания: ${row.company || '—'}
+Менеджер: ${row.manager || '—'}
+Отрасль: ${row.industry || '—'}
+Сегмент: ${row.segment || '—'}
+Пользователи: ${row.users || '—'}
+Бюджет: ${row.budget || '—'}
+Статус: ${row.status || '—'}
+Приоритет: ${row.priority || '—'}
+Дней без движения: ${row.days ?? '—'}
+Следующее действие: ${row.nextAction || '—'}
+Срок заключения: ${row.deadline || '—'}
+Источник: ${row.source || '—'}
+БИН: ${row.bin || '—'}`
+          )
+          .join('\n\n')
+
+        return `Ты — руководитель продаж и коммерческий аналитик Documentolog.
+
+Ниже приведён актуальный список компаний из воронки продаж. Проанализируй только эти данные. Не выдумывай факты. Если данных недостаточно, укажи это явно.
+
+ЦЕЛЬ
+Определи, на какие компании сделать основной акцент в ближайшие 7 дней, какие сделки находятся под угрозой и какие действия дадут наибольший коммерческий результат.
+
+ПРАВИЛА
+- «Высокий» приоритет требует срочного внимания.
+- Особо выделяй SLA, лиды без движения более 14 дней, КП старше 45 дней и бюджет «Согласован».
+- Учитывай количество пользователей, срок заключения и текущий статус.
+- Не считай потенциальную выручку без достаточных данных.
+
+ТРЕБУЕМЫЙ ОТВЕТ
+1. Краткий вывод для руководителя: 5–7 главных наблюдений.
+2. Топ-10 компаний для работы в порядке срочности и коммерческого потенциала.
+3. Лиды, с которыми нужно связаться сегодня.
+4. Сделки с риском потери и причина риска.
+5. Анализ по этапам: Новое, КП в работе, КП отправлено, Договор, Отказ, Архив.
+6. Компании с бюджетом «Согласован».
+7. Компании без движения более 14 и более 45 дней.
+8. Конкретный план действий менеджера на 5 рабочих дней.
+9. Какие лиды можно временно отложить.
+10. Какие данные необходимо уточнить у клиентов.
+
+Для каждой рекомендации указывай компанию, основание и конкретное следующее действие. Не используй общие фразы вроде «усилить работу».
+
+ДАННЫЕ ВОРОНКИ (${list.length} записей)
+
+${rowsText}`
+      }
+
+      async function copyPortfolioPrompt(button) {
+        const list = getVisibleRows()
+        if (!list.length) {
+          alert('Нет компаний для формирования общего промпта')
+          return
+        }
+        const prompt = buildPortfolioPrompt(list)
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(prompt)
+          } else {
+            const textarea = document.createElement('textarea')
+            textarea.value = prompt
+            textarea.style.position = 'fixed'
+            textarea.style.opacity = '0'
+            document.body.appendChild(textarea)
+            textarea.focus()
+            textarea.select()
+            const copied = document.execCommand('copy')
+            document.body.removeChild(textarea)
+            if (!copied) throw new Error('Clipboard copy failed')
+          }
+          const originalText = button.textContent
+          button.textContent = '✓ Промпт скопирован'
+          setTimeout(() => (button.textContent = originalText), 1800)
+        } catch {
+          alert('Не удалось скопировать промпт')
+        }
+      }
+
       async function archiveRow(recordId, idx) {
         if (!confirm('Переместить анкету в архив?')) return
         try {
@@ -1666,7 +2030,8 @@
           const data = await res.json()
           if (!res.ok || !data.ok)
             throw new Error(data.error || 'Ошибка архивации')
-          rows.splice(idx, 1)
+          const globalIdx = rows.indexOf(getVisibleRows()[idx])
+          if (globalIdx !== -1) rows.splice(globalIdx, 1)
           render()
           updateStats()
         } catch (e) {
@@ -1685,6 +2050,16 @@
         loadData()
       }
 
+      function toggleProblem() {
+        onlyProblem = !onlyProblem
+        const button = document.getElementById('problem-toggle')
+        button.style.background = onlyProblem ? '#FFEBEE' : ''
+        button.style.color = onlyProblem ? '#C62828' : ''
+        button.style.borderColor = onlyProblem ? '#FFCDD2' : ''
+        render()
+        updateStats()
+      }
+
       async function updateStatus(recordId, newStatus, selectEl, idx) {
         const oldCls = selectEl.className
         selectEl.disabled = true
@@ -1698,8 +2073,7 @@
           const data = await res.json()
           if (data.ok) {
             // Update local data
-            const list =
-              curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+            const list = getVisibleRows()
             const globalIdx = rows.indexOf(list[idx])
             if (globalIdx !== -1) rows[globalIdx].status = newStatus
             // Update select style
@@ -1718,9 +2092,20 @@
         }
       }
 
+      function renderBreakdown(targetId, values) {
+        const target = document.getElementById(targetId)
+        target.innerHTML = values.size
+          ? [...values]
+              .map(
+                ([label, count]) =>
+                  `<span class="analytics-item"><span>${label}</span><strong>${count}</strong></span>`
+              )
+              .join('')
+          : '<span class="analytics-item">Нет данных</span>'
+      }
+
       function updateStats() {
-        const list =
-          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        const list = getVisibleRows()
         const formatNumber = (value) =>
           new Intl.NumberFormat('ru-RU').format(value)
         const users = list.reduce(
@@ -1741,18 +2126,6 @@
           deployments.set(deploy, (deployments.get(deploy) || 0) + 1)
           statuses.set(status, (statuses.get(status) || 0) + 1)
         })
-        const renderBreakdown = (targetId, values) => {
-          const target = document.getElementById(targetId)
-          target.innerHTML = values.size
-            ? [...values]
-                .map(
-                  ([label, count]) =>
-                    `<span class="analytics-item"><span>${label}</span><strong>${count}</strong></span>`
-                )
-                .join('')
-            : '<span class="analytics-item">Нет данных</span>'
-        }
-
         document.getElementById('st-companies').textContent = formatNumber(
           new Set(list.map((row) => row.company).filter(Boolean)).size
         )
@@ -1760,19 +2133,118 @@
         document.getElementById('st-revenue').textContent = formatNumber(
           users * 6490 * 12
         )
+        const active = list.filter(
+          (row) => !['Договор', 'Отказ', 'Архив'].includes(row.status)
+        )
+        const overdue = active.filter((row) => {
+          const deadline = parseReportDate(row.deadline)
+          return deadline && deadline < new Date()
+        }).length
+        const deals = list.filter((row) => row.status === 'Договор').length
+        document.getElementById('st-new').textContent = formatNumber(
+          list.filter((row) => row.status === 'Новое').length
+        )
+        document.getElementById('st-overdue').textContent =
+          formatNumber(overdue)
+        document.getElementById('st-problem').textContent = formatNumber(
+          list.filter((row) => row.priority === 'Высокий').length
+        )
+        document.getElementById('st-conversion').textContent = list.length
+          ? Math.round((deals / list.length) * 100) + '%'
+          : '0%'
         renderBreakdown('analytics-deploy', deployments)
         renderBreakdown('analytics-status', statuses)
+        renderAdvancedAnalytics(list)
+      }
+
+      function parseReportDate(value) {
+        if (!value || value === '—') return null
+        const raw = String(value).trim()
+        const ru = raw.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/)
+        const date = ru
+          ? new Date(`${ru[3]}-${ru[2]}-${ru[1]}T23:59:59`)
+          : new Date(raw)
+        return Number.isNaN(date.getTime()) ? null : date
+      }
+
+      function renderAdvancedAnalytics(list) {
+        const stages = ['Новое', 'КП в работе', 'КП отправлено', 'Договор']
+        const counts = stages.map(
+          (status) => list.filter((row) => row.status === status).length
+        )
+        const firstCount = list.length || 0
+        document.getElementById('analytics-funnel').innerHTML = stages
+          .map((stage, index) => {
+            const count = counts[index]
+            const ratio = firstCount
+              ? Math.round((count / firstCount) * 100)
+              : 0
+            return `<div class="funnel-row"><span>${stage}</span><div class="funnel-bar"><span style="width:${ratio}%"></span></div><strong>${count}</strong></div>`
+          })
+          .join('')
+
+        const managerMap = new Map()
+        list.forEach((row) => {
+          const name = row.manager || 'Не указан'
+          const item = managerMap.get(name) || {
+            total: 0,
+            deals: 0,
+            refusals: 0,
+          }
+          item.total++
+          if (row.status === 'Договор') item.deals++
+          if (row.status === 'Отказ') item.refusals++
+          managerMap.set(name, item)
+        })
+        document.getElementById('analytics-managers').innerHTML =
+          managerMap.size
+            ? `<table class="report-table"><thead><tr><th>Менеджер</th><th>Заявки</th><th>Договоры</th><th>Конв.</th></tr></thead><tbody>${[...managerMap].map(([name, item]) => `<tr><td>${name}</td><td>${item.total}</td><td>${item.deals}</td><td>${Math.round((item.deals / item.total) * 100)}%</td></tr>`).join('')}</tbody></table>`
+            : '<span class="analytics-item">Нет данных</span>'
+
+        const sourceMap = new Map()
+        list.forEach((row) => {
+          const source = row.source || 'Не указан'
+          sourceMap.set(source, (sourceMap.get(source) || 0) + 1)
+        })
+        const refusals = list.filter((row) => row.status === 'Отказ').length
+        sourceMap.set('Отказы', refusals)
+        renderBreakdown('analytics-sources', sourceMap)
+
+        const transitions = new Map()
+        list.forEach((row) => {
+          const history = Array.isArray(row.statusHistory)
+            ? row.statusHistory
+            : []
+          history.slice(1).forEach((entry, index) => {
+            const previous = history[index]
+            const elapsed = new Date(entry.at) - new Date(previous.at)
+            if (!Number.isNaN(elapsed) && elapsed >= 0) {
+              const key = `${previous.status} → ${entry.status}`
+              const value = transitions.get(key) || { total: 0, count: 0 }
+              value.total += elapsed
+              value.count++
+              transitions.set(key, value)
+            }
+          })
+        })
+        const timing = new Map(
+          [...transitions].map(([key, value]) => [
+            key,
+            `${Math.round((value.total / value.count / 86400000) * 10) / 10} дн.`,
+          ])
+        )
+        renderBreakdown('analytics-timing', timing)
       }
 
       function openModal(i) {
-        const list =
-          curMgr === 'all' ? rows : rows.filter((r) => r.mgr === curMgr)
+        const list = getVisibleRows()
         const r = list[i]
         if (!r) return
         _prompt = r.prompt || ''
         document.getElementById('m-title').textContent = r.company
         document.getElementById('m-code').textContent = _prompt
         document.getElementById('m-detail').innerHTML = `
+      <div class="det"><div class="lbl">ID заявки</div><div class="val">${r.applicationId || r.id}</div></div>
     <div class="det"><div class="lbl">Менеджер</div><div class="val">${r.manager}</div></div>
     <div class="det"><div class="lbl">Отрасль</div><div class="val">${r.industry || '—'}</div></div>
     <div class="det"><div class="lbl">Пользователей</div><div class="val">${r.users} чел.</div></div>

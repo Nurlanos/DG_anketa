@@ -66,15 +66,20 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
       const managerId = String(req.body?.managerId || '').trim()
-      const managerRecord = records.find((record) => record.fields?.manager_id === managerId)
-      if (!managerRecord) return res.status(404).json({ error: 'Менеджер не найден' })
+      const managerRecord = records.find(
+        (record) => record.fields?.manager_id === managerId
+      )
+      if (!managerRecord)
+        return res.status(404).json({ error: 'Менеджер не найден' })
 
       const userRecords = await (async () => {
         const params = new globalThis.URLSearchParams({
           filterByFormula: `{Компания}='__DG_USER_CONFIG__'`,
           pageSize: '100',
         })
-        const response = await fetch(getAirtableUrl(`?${params}`), { headers: headers(token) })
+        const response = await fetch(getAirtableUrl(`?${params}`), {
+          headers: headers(token),
+        })
         if (!response.ok) throw new Error((await response.text()).slice(0, 500))
         return (await response.json()).records || []
       })()
@@ -88,7 +93,9 @@ export default async function handler(req, res) {
         headers: headers(token),
       })
       if (!response.ok) throw new Error((await response.text()).slice(0, 500))
-      await Promise.all(linkedUsers.map((record) => deleteDashboardUser(record.id)))
+      await Promise.all(
+        linkedUsers.map((record) => deleteDashboardUser(record.id))
+      )
       return res.status(200).json({ ok: true })
     }
 

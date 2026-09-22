@@ -69,6 +69,8 @@ function normalizeAirtableUser(record) {
     mustChangePassword: metadata.mustChangePassword === true,
     inviteHash: metadata.inviteHash || '',
     inviteExpires: Number(metadata.inviteExpires || 0),
+    resetHash: metadata.resetHash || '',
+    resetExpires: Number(metadata.resetExpires || 0),
   }
 }
 
@@ -121,7 +123,13 @@ export async function deleteDashboardUser(recordId) {
   if (!response.ok) throw new Error((await response.text()).slice(0, 500))
 }
 
-import { createHash, createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
+import {
+  createHash,
+  createHmac,
+  randomBytes,
+  scrypt,
+  timingSafeEqual,
+} from 'node:crypto'
 import { promisify } from 'node:util'
 
 const scryptAsync = promisify(scrypt)
@@ -152,9 +160,11 @@ function readSession(req) {
   const value = token.slice(0, separator)
   const signature = token.slice(separator + 1)
   const expected = sign(value)
+  const signatureBuffer = Buffer.from(signature)
+  const expectedBuffer = Buffer.from(expected)
   if (
-    signature.length !== expected.length ||
-    !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+    signatureBuffer.length !== expectedBuffer.length ||
+    !timingSafeEqual(signatureBuffer, expectedBuffer)
   )
     return null
   try {
@@ -199,11 +209,42 @@ export function createInviteToken() {
 }
 
 export function hashInviteToken(token) {
-  return createHash('sha256').update(String(token || '')).digest('base64url')
+  return createHash('sha256')
+    .update(String(token || ''))
+    .digest('base64url')
+}
+
+export function createPasswordResetToken(email) {
+  const value = Buffer.from(
+    JSON.stringify({ email, exp: Math.floor(Date.now() / 1000) + 60 * 60 })
+  ).toString('base64url')
+  return `${value}.${sign(value)}`
+}
+
+export function readPasswordResetToken(token) {
+  const separator = String(token || '').lastIndexOf('.')
+  if (separator < 1 || !process.env.DASH_SESSION_SECRET) return null
+  const value = token.slice(0, separator)
+  const signature = token.slice(separator + 1)
+  const expected = sign(value)
+  if (
+    signature.length !== expected.length ||
+    !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+  )
+    return null
+  try {
+    const payload = JSON.parse(Buffer.from(value, 'base64url').toString('utf8'))
+    return payload.exp > Math.floor(Date.now() / 1000) ? payload : null
+  } catch {
+    return null
+  }
 }
 
 export function getAppUrl() {
-  return process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+  return (
+    process.env.APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+  )
 }
 
 export async function findDashboardUser(email) {

@@ -151,6 +151,9 @@ export default async function handler(req, res) {
       }
       await updateDashboardUser(recordId, {
         Примечания: JSON.stringify({
+          email: target.email,
+          name: target.name,
+          managerId: target.managerId,
           role: target.role,
           passwordHash: target.passwordHash,
           status: action === 'block' ? 'blocked' : 'active',
@@ -167,6 +170,9 @@ export default async function handler(req, res) {
         })
       await updateDashboardUser(recordId, {
         Примечания: JSON.stringify({
+          email: target.email,
+          name: target.name,
+          managerId: target.managerId,
           role: target.role,
           passwordHash: await hashPassword(password),
           status: target.status,
