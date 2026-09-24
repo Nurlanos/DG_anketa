@@ -66,11 +66,11 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
       const managerId = String(req.body?.managerId || '').trim()
+      if (!managerId)
+        return res.status(400).json({ error: 'Не указан ID менеджера' })
       const managerRecord = records.find(
         (record) => record.fields?.manager_id === managerId
       )
-      if (!managerRecord)
-        return res.status(404).json({ error: 'Менеджер не найден' })
 
       const userRecords = await (async () => {
         const params = new globalThis.URLSearchParams({
@@ -88,11 +88,13 @@ export default async function handler(req, res) {
         return metadata.managerId === managerId
       })
 
-      const response = await fetch(getAirtableUrl(`/${managerRecord.id}`), {
-        method: 'DELETE',
-        headers: headers(token),
-      })
-      if (!response.ok) throw new Error((await response.text()).slice(0, 500))
+      if (managerRecord) {
+        const response = await fetch(getAirtableUrl(`/${managerRecord.id}`), {
+          method: 'DELETE',
+          headers: headers(token),
+        })
+        if (!response.ok) throw new Error((await response.text()).slice(0, 500))
+      }
       await Promise.all(
         linkedUsers.map((record) => deleteDashboardUser(record.id))
       )
