@@ -1399,19 +1399,8 @@
         try {
           const response = await fetch('/api/managers')
           const data = await response.json()
-          if (
-            response.ok &&
-            Array.isArray(data.managers) &&
-            data.managers.length
-          ) {
-            managers = managers.map((local) => {
-              const server = data.managers.find((item) => item.id === local.id)
-              return server ? { ...local, ...server } : local
-            })
-            data.managers.forEach((server) => {
-              if (!managers.some((local) => local.id === server.id))
-                managers.push(server)
-            })
+          if (response.ok && Array.isArray(data.managers)) {
+            managers = data.managers
             renderManagers()
           }
         } catch (e) {
